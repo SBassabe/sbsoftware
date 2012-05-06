@@ -1,0 +1,4 @@
+occupancyMgr = function() {
+	
+	
+};
