@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      canvas {
+        border: 1px solid #9C9898;
+      }
+    </style>
+    <script src="./libraries/kinetic-v3.9.2.js"></script>
+    <script>
+      window.onload = function() {
+        var stage = new Kinetic.Stage({
+          container: "container",
+          width: 578,
+          height: 200
+        });
+
+        var layer = new Kinetic.Layer();
+
+        for (i=0 ; i<5; i++) {
+
+        	var circle = new Kinetic.Circle({
+                x: (stage.getWidth() / 2) + i*10,
+                y: stage.getHeight() / 2,
+                radius: 3,
+                fill: "red",
+                stroke: "black",
+                strokeWidth: 2,
+                draggable: true
+              });
+        	
+            // add the shape to the layer
+            layer.add(circle);
+        	
+        }
+
+        // add the layer to the stage
+        stage.add(layer);
+      };
+
+    </script>
+  </head>
+  <body>
+    <div id="container"></div>
+  </body>
+</html>

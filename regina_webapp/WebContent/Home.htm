@@ -6,6 +6,7 @@
 <style type="text/css">
 <!--
 @import url("./css/default.css");
+@import url("./css/smoothness/jquery-ui-1.8.20.custom.css");
 -->
 </style>
 <script src="./libraries/kinetic-v3.9.2.js"></script>
@@ -13,9 +14,23 @@
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
 <script src="./libraries/jquery-1.7.2.min.js"></script>
+<script src="./libraries/jquery-ui-1.8.20.custom.min.js"></script>
 <script>
 window.onload = function() {
-
+	
+	$( "#dialog" ).show();
+	$( "#dialog" ).dialog({
+			width: 330,
+			resizable: false,
+			minHeight: 60,
+			position: [70,125], 
+			show: { effect: 'drop', direction: "down" } ,
+			hide: { effect: 'drop', direction: "down" } ,
+		    title: "Informazione ...",
+		    autoOpen: false,
+		    close: function() {$("#infBtn").show();},
+		    open: function() {$("#infBtn").hide();}
+	});
 	//app = null;
 	//$('#container').innerHTML = "";
 	app = new applicationMgr();
@@ -26,7 +41,11 @@ window.onload = function() {
 </head>
 <body>
 <!-- 	<img src="./images/piano_rialzato_edificio_B_50.jpeg"/> -->
-    <div id="head"><img height="80px" src="./images/logo_regina_logistica_02.gif"></div>
+    
+    <div id="head">
+    	<img id="infBtn" alt="informazione" src="./images/info_03.png" onclick="app.canvasMgr.showDiag()">
+    	<img height="80px" src="./images/logo_regina_logistica_02.gif">
+    </div>
 	<div id="cont_border">
 		<div id="container"></div>
 	</div>
@@ -51,11 +70,28 @@ window.onload = function() {
 			<option value="03">Marzo</option>
 			<option value="04">Aprile</option>
 			<option value="05">Maggio</option>
+			<option value="06">Giugno</option>
+			<option value="07">Luglio</option>
+			<option value="08">Agosto</option>
+			<option value="09">Settembre</option>
+			<option value="10">Ottobre</option>
+			<option value="11">Novembre</option>
+			<option value="12">Dicembre</option>
 		</select>
 	</div>
 	<div class="selectors">
-		<input type="range" id="day" min="1" max="31" style="width: 443px" onchange="app.canvasMgr.selectorsChanged()"/>
+		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="app.canvasMgr.selectorsChanged()"/>
 	</div>
 	<div class="selectors"><div id="dayvalue">15</div></div>
+	<div style="display:block;" class="config">
+		<input value="pressMe" type="button" onclick="app.canvasMgr.clickMe()" style="vertical-align: top;"/>
+		<textarea rows="10" cols="50" id="area"></textarea> 
+	</div>
+		<div id="dialog" title="Basic dialog">
+		<div class="left">Piano:</div><div class="right" id="diagFloor"></div><br>
+		<div class="left">Letti per Piano:</div><div class="right" id="diagNumBeds">16</div><br>
+		<div class="left">Stanza:</div><div class="right" id="diagRoom">501</div><br>
+		<div class="left">Letto:</div><div class="right" id="diagBed">1</div><br>
+	</div>
 </body>
 </html>

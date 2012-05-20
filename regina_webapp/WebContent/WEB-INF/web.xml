@@ -15,6 +15,10 @@
     <display-name>FloorList</display-name>
     <servlet-name>FloorList</servlet-name>
     <servlet-class>it.sbsoft.servlets.FloorList</servlet-class>
+    <init-param>
+      <param-name>persistProperties</param-name>
+      <param-value>false</param-value> 
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>FloorList</servlet-name>

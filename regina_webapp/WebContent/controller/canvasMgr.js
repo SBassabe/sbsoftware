@@ -1,14 +1,23 @@
 canvasMgr = function(){
 
 	var currObj = this;
+	this.currFloor = "";
+
+	// we need 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
 		container : "container",
 		width : 1164,
 		height : 500
 	});
+
+	this.floorLyr = new Kinetic.Layer({id: "floorLyr"});
+	this.toolTipLyr = new Kinetic.Layer({id: "toolTipLyr"});
+	this.occLyr = new Kinetic.Layer({id: "occLyr"});
+	
+	// wd nedd a FloorArray a ToolTip and some icons
 	this.floorArr = new Array();
-	this.layers = new Array();
-	this.tt = "ttLyr";
+	//this.layers = new Array();
+	//this.tt = "ttLyr";
     this.tooltip = new Kinetic.Text({
         text: "",
         fontFamily: "Calibri",
@@ -24,25 +33,36 @@ canvasMgr = function(){
 	var fImgOcc = new Image();
 	var mImgPre = new Image();
 	var fImgPre = new Image();
-
+	var xImgLib = new Image();
+	
 	// start here
 	this.init = function() {
 
 		currObj.prepIcons();
-		currObj.createLayerForTooltip();
-		currObj.getFloorList(currObj.createLayersForFloors);
+		currObj.addAllLayersToStage();
+		currObj.getFloorList(currObj.createBuildingPulldown);
+		// initialize Selectors here if necessary.
 		currObj.selectorsChanged();
 	};
 	
-	// prepare icon images
 	this.prepIcons = function() {
 	
 		mImgOcc.src = "./images/male_occ_20.png";
 		fImgOcc.src = "./images/female_occ_20.png";
 		mImgPre.src = "./images/male_pre_20.png";
 		fImgPre.src = "./images/female_pre_20.png";
+		xImgLib.src = "./images/stanza_lib_20.png";
 	};
+
+	this.addAllLayersToStage = function() {
 		
+		currObj.stage.add(currObj.floorLyr);
+		currObj.toolTipLyr.add(currObj.tooltip);
+		currObj.stage.add(currObj.toolTipLyr);
+		currObj.stage.add(currObj.occLyr);
+		
+	};
+	
 	// get floor list from server and load array...
 	this.getFloorList = function(_callback) {
 		
@@ -65,17 +85,17 @@ canvasMgr = function(){
                 }
             });
             
-        } 
-        catch (e) {
+        } catch (e) {
             alert("ajax call error:" + e);
             return;
         }
-		
 	};
 	
 	this.getFloorListElab = function(transport, _callback) {
 		
 		if (transport.error == undefined) {
+			
+			var firstFloor="";
 			
 			for(var i=0; i<transport.ret2cli.length; i++) {	
 				
@@ -86,66 +106,16 @@ canvasMgr = function(){
 				floor.desc = flr.description;
 				floor.imgSrc = flr.imgSrc;
 				floor.floorMap = flr.floorMap;
-				currObj.floorArr[flr.id] = floor;				
+				currObj.floorArr[flr.id] = floor;
+				
+				if (i==0) firstFloor=flr.id;
 			}
 			
-			_callback(); //createLayersForFloors
+			_callback(firstFloor); //currObj.createBuildingPulldown
 			
 		} else {
 			alert("There has been an error. Please trace...");
 		};
-	};
-	
-	// create a single layer for every floor object in the floorArray
-	this.createLayersForFloors = function() {
-		
-		var buildId=0;
-		
-		for (obj in currObj.floorArr) {
-			
-			buildId = currObj.floorArr[obj].id;
-			lyrImg = new Kinetic.Layer({id: buildId});
-			imageObj = new Image();
-			
-			imageObj.src = currObj.floorArr[obj].imgSrc;
-
-				var image = new Kinetic.Image({
-					x : 0,
-					y : 20,
-					image : imageObj,
-					width : 1164,
-					height : 500,
-					name: currObj.floorArr[obj].desc
-				});
-				
-				if (true){
-					image.on("mousemove", function(){
-		                var mousePos = currObj.stage.getMousePosition();
-		                var txt = "x=" + mousePos.x + " y=" + mousePos.y;
-		                currObj.tooltip.setPosition(mousePos.x + 5, mousePos.y + 5);
-		                currObj.tooltip.setText(txt);
-		                currObj.tooltip.show();
-		                currObj.layers[currObj.tt].draw();
-		            });
-				}
-	            
-				lyrImg.add(image);
-				currObj.layers[buildId] = lyrImg;
-				currObj.stage.add(lyrImg);
-		}
-
-		currObj.createBuildingPulldown(buildId);
-		currObj.layers[buildId].moveToTop();
-
-	};
-	
-	// create a single layer for tool tip
-	this.createLayerForTooltip = function() {
-	
-		ttLayer = new Kinetic.Layer();
-		ttLayer.add(currObj.tooltip);
-		currObj.layers[currObj.tt] = ttLayer;
-		currObj.stage.add(ttLayer);
 	};
 	
 	// create pulldown with list of floors ...
@@ -162,77 +132,102 @@ canvasMgr = function(){
 		$('#building').val(buildId);
 	};
 	
-	//change floor
-	this.changeFloor = function(obj) {
-		
-		var floorId = obj.value;
-		currObj.layers[floorId].moveToTop();
-		
-	};
-	
-	//The idea is to create a new layer with id:'<buidingId>_<yyyymmdd>'
+	//The idea is to populate the occLayer
 	this.createOccLayer = function(buildingId, day) {
 		
-		var lyrId = buildingId + "_" + day;
+		currObj.occLyr.removeChildren();
 		
-		if (currObj.layers[lyrId] == undefined) {
-
-			currObj.layers[lyrId] = new Kinetic.Layer({id: lyrId});
-			
-			var image;
-			var xVal;
-			var yVal;
-			var zoomFact = 1.07;
+		var fMap = currObj.floorArr[buildingId].floorMap;
+		var oMap = currObj.floorArr[buildingId].occMap[day];
+		
+		for (mObj in fMap) {( function() {
+		//for (mObj in fMap) {
+		    
+			var cObj = currObj.floorArr[buildingId].getObj4Bed(oMap, fMap[mObj].bed);
+			var rom = fMap[mObj].room;
+			var bed = cObj.bed; 
 			var obj;
+			var zoomFact = 1;
 			
-			var fMap = currObj.floorArr[buildingId].floorMap;
-			var oMap = currObj.floorArr[buildingId].occMap[day];
-			
-			for (mObj in fMap) {
-			    
-				cObj = currObj.floorArr[buildingId].getObj4Bed(oMap, fMap[mObj].bed);
-				
-			 	if (cObj.gender == "M") {
-					obj = mImgOcc;
+			if (cObj.status == 0) {
+				obj = xImgLib;
+				bed = bed + " (libero)";
+			} else {
+				if (cObj.status == 1) {
+					bed = bed + " (occupato)";
+					if (cObj.gender == "M") {
+						obj = mImgOcc;
+					} else {
+						obj = fImgOcc;
+					};
 				} else {
-					obj = fImgPre;
-				};
-			    
-			    xVal = fMap[mObj].xVal;
-			    yVal = fMap[mObj].yVal;
-			    
-				image = new Kinetic.Image({
-						x : xVal*zoomFact,
-						y : yVal*zoomFact,
-						image : obj,
-						width : 20,
-						height : 20,
-						id: cObj.bed
-				});
-				
-	            image.on("mousemove", function(){
-	                var mousePos = currObj.stage.getMousePosition();
-	                var txt = "Letto: " + cObj.bed;
-	                currObj.tooltip.setPosition(mousePos.x + 5, mousePos.y + 5);
-	                currObj.tooltip.setText(txt);
-	                currObj.tooltip.show();
-	                currObj.layers[currObj.tt].draw();
-	            });
-	 
-	            image.on("mouseout", function(){
-	                currObj.tooltip.hide();
-	                currObj.layers[currObj.tt].draw();
-	            });
-	    	    //tooltipLayer.listen(false);
-				currObj.layers[lyrId].add(image);
-				//image = undefined;
+					bed = bed + " (prenotato)";
+					if (cObj.gender == "M") {
+						obj = mImgPre;
+					} else {
+						obj = fImgPre;
+					};					
+				} 	
 			};
-		};
-		//currObj.layers[lyrId].draw();
-		currObj.stage.add(currObj.layers[lyrId]);
-		currObj.showLayer4Day(buildingId, lyrId);
-		
-	};
+		    
+		    var xVal = fMap[mObj].xVal;
+		    var yVal = fMap[mObj].yVal;
+			var image = new Kinetic.Image({
+					x : xVal*zoomFact,
+					y : yVal*zoomFact,
+					image : obj,
+					width : 20,
+					height : 20,
+					draggable: true,
+					bed: cObj.bed,
+					codStanza: fMap[mObj].codStanza,
+					building: fMap[mObj].building,
+					room: fMap[mObj].room
+			});
+			
+            image.on("dragstart", function() {
+            	document.body.style.cursor = "pointer";
+                //layer.draw();
+            });
+            image.on("dragmove", function() {
+                document.body.style.cursor = "pointer";
+            });
+            image.on("mouseover", function(){
+            	document.body.style.cursor = "pointer";
+            });
+            image.on("mouseout", function() {
+                document.body.style.cursor = "default";              
+                $( "#diagRoom" ).html('---');
+                $( "#diagBed" ).html('---');
+            });
+			
+            image.on("mousemove", function(){
+                //var mousePos = currObj.stage.getMousePosition();
+                //var txt = " X=" + mousePos.x + " Y=" + mousePos.y;
+                //var txt = "Letto: " + cObj.bed +" Nome: " + cObj.name + " Cognome: " + cObj.surname;
+                //txt = txt + " Stanza: " + rom;
+                //currObj.tooltip.setPosition(mousePos.x, mousePos.y);
+                //currObj.tooltip.setText(txt);
+                //currObj.tooltip.show();
+                //currObj.toolTipLyr.draw();
+                //$( "#diagFloor" ).html(fMap[mObj].building);
+                $( "#diagRoom" ).html(rom);
+                $( "#diagBed" ).html(bed);
+            });
+ /*
+            image.on("mouseout", function(){
+                currObj.tooltip.hide();
+                currObj.toolTipLyr.draw();
+            });
+*/
+            currObj.occLyr.add(image);
+            //currObj.occLyr.draw();
+            //currObj.stage.draw();
+		}());
+	  }
+	  currObj.occLyr.draw();
+	  currObj.stage.draw();
+	};  
 	
 	// get occupancy for specific date and load array...
 	this.getFloorOcc4DateList = function(buildId, dt, _callback) {
@@ -275,7 +270,7 @@ canvasMgr = function(){
 			
 			ret = transport.ret2cli;
 			currObj.floorArr[ret.id].occMap[ret.dt] = ret.occMap;
-			_callback(ret.id, ret.dt);
+			_callback(ret.id, ret.dt); //currObj.createOccLayer
 			
 		} else {
 			alert("There has been an error. Please trace...");
@@ -299,14 +294,56 @@ canvasMgr = function(){
 		if (day.length == 1) day="0"+day;
 		var dt = year+month+day;
 		
-		var lyrId = buildId + "_" + dt;
-		
-		if (currObj.layers[lyrId] == undefined) {
+		if (this.currFloor != buildId) {
+			this.currFloor=buildId;
+			currObj.populateFloorLayer(buildId);	
+		}
+
+		if (currObj.floorArr[buildId].occMap[dt] == undefined ) {
 			currObj.getFloorOcc4DateList(buildId, dt, currObj.createOccLayer);
 		} else {
-			currObj.showLayer4Day(buildId, lyrId);
+			currObj.createOccLayer(buildId, dt);
 		}
-	};	
+		
+		currObj.toolTipLyr.moveToTop();
+	};
+	
+	this.populateFloorLayer = function(buildId) {
+
+		imageObj = new Image();
+		imageObj.onload = function() {
+			var image = new Kinetic.Image({
+				x : 0,
+				y : 20,
+				image : imageObj,
+				width : 1164,
+				height : 500,
+				name: currObj.floorArr[buildId].desc
+			});
+			$( "#diagFloor" ).html(currObj.floorArr[buildId].desc);
+            $( "#diagRoom" ).html('---');
+            $( "#diagBed" ).html('---');
+            $( "#diagNumBeds" ).html(currObj.floorArr[buildId].floorMap.length);
+			currObj.floorLyr.removeChildren();
+			currObj.floorLyr.add(image);
+			currObj.stage.draw();
+		};
+		imageObj.src = currObj.floorArr[buildId].imgSrc;
+		/*
+		image.on("mousemove", function(){
+            var mousePos = currObj.stage.getMousePosition();
+            var txt = "x=" + mousePos.x + " y=" + mousePos.y;
+            currObj.tooltip.setPosition(mousePos.x - 50, mousePos.y - 50);
+            currObj.tooltip.setText(txt);
+            currObj.tooltip.show();
+            currObj.toolTipLyr.draw();
+        });
+        image.on("mouseout", function(){
+            currObj.tooltip.hide();
+            currObj.toolTipLyr.draw();
+        });
+		*/
+	};
 	
 	this.showLayer4Day = function(buildId, bday) {
 		
@@ -314,5 +351,31 @@ canvasMgr = function(){
 		currObj.layers[bday].moveToTop();
 		currObj.layers[currObj.tt].moveToTop();
 		
-	};	
+	};
+	
+	this.clickMe = function() {
+
+		// I need: //CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y,
+		var txt="";
+		for (obj in currObj.occLyr.getChildren()) {
+
+			
+			posObj=currObj.occLyr.children[obj].getPosition();
+			//txt= txt+"id:"+currObj.occLyr.children[obj]._id+" X="+posObj.x+" Y="+posObj.y+"\n";
+			
+			var X = posObj.x;
+			var Y = posObj.y;
+			var CODSTAN = currObj.occLyr.children[obj].getAttrs().codStanza;
+			var NUMSTANZA = currObj.occLyr.children[obj].getAttrs().room;
+			var CODLETTO = currObj.occLyr.children[obj].getAttrs().bed;
+			var IDSEDE = currObj.occLyr.children[obj].getAttrs().building;
+			txt = txt + CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y + ',';
+		};
+		$('#area').val(txt);
+	
+	};
+	
+	this.showDiag = function() {
+		$( "#dialog" ).dialog('open');
+	};
 };

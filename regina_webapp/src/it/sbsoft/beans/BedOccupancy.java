@@ -6,7 +6,14 @@ public class BedOccupancy {
 	private String name;
 	private String surname;
 	private String gender;
+	private String status;
 	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getBed() {
 		return bed;
 	}
