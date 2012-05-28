@@ -6,6 +6,8 @@ floorMgr = function(){
     this.imgSrc = null;
     this.floorMap = new Array();
     this.occMap = new Array();
+    this.featMap = new Array();
+    this.doctorMap = new Array();
 
     this.getObj4Bed = function(occArr, bed) {
     	

@@ -25,7 +25,11 @@ public final class dbExample
 	  
 	  try {
 		  
-		  String databaseURL = "jdbc:firebirdsql:localhost/3050:C:/FBDB/CBAOSPITIB.FDB";
+		  String db = "localhost/3050:C:/FBDB/CBAOSPITIB.FDB";		  
+		       db = "192.168.0.5/3050:C:/FBDB/CBAOSPITIB.FDB";
+		  
+		  //jdbc:subprotocol:subname
+		  String databaseURL = "jdbc:firebirdsql:"+db;
 		  String user = "sysdba";
 		  String password = "masterkey";
 		    

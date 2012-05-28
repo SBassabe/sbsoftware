@@ -34,6 +34,11 @@ canvasMgr = function(){
 	var mImgPre = new Image();
 	var fImgPre = new Image();
 	var xImgLib = new Image();
+	var featImgI = new Image();
+	var featImgA = new Image();
+	var featImgS = new Image();
+	var featImgT = new Image();
+	var featImgB = new Image();
 	
 	// start here
 	this.init = function() {
@@ -52,6 +57,11 @@ canvasMgr = function(){
 		mImgPre.src = "./images/male_pre_20.png";
 		fImgPre.src = "./images/female_pre_20.png";
 		xImgLib.src = "./images/stanza_lib_20.png";
+		featImgI.src ="./images/letter_I_blue.png";
+		featImgA.src ="./images/letter_A_blue.png";
+		featImgS.src ="./images/letter_S_blue.png";
+		featImgT.src ="./images/letter_T_blue.png";
+		featImgB.src ="./images/letter_B_blue.png";
 	};
 
 	this.addAllLayersToStage = function() {
@@ -106,6 +116,8 @@ canvasMgr = function(){
 				floor.desc = flr.description;
 				floor.imgSrc = flr.imgSrc;
 				floor.floorMap = flr.floorMap;
+				floor.featMap = flr.featureMap;
+				floor.doctorMap = flr.doctorMap;
 				currObj.floorArr[flr.id] = floor;
 				
 				if (i==0) firstFloor=flr.id;
@@ -294,9 +306,10 @@ canvasMgr = function(){
 		if (day.length == 1) day="0"+day;
 		var dt = year+month+day;
 		
+		// flag used to capture current floor change
 		if (this.currFloor != buildId) {
 			this.currFloor=buildId;
-			currObj.populateFloorLayer(buildId);	
+			currObj.populateFloorLayer(buildId);
 		}
 
 		if (currObj.floorArr[buildId].occMap[dt] == undefined ) {
@@ -310,6 +323,7 @@ canvasMgr = function(){
 	
 	this.populateFloorLayer = function(buildId) {
 
+		// Floor Image
 		imageObj = new Image();
 		imageObj.onload = function() {
 			var image = new Kinetic.Image({
@@ -327,22 +341,110 @@ canvasMgr = function(){
 			currObj.floorLyr.removeChildren();
 			currObj.floorLyr.add(image);
 			currObj.stage.draw();
+
+			// Doctor info
+			currObj.getDoctorInfo(buildId);
+			// Floor features
+			currObj.getFeatureInfo(buildId);
+		
 		};
 		imageObj.src = currObj.floorArr[buildId].imgSrc;
-		/*
-		image.on("mousemove", function(){
-            var mousePos = currObj.stage.getMousePosition();
-            var txt = "x=" + mousePos.x + " y=" + mousePos.y;
-            currObj.tooltip.setPosition(mousePos.x - 50, mousePos.y - 50);
-            currObj.tooltip.setText(txt);
-            currObj.tooltip.show();
-            currObj.toolTipLyr.draw();
-        });
-        image.on("mouseout", function(){
-            currObj.tooltip.hide();
-            currObj.toolTipLyr.draw();
-        });
-		*/
+		currObj.stage.draw();
+
+	};
+	
+	this.getDoctorInfo = function(buildId) {
+		
+		// Doctor info
+		for (f in currObj.floorArr[buildId].doctorMap) {( function() {
+			
+			var dObj = currObj.floorArr[buildId].doctorMap[f];
+			//var polyPnts = "[" + dObj.polyPoints + "]";
+			var polyPnts = dObj.polyPoints.split(",");
+ 			
+			var poly2 = new Kinetic.Polygon({
+			        points: polyPnts,
+			        fill: "#00D2F0",
+			        alpha: 0.2,
+			        stroke: "#00D2F0",
+			        strokeWidth: 0
+		    });
+		        
+			currObj.floorLyr.add(poly2);
+			currObj.floorLyr.draw();
+			currObj.stage.draw();
+			
+			}());
+		};		
+	};
+	
+	this.getFeatureInfo = function(buildId) {
+		
+		var i=1;
+		for (f in currObj.floorArr[buildId].featMap) {( function() {
+			    //i++;
+				var fObj = currObj.floorArr[buildId].featMap[f];
+				var obj;
+				var rom = fObj.room;
+				var romDesc = rom+"["+ fObj.featDesc + "]";
+				var featType = fObj.featType;
+				
+				// I;Infermeria,A;Studio Medico,S;Soggiorno Cucinino,T;Vano Tecnico,B;Bagno"
+				switch (featType)
+				{
+				  case "I":
+					  obj=featImgI;
+					  break;
+				  case "A":
+					  obj=featImgA;
+					  break;
+				  case "S":
+					  obj=featImgS;
+					  break;
+				  case "T":
+				      obj=featImgT;
+				  	  break;
+				  default:
+				      obj=featImgB;
+				};
+				
+				xVal = fObj.xVal*i;
+				yVal = fObj.yVal*i;
+
+				var image = new Kinetic.Image({
+					x : xVal,
+					y : yVal,
+					image : obj,
+					width : 20,
+					height : 20,
+					featType : featType,
+					room : rom,
+					draggable: true
+				});
+				
+				image.on("dragstart", function() {
+	            	document.body.style.cursor = "pointer";
+	            });
+	            image.on("dragmove", function() {
+	                document.body.style.cursor = "pointer";
+	            });
+	            image.on("mouseover", function(){
+	            	document.body.style.cursor = "pointer";
+	            });
+	            image.on("mouseout", function() {
+	                document.body.style.cursor = "default";
+	                $( "#diagRoom" ).html('---');
+	            });
+	            image.on("mousemove", function(){
+	                $( "#diagRoom" ).html(romDesc);
+	            });
+				
+				currObj.floorLyr.add(image);
+				currObj.floorLyr.draw();
+				currObj.stage.draw();
+			}());
+		};
+
 	};
 	
 	this.showLayer4Day = function(buildId, bday) {
@@ -371,6 +473,26 @@ canvasMgr = function(){
 			var IDSEDE = currObj.occLyr.children[obj].getAttrs().building;
 			txt = txt + CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y + ',';
 		};
+		
+		txt = txt + "\n\n[FloorFeatures for '" + this.currFloor  + "' floor]" ;
+		
+		for (obj in currObj.floorLyr.getChildren()) {
+
+			var type = currObj.floorLyr.children[obj].getAttrs().featType;
+			if (type == undefined) continue;
+			
+			posObj=currObj.floorLyr.children[obj].getPosition();
+			//txt= txt+"id:"+currObj.occLyr.children[obj]._id+" X="+posObj.x+" Y="+posObj.y+"\n";
+			//B1.floor_feat="I;509;10;10,S;515;11;11,T;508;12;12,B;500;13;13"
+			// type; room; x; y
+			
+			var type = currObj.floorLyr.children[obj].getAttrs().featType;
+			var room = currObj.floorLyr.children[obj].getAttrs().room;	
+			var X = posObj.x;
+			var Y = posObj.y;
+			txt = txt + type +';'+ room +';'+ X +';'+ Y + ',';
+		};
+		
 		$('#area').val(txt);
 	
 	};

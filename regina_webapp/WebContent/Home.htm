@@ -9,7 +9,7 @@
 @import url("./css/smoothness/jquery-ui-1.8.20.custom.css");
 -->
 </style>
-<script src="./libraries/kinetic-v3.9.2.js"></script>
+<script src="./libraries/kinetic-v3.9.5.js"></script>
 <script type="text/javascript" src="controller/application.js"></script>
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
@@ -79,10 +79,10 @@ window.onload = function() {
 			<option value="12">Dicembre</option>
 		</select>
 	</div>
+	<div class="selectors"><div id="dayvalue">15</div></div>
 	<div class="selectors">
 		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="app.canvasMgr.selectorsChanged()"/>
 	</div>
-	<div class="selectors"><div id="dayvalue">15</div></div>
 	<div style="display:block;" class="config">
 		<input value="pressMe" type="button" onclick="app.canvasMgr.clickMe()" style="vertical-align: top;"/>
 		<textarea rows="10" cols="50" id="area"></textarea> 

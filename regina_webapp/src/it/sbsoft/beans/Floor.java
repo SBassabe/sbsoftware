@@ -11,6 +11,8 @@ public class Floor {
 	// map context
 	private String imgSrc;
 	private List<FloorMap> floorMap;
+	private List<FeatureMap> featureMap;
+	private List<DoctorMap> doctorMap;
 	
 	// occupancy context
 	private String dt; // <yyyymmdd>
@@ -40,6 +42,12 @@ public class Floor {
 	public void setFloorMap(List<FloorMap> floorMap) {
 		this.floorMap = floorMap;
 	}
+	public List<FeatureMap> getFeatureMap() {
+		return featureMap;
+	}
+	public void setFeatureMap(List<FeatureMap> featureMap) {
+		this.featureMap = featureMap;
+	}
 	public String getDt() {
 		return dt;
 	}
@@ -51,5 +59,11 @@ public class Floor {
 	}
 	public void setOccMap(List<BedOccupancy> occMap) {
 		this.occMap = occMap;
+	}
+	public List<DoctorMap> getDoctorMap() {
+		return doctorMap;
+	}
+	public void setDoctorMap(List<DoctorMap> doctorMap) {
+		this.doctorMap = doctorMap;
 	}
 }

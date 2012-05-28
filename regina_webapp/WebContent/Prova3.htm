@@ -9,15 +9,22 @@
       canvas {
         border: 1px solid #9C9898;
       }
+      #container {
+        background-image: url('./images/EDIFICIO_A_PIANO_PRIMO.jpg');
+        width: 1164px;
+        height: 500px;
+      }
     </style>
     <script src="./libraries/kinetic-v3.9.5.js"></script>
     <script>
       function updateDottedLines(layer) {
         var q = layer.quad;
         var b = layer.bezier;
+        var c = layer.poly;
 
         var quadLine = layer.get('#quadLine')[0];
         var bezierLine = layer.get('#bezierLine')[0];
+        var polyLine = layer.get('#polyLine')[0];
 
         quadLine.setPoints([
           q.start.attrs.x, q.start.attrs.y, 
@@ -32,6 +39,15 @@
           b.control3.attrs.x, b.control3.attrs.y,
           b.control4.attrs.x, b.control4.attrs.y,
           b.end.attrs.x, b.end.attrs.y
+        ]);
+        
+        polyLine.setPoints([
+          c.start.attrs.x, c.start.attrs.y, 
+          c.control1.attrs.x, c.control1.attrs.y, 
+          c.control2.attrs.x, c.control2.attrs.y,
+          c.control3.attrs.x, c.control3.attrs.y,
+          c.control4.attrs.x, c.control4.attrs.y,
+          c.end.attrs.x, c.end.attrs.y
         ]);
       }
       function buildAnchor(layer, x, y, anchor) {
@@ -90,8 +106,8 @@
       window.onload = function() {
         var stage = new Kinetic.Stage({
           container: "container",
-          width: 578,
-          height: 200
+          width: 1164,
+          height: 500
         });
 
         var layer = new Kinetic.Layer({
@@ -116,10 +132,20 @@
           alpha: 0.3
         });
 
+        var poly = new Kinetic.Polygon({
+	        //points: [73, 192, 73, 160, 340, 23, 500, 109, 499, 139, 342, 93],
+	        fill: "#00D2FF",
+	        alpha: 0.3,
+	        stroke: "black",
+	        strokeWidth: 3,
+	        id: "polyLine"
+        });
+        
         // add dotted line connectors
         layer.add(quadLine);
         layer.add(bezierLine);
-
+        layer.add(poly);
+       
         /*
          * update the dotted line points before
          * drawing the layer
@@ -145,7 +171,16 @@
           control4: buildAnchor(layer, 220, 150),
           end: buildAnchor(layer, 300, 150)
         };
-
+        //[73, 192,   73, 160,   340, 23,   500, 109,   499, 139,   342, 93]
+        layer.poly = {
+          start: buildAnchor(layer, 73, 192),
+          control1: buildAnchor(layer, 73, 160),
+          control2: buildAnchor(layer, 340, 23),
+          control3: buildAnchor(layer, 500, 109),
+          control4: buildAnchor(layer, 499, 139),
+          end: buildAnchor(layer, 342, 93)
+        };
+        
         stage.on("mouseout", function() {
           layer.draw();
         });
