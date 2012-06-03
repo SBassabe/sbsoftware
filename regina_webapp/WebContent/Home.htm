@@ -10,11 +10,11 @@
 -->
 </style>
 <script src="./libraries/kinetic-v3.9.5.js"></script>
-<script type="text/javascript" src="controller/application.js"></script>
-<script type="text/javascript" src="controller/canvasMgr.js"></script>
-<script type="text/javascript" src="controller/floorMgr.js"></script>
 <script src="./libraries/jquery-1.7.2.min.js"></script>
 <script src="./libraries/jquery-ui-1.8.20.custom.min.js"></script>
+<script type="text/javascript" src="controller/canvasMgr.js"></script>
+<script type="text/javascript" src="controller/floorMgr.js"></script>
+<script type="text/javascript" src="controller/maintMgr.js"></script>
 <script>
 window.onload = function() {
 	
@@ -33,8 +33,10 @@ window.onload = function() {
 	});
 	//app = null;
 	//$('#container').innerHTML = "";
-	app = new applicationMgr();
-	app.start();
+	canvasMgr = new canvasMgr();
+	canvasMgr.init();
+	//app = new applicationMgr();
+	//app.start();
 	
 };
 </script>
@@ -43,7 +45,7 @@ window.onload = function() {
 <!-- 	<img src="./images/piano_rialzato_edificio_B_50.jpeg"/> -->
     
     <div id="head">
-    	<img id="infBtn" alt="informazione" src="./images/info_03.png" onclick="app.canvasMgr.showDiag()">
+    	<img id="infBtn" alt="informazione" src="./images/info_03.png" onclick="canvasMgr.showDiag()">
     	<img height="80px" src="./images/logo_regina_logistica_02.gif">
     </div>
 	<div id="cont_border">
@@ -51,12 +53,12 @@ window.onload = function() {
 	</div>
 	<div class="selectors" style="float: left; width: 250px">
 		<label>Edificio</label>
-		<select id="building" style="width: 200px;" onchange="app.canvasMgr.selectorsChanged()">
+		<select id="building" style="width: 200px;" onchange="canvasMgr.selectorsChanged()">
 		</select>
 	</div>
 	<div class="selectors" style="float: left">
 		<label>Anno</label>
-		<select id="year" onchange="app.canvasMgr.selectorsChanged()">
+		<select id="year" onchange="canvasMgr.selectorsChanged()">
 			<option value="2011">2011</option>
 			<option value="2012">2012</option>
 			<option value="2013">2013</option>
@@ -64,7 +66,7 @@ window.onload = function() {
 	</div>
 	<div class="selectors">
 		<label>Mese</label> 
-		<select id="month" onchange="app.canvasMgr.selectorsChanged()">
+		<select id="month" onchange="canvasMgr.selectorsChanged()">
 			<option value="01">Gennaio</option>
 			<option value="02">Febbraio</option>
 			<option value="03">Marzo</option>
@@ -81,10 +83,10 @@ window.onload = function() {
 	</div>
 	<div class="selectors"><div id="dayvalue">15</div></div>
 	<div class="selectors">
-		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="app.canvasMgr.selectorsChanged()"/>
+		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/>
 	</div>
 	<div style="display:block;" class="config">
-		<input value="pressMe" type="button" onclick="app.canvasMgr.clickMe()" style="vertical-align: top;"/>
+		<input value="pressMe" type="button" onclick="canvasMgr.clickMe()" style="vertical-align: top;"/>
 		<textarea rows="10" cols="50" id="area"></textarea> 
 	</div>
 		<div id="dialog" title="Basic dialog">

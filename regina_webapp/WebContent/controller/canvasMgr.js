@@ -1,23 +1,27 @@
 canvasMgr = function(){
 
+	console.log("canvasMgr obj created ...");
 	var currObj = this;
 	this.currFloor = "";
+	this.maintMode = true;
+	this.maintMgr;
+	
+	if (currObj.maintMode) {
+		currObj.maintMgr = new maintMgr();
+	}
 
-	// we need 1 stage and 3 layers
+	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
 		container : "container",
 		width : 1164,
 		height : 500
 	});
-
 	this.floorLyr = new Kinetic.Layer({id: "floorLyr"});
 	this.toolTipLyr = new Kinetic.Layer({id: "toolTipLyr"});
 	this.occLyr = new Kinetic.Layer({id: "occLyr"});
 	
-	// wd nedd a FloorArray a ToolTip and some icons
+	// Add a FloorArray a ToolTip and some icons
 	this.floorArr = new Array();
-	//this.layers = new Array();
-	//this.tt = "ttLyr";
     this.tooltip = new Kinetic.Text({
         text: "",
         fontFamily: "Calibri",
@@ -29,50 +33,46 @@ canvasMgr = function(){
         visible: false
     });
 
-	var mImgOcc = new Image();
-	var fImgOcc = new Image();
-	var mImgPre = new Image();
-	var fImgPre = new Image();
-	var xImgLib = new Image();
-	var featImgI = new Image();
-	var featImgA = new Image();
-	var featImgS = new Image();
-	var featImgT = new Image();
-	var featImgB = new Image();
+	this.mImgOcc = new Image();
+	this.fImgOcc = new Image();
+	this.mImgPre = new Image();
+	this.fImgPre = new Image();
+	this.xImgLib = new Image();
+	this.featImgI = new Image();
+	this.featImgA = new Image();
+	this.featImgS = new Image();
+	this.featImgT = new Image();
+	this.featImgB = new Image();
+	
+	this.mImgOcc.src = "./images/male_occ_20.png";
+	this.fImgOcc.src = "./images/female_occ_20.png";
+	this.mImgPre.src = "./images/male_pre_20.png";
+	this.fImgPre.src = "./images/female_pre_20.png";
+	this.xImgLib.src = "./images/stanza_lib_20.png";
+	this.featImgI.src ="./images/letter_I_blue.png";
+	this.featImgA.src ="./images/letter_A_blue.png";
+	this.featImgS.src ="./images/letter_S_blue.png";
+	this.featImgT.src ="./images/letter_T_blue.png";
+	this.featImgB.src ="./images/letter_B_blue.png";
 	
 	// start here
 	this.init = function() {
 
-		currObj.prepIcons();
-		currObj.addAllLayersToStage();
-		currObj.getFloorList(currObj.createBuildingPulldown);
-		// initialize Selectors here if necessary.
-		currObj.selectorsChanged();
-	};
-	
-	this.prepIcons = function() {
-	
-		mImgOcc.src = "./images/male_occ_20.png";
-		fImgOcc.src = "./images/female_occ_20.png";
-		mImgPre.src = "./images/male_pre_20.png";
-		fImgPre.src = "./images/female_pre_20.png";
-		xImgLib.src = "./images/stanza_lib_20.png";
-		featImgI.src ="./images/letter_I_blue.png";
-		featImgA.src ="./images/letter_A_blue.png";
-		featImgS.src ="./images/letter_S_blue.png";
-		featImgT.src ="./images/letter_T_blue.png";
-		featImgB.src ="./images/letter_B_blue.png";
-	};
-
-	this.addAllLayersToStage = function() {
+		console.log("init() Called ... 	");
 		
+		// add all layers to stage
 		currObj.stage.add(currObj.floorLyr);
 		currObj.toolTipLyr.add(currObj.tooltip);
 		currObj.stage.add(currObj.toolTipLyr);
 		currObj.stage.add(currObj.occLyr);
 		
+		// get all floor info from server
+		currObj.getFloorList(currObj.createBuildingPulldown);
+		
+		// initialize Selectors here if necessary.
+		currObj.selectorsChanged();
 	};
-	
+
 	// get floor list from server and load array...
 	this.getFloorList = function(_callback) {
 		
@@ -103,6 +103,7 @@ canvasMgr = function(){
 	
 	this.getFloorListElab = function(transport, _callback) {
 		
+		// This function loads the floorArray[] with floor objects ....
 		if (transport.error == undefined) {
 			
 			var firstFloor="";
@@ -144,159 +145,14 @@ canvasMgr = function(){
 		$('#building').val(buildId);
 	};
 	
-	//The idea is to populate the occLayer
-	this.createOccLayer = function(buildingId, day) {
-		
-		currObj.occLyr.removeChildren();
-		
-		var fMap = currObj.floorArr[buildingId].floorMap;
-		var oMap = currObj.floorArr[buildingId].occMap[day];
-		
-		for (mObj in fMap) {( function() {
-		//for (mObj in fMap) {
-		    
-			var cObj = currObj.floorArr[buildingId].getObj4Bed(oMap, fMap[mObj].bed);
-			var rom = fMap[mObj].room;
-			var bed = cObj.bed; 
-			var obj;
-			var zoomFact = 1;
-			
-			if (cObj.status == 0) {
-				obj = xImgLib;
-				bed = bed + " (libero)";
-			} else {
-				if (cObj.status == 1) {
-					bed = bed + " (occupato)";
-					if (cObj.gender == "M") {
-						obj = mImgOcc;
-					} else {
-						obj = fImgOcc;
-					};
-				} else {
-					bed = bed + " (prenotato)";
-					if (cObj.gender == "M") {
-						obj = mImgPre;
-					} else {
-						obj = fImgPre;
-					};					
-				} 	
-			};
-		    
-		    var xVal = fMap[mObj].xVal;
-		    var yVal = fMap[mObj].yVal;
-			var image = new Kinetic.Image({
-					x : xVal*zoomFact,
-					y : yVal*zoomFact,
-					image : obj,
-					width : 20,
-					height : 20,
-					draggable: true,
-					bed: cObj.bed,
-					codStanza: fMap[mObj].codStanza,
-					building: fMap[mObj].building,
-					room: fMap[mObj].room
-			});
-			
-            image.on("dragstart", function() {
-            	document.body.style.cursor = "pointer";
-                //layer.draw();
-            });
-            image.on("dragmove", function() {
-                document.body.style.cursor = "pointer";
-            });
-            image.on("mouseover", function(){
-            	document.body.style.cursor = "pointer";
-            });
-            image.on("mouseout", function() {
-                document.body.style.cursor = "default";              
-                $( "#diagRoom" ).html('---');
-                $( "#diagBed" ).html('---');
-            });
-			
-            image.on("mousemove", function(){
-                //var mousePos = currObj.stage.getMousePosition();
-                //var txt = " X=" + mousePos.x + " Y=" + mousePos.y;
-                //var txt = "Letto: " + cObj.bed +" Nome: " + cObj.name + " Cognome: " + cObj.surname;
-                //txt = txt + " Stanza: " + rom;
-                //currObj.tooltip.setPosition(mousePos.x, mousePos.y);
-                //currObj.tooltip.setText(txt);
-                //currObj.tooltip.show();
-                //currObj.toolTipLyr.draw();
-                //$( "#diagFloor" ).html(fMap[mObj].building);
-                $( "#diagRoom" ).html(rom);
-                $( "#diagBed" ).html(bed);
-            });
- /*
-            image.on("mouseout", function(){
-                currObj.tooltip.hide();
-                currObj.toolTipLyr.draw();
-            });
-*/
-            currObj.occLyr.add(image);
-            //currObj.occLyr.draw();
-            //currObj.stage.draw();
-		}());
-	  }
-	  currObj.occLyr.draw();
-	  currObj.stage.draw();
-	};  
-	
-	// get occupancy for specific date and load array...
-	this.getFloorOcc4DateList = function(buildId, dt, _callback) {
-		
-		var method = 'getFloorOcc4DateList';
-        try {
-        	
-        	var params = {
-                    buildId: buildId,
-                    dt: dt
-                };
-            
-            $.ajax({
-                url: "FloorOccupancy",
-                dataType: "json",
-                timeout: 10000,
-                type: 'POST',
-                async: false,
-                data: params,
-                context: document.body,
-                success: function(transport){
-                	currObj.getFloorOcc4DateListElab(transport, _callback);
-                },
-                error: function(jqXHR, textStatus, errorThrown){
-                    alert("error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown);
-                }
-            });
-            
-        } 
-        catch (e) {
-            alert("ajax call error:" + e);
-            return;
-        }
-		
-	};
-	
-	this.getFloorOcc4DateListElab = function(transport, _callback) {
-		
-		if (transport.error == undefined) {
-			
-			ret = transport.ret2cli;
-			currObj.floorArr[ret.id].occMap[ret.dt] = ret.occMap;
-			_callback(ret.id, ret.dt); //currObj.createOccLayer
-			
-		} else {
-			alert("There has been an error. Please trace...");
-		};
-	};
-	
 	this.selectorsChanged = function() {
-		
+
+		// capture current values
 		var buildId="";
 		var year="";
 		var month="";
 		var day="";
-	
-		// capture current values
+
 		buildId = $('#building').val();
 		year = $('#year').val();
 		month = $('#month').val();
@@ -309,152 +165,22 @@ canvasMgr = function(){
 		// flag used to capture current floor change
 		if (this.currFloor != buildId) {
 			this.currFloor=buildId;
-			currObj.populateFloorLayer(buildId);
+			//currObj.populateFloorLayer(buildId);
+			currObj.floorArr[buildId].populateFloorLayer(currObj.stage, currObj.floorLyr, currObj.occLyr, dt);
+		} else {
+			
+			// populateOccLayer
+			if (currObj.floorArr[buildId].occMap[dt] == undefined ) {
+				currObj.floorArr[buildId].getFloorOcc4DateList(currObj.stage, currObj.occLyr, dt, currObj.floorArr[buildId].createOccLayer);
+			} else {
+				currObj.floorArr[buildId].createOccLayer(currObj.stage, currObj.occLyr, dt);
+			}			
 		}
 
-		if (currObj.floorArr[buildId].occMap[dt] == undefined ) {
-			currObj.getFloorOcc4DateList(buildId, dt, currObj.createOccLayer);
-		} else {
-			currObj.createOccLayer(buildId, dt);
-		}
-		
 		currObj.toolTipLyr.moveToTop();
 	};
-	
-	this.populateFloorLayer = function(buildId) {
 
-		// Floor Image
-		imageObj = new Image();
-		imageObj.onload = function() {
-			var image = new Kinetic.Image({
-				x : 0,
-				y : 20,
-				image : imageObj,
-				width : 1164,
-				height : 500,
-				name: currObj.floorArr[buildId].desc
-			});
-			$( "#diagFloor" ).html(currObj.floorArr[buildId].desc);
-            $( "#diagRoom" ).html('---');
-            $( "#diagBed" ).html('---');
-            $( "#diagNumBeds" ).html(currObj.floorArr[buildId].floorMap.length);
-			currObj.floorLyr.removeChildren();
-			currObj.floorLyr.add(image);
-			currObj.stage.draw();
-
-			// Doctor info
-			currObj.getDoctorInfo(buildId);
-			// Floor features
-			currObj.getFeatureInfo(buildId);
-		
-		};
-		imageObj.src = currObj.floorArr[buildId].imgSrc;
-		currObj.stage.draw();
-
-	};
-	
-	this.getDoctorInfo = function(buildId) {
-		
-		// Doctor info
-		for (f in currObj.floorArr[buildId].doctorMap) {( function() {
-			
-			var dObj = currObj.floorArr[buildId].doctorMap[f];
-			//var polyPnts = "[" + dObj.polyPoints + "]";
-			var polyPnts = dObj.polyPoints.split(",");
- 			
-			var poly2 = new Kinetic.Polygon({
-			        points: polyPnts,
-			        fill: "#00D2F0",
-			        alpha: 0.2,
-			        stroke: "#00D2F0",
-			        strokeWidth: 0
-		    });
-		        
-			currObj.floorLyr.add(poly2);
-			currObj.floorLyr.draw();
-			currObj.stage.draw();
-			
-			}());
-		};		
-	};
-	
-	this.getFeatureInfo = function(buildId) {
-		
-		var i=1;
-		for (f in currObj.floorArr[buildId].featMap) {( function() {
-			    //i++;
-				var fObj = currObj.floorArr[buildId].featMap[f];
-				var obj;
-				var rom = fObj.room;
-				var romDesc = rom+"["+ fObj.featDesc + "]";
-				var featType = fObj.featType;
-				
-				// I;Infermeria,A;Studio Medico,S;Soggiorno Cucinino,T;Vano Tecnico,B;Bagno"
-				switch (featType)
-				{
-				  case "I":
-					  obj=featImgI;
-					  break;
-				  case "A":
-					  obj=featImgA;
-					  break;
-				  case "S":
-					  obj=featImgS;
-					  break;
-				  case "T":
-				      obj=featImgT;
-				  	  break;
-				  default:
-				      obj=featImgB;
-				};
-				
-				xVal = fObj.xVal*i;
-				yVal = fObj.yVal*i;
-
-				var image = new Kinetic.Image({
-					x : xVal,
-					y : yVal,
-					image : obj,
-					width : 20,
-					height : 20,
-					featType : featType,
-					room : rom,
-					draggable: true
-				});
-				
-				image.on("dragstart", function() {
-	            	document.body.style.cursor = "pointer";
-	            });
-	            image.on("dragmove", function() {
-	                document.body.style.cursor = "pointer";
-	            });
-	            image.on("mouseover", function(){
-	            	document.body.style.cursor = "pointer";
-	            });
-	            image.on("mouseout", function() {
-	                document.body.style.cursor = "default";
-	                $( "#diagRoom" ).html('---');
-	            });
-	            image.on("mousemove", function(){
-	                $( "#diagRoom" ).html(romDesc);
-	            });
-				
-				currObj.floorLyr.add(image);
-				currObj.floorLyr.draw();
-				currObj.stage.draw();
-			}());
-		};
-
-	};
-	
-	this.showLayer4Day = function(buildId, bday) {
-		
-		currObj.layers[buildId].moveToTop();
-		currObj.layers[bday].moveToTop();
-		currObj.layers[currObj.tt].moveToTop();
-		
-	};
-	
+	// Maintenance mode ...
 	this.clickMe = function() {
 
 		// I need: //CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y,
