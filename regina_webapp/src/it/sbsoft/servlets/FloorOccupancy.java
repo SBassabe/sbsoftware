@@ -52,6 +52,7 @@ public class FloorOccupancy extends HttpServlet {
 			
 			//normal response
 			ret.setRet2cli(floor);
+			System.out.println("FloorOccupancy => return " + gson.toJson(ret));
 			out.print(gson.toJson(ret));
 			
 		} catch (Exception e) {
@@ -74,7 +75,7 @@ public class FloorOccupancy extends HttpServlet {
 		List<BedOccupancy> bedOccMap = new ArrayList<BedOccupancy>();
 		BedOccupancy bOcc;
 		
-		System.out.println("buildId" + buildId);
+		System.out.println("buildId ->" + buildId);
 		//CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y
 		if (buildId.compareTo("A0") == 0) {
 			//mp = "733;3;143;A0;700;388,733;3;144;A0;740;388,736;4;155;A0;760;388,736;4;156;A0;780;388,736;4;198;A0;790;388,698;19;70;A0;980;265,698;19;71;A0;990;265,698;19;186;A0;1000;265,699;21;72;A0;970;265,699;21;73;A0;960;265,699;21;188;A0;950;265,699;21;190;A0;940;265,700;22;74;A0;770;240,700;22;75;A0;815;240,700;22;76;A0;770;270,700;22;196;A0;815;270";

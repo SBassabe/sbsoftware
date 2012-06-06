@@ -44,8 +44,14 @@ body {
 
 #infBtn {
 	position: absolute; 
-	top: 18px; 
-	left: 14px;
+	top: 25px; 
+	left: 35px;
+}
+
+#mntBtn {
+	position: absolute; 
+	top: 25px; 
+	left: 80px;
 }
 
 #dialog {
@@ -65,4 +71,20 @@ div.right {
 	display: inline;
 	width: 55%;
 	left: 142px;
+}
+
+#jbutton {
+	width: 170px;
+}
+
+#radio {
+	padding: 10px;
+}
+
+#rad1lbl {
+	width: 80px;
+}
+
+#maintDiag {
+	text-align: center;
 }

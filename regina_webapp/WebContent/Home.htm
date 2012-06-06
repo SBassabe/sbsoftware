@@ -15,6 +15,7 @@
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
 <script type="text/javascript" src="controller/maintMgr.js"></script>
+<script type="text/javascript" src="controller/returnObj.js"></script>
 <script>
 window.onload = function() {
 	
@@ -31,6 +32,23 @@ window.onload = function() {
 		    close: function() {$("#infBtn").show();},
 		    open: function() {$("#infBtn").hide();}
 	});
+	
+	$( "#radio" ).buttonset();
+	$( "#jbutton" ).button();
+
+	$( "#maintDiag" ).show();
+	$( "#maintDiag" ).dialog({
+			width: 330,
+			resizable: false,
+			minHeight: 60,
+			position: [300,125], 
+			show: { effect: 'drop', direction: "down" } ,
+			hide: { effect: 'drop', direction: "down" } ,
+		    title: "Modalita' Configurazione",
+		    autoOpen: false,
+		    close: function() {$("#mntBtn").show();},
+		    open: function() {$("#mntBtn").hide();}
+	});	
 	//app = null;
 	//$('#container').innerHTML = "";
 	canvasMgr = new canvasMgr();
@@ -42,10 +60,9 @@ window.onload = function() {
 </script>
 </head>
 <body>
-<!-- 	<img src="./images/piano_rialzato_edificio_B_50.jpeg"/> -->
-    
     <div id="head">
-    	<img id="infBtn" alt="informazione" src="./images/info_03.png" onclick="canvasMgr.showDiag()">
+    	<img id="infBtn" alt="informazione" src="./images/icon_info.png" onclick="canvasMgr.showDiag()">
+    	<img id="mntBtn" alt="configurazione" src="./images/icon_make.png" onclick="canvasMgr.showMntDiag()">
     	<img height="80px" src="./images/logo_regina_logistica_02.gif">
     </div>
 	<div id="cont_border">
@@ -94,6 +111,14 @@ window.onload = function() {
 		<div class="left">Letti per Piano:</div><div class="right" id="diagNumBeds">16</div><br>
 		<div class="left">Stanza:</div><div class="right" id="diagRoom">501</div><br>
 		<div class="left">Letto:</div><div class="right" id="diagBed">1</div><br>
+	</div>
+	<div id="maintDiag">
+		  <div id="radio">
+		  		<input type="radio" id="radio2" name="radio" value="off" onclick="canvasMgr.checkMaintRadio(this.value)" checked="checked" /><label for="radio2">Off</label>
+				<input type="radio" id="radio1" name="radio" value="on" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio1"><div id="rad1lbl">On</div></label>
+		  </div>
+		  <!-- button id="jbutton" onclick="canvasMgr.maintMgr.collectLayerData()">Salva Modifiche</button-->
+		  <!-- input value="Save regina.properties ..." type="button" onclick="canvasMgr.maintMgr.collectLayerData()" style="vertical-align: top;"/ -->
 	</div>
 </body>
 </html>

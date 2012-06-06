@@ -3,12 +3,8 @@ canvasMgr = function(){
 	console.log("canvasMgr obj created ...");
 	var currObj = this;
 	this.currFloor = "";
-	this.maintMode = true;
-	this.maintMgr;
-	
-	if (currObj.maintMode) {
-		currObj.maintMgr = new maintMgr();
-	}
+	this.maintMode = false;
+	this.maintMgr = new maintMgr();
 
 	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
@@ -38,6 +34,7 @@ canvasMgr = function(){
 	this.mImgPre = new Image();
 	this.fImgPre = new Image();
 	this.xImgLib = new Image();
+	this.zImgLib = new Image();
 	this.featImgI = new Image();
 	this.featImgA = new Image();
 	this.featImgS = new Image();
@@ -49,6 +46,7 @@ canvasMgr = function(){
 	this.mImgPre.src = "./images/male_pre_20.png";
 	this.fImgPre.src = "./images/female_pre_20.png";
 	this.xImgLib.src = "./images/stanza_lib_20.png";
+	this.zImgLib.src = "./images/stanza_maint_20.png";
 	this.featImgI.src ="./images/letter_I_blue.png";
 	this.featImgA.src ="./images/letter_A_blue.png";
 	this.featImgS.src ="./images/letter_S_blue.png";
@@ -134,6 +132,8 @@ canvasMgr = function(){
 	// create pulldown with list of floors ...
 	this.createBuildingPulldown = function(buildId) {
 
+		if ($('#building').val() == null) {
+		
 		for (obj in currObj.floorArr) {
 			
 			$('#building').append($("<option/>", {
@@ -143,6 +143,7 @@ canvasMgr = function(){
 			
 		}
 		$('#building').val(buildId);
+	};
 	};
 	
 	this.selectorsChanged = function() {
@@ -183,6 +184,7 @@ canvasMgr = function(){
 	// Maintenance mode ...
 	this.clickMe = function() {
 
+		console.log("clickMeDeprecate called....")
 		// I need: //CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y,
 		var txt="";
 		for (obj in currObj.occLyr.getChildren()) {
@@ -219,11 +221,53 @@ canvasMgr = function(){
 			txt = txt + type +';'+ room +';'+ X +';'+ Y + ',';
 		};
 		
-		$('#area').val(txt);
+		$('#areaDiag').val(txt);
 	
 	};
 	
 	this.showDiag = function() {
 		$( "#dialog" ).dialog('open');
+	};
+	
+	this.showMntDiag = function() {
+		$( "#maintDiag" ).dialog('open');
+	};
+	
+	this.checkMaintRadio = function(val) {
+		
+		console.log("checkMaintRadio -> " + val);
+		//if ($("#radio1").attr('checked') != undefined) {
+		if (val == "on") {	
+			console.log("maint ON");
+			if (!currObj.maintMode) {
+				currObj.maintMode=true;
+				currObj.currFloor = "";
+				currObj.floorLyr.removeChildren();
+				currObj.occLyr.removeChildren();
+				// get all floor info from server
+				currObj.getFloorList(currObj.createBuildingPulldown);
+				
+				// initialize Selectors here if necessary.
+				currObj.selectorsChanged();
+				document.getElementById("rad1lbl").innerHTML="Salva";
+			} else {
+				currObj.maintMgr.collectLayerData();
+			}
+			
+		} else {
+			console.log("maint OFF");
+			if (currObj.maintMode) {
+				currObj.maintMode=false;
+				currObj.currFloor = "";
+				currObj.floorLyr.removeChildren();
+				currObj.occLyr.removeChildren();
+				// get all floor info from server
+				currObj.getFloorList(currObj.createBuildingPulldown);
+				
+				// initialize Selectors here if necessary.
+				currObj.selectorsChanged();
+				document.getElementById("rad1lbl").innerHTML="On";
+			}
+		};
 	};
 };

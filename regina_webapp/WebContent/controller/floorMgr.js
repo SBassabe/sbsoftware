@@ -18,6 +18,7 @@ floorMgr = function(){
     
 	this.populateFloorLayer = function(stage, flrLayer, occLayer, dt) {
 
+		console.log("populateFloorLayer called ...");
 		// Floor Image
 		imageObj = new Image();
 		imageObj.onload = function() {
@@ -37,22 +38,18 @@ floorMgr = function(){
             flrLayer.add(image);
 			stage.draw();
 			
-			if (!canvasMgr.maintMode) {
-				// populateOccLayer
-				if (floorMgrObj.occMap[dt] == undefined ) {
+			occLayer.removeChildren();
+			if (!canvasMgr.maintMode && floorMgrObj.occMap[dt] == undefined ) {
 					floorMgrObj.getFloorOcc4DateList(stage, occLayer, dt, floorMgrObj.createOccLayer);
 				} else {
+				// Maint or Real logic in method
 					floorMgrObj.createOccLayer(stage, occLayer, dt);
 				}
-			} else {
-				occLayer.removeChildren();
-				console.log("Just get maint info on occLayer !!!");
-			}
 
 			// Doctor info
-			floorMgrObj.getDoctorInfo(stage, flrLayer);
+			floorMgrObj.getDoctorInfo(stage, canvasMgr.floorLyr);
 			// Floor features
-			floorMgrObj.getFeatureInfo(stage, flrLayer);
+			floorMgrObj.getFeatureInfo(stage, canvasMgr.floorLyr);
 		
 		};
 		imageObj.src = this.imgSrc;
@@ -121,7 +118,7 @@ floorMgr = function(){
 		
 		if (canvasMgr.maintMode) {
 			canvasMgr.maintMgr.clearDoctorInfo(layer);
-			canvasMgr.maintMgr.initTst(layer);
+			canvasMgr.maintMgr.initTst(layer, floorMgrObj.doctorMap);
 		} else {
 		
 			// Doctor info
@@ -139,12 +136,19 @@ floorMgr = function(){
 				        strokeWidth: 0
 			    });
 			        
+				poly2.on("mouseout", function() {;
+	                $( "#diagRoom" ).html('---');
+	            });
+				poly2.on("mousemove", function(){
+	                $( "#diagRoom" ).html(dObj.docId);
+	            });
+			        
 				layer.add(poly2);
-				layer.draw();
-				stage.draw();
 				
 				}());
 			};
+			layer.draw();
+			stage.draw();
 		}
 	};
 	
@@ -204,9 +208,9 @@ floorMgr = function(){
 	            });
 				
 				layer.add(image);
+			}());
 				layer.draw();
 				stage.draw();
-			}());
 		};
 
 	};
@@ -219,17 +223,72 @@ floorMgr = function(){
 		if (!canvasMgr.maintMode) {
 			floorMgrObj.createOccLayerMapInfo(stage, layer, day);
 		} else {
-			//floorMgrObj.createOccLayerMapInfo(stage, layer, day);
-			console.log("call maint here !!");
+			floorMgrObj.createOccLayerMaintInfo(stage, layer);
 		}
 		
 	};
 	
-	this.createOccLayerMaintInfo = function(stage, layer, day) {
+	this.createOccLayerMaintInfo = function(stage, layer) {
 		
+		console.log("createOccLayerMaintInfo called ...");
+		
+		var fMap = floorMgrObj.floorMap;
+		
+		for (mObj in fMap) {( function() {
+		    
+			var rom = fMap[mObj].room;
+			var bed = fMap[mObj].bed; 
+			var obj;
+			var zoomFact = 1;
+		
+			obj = canvasMgr.zImgLib;
+		    
+		    var xVal = fMap[mObj].xVal;
+		    var yVal = fMap[mObj].yVal;
+			var image = new Kinetic.Image({
+					x : xVal*zoomFact,
+					y : yVal*zoomFact,
+					image : obj,
+					width : 20,
+					height : 20,
+					draggable: false,
+					bed: bed,
+					codStanza: fMap[mObj].codStanza,
+					building: fMap[mObj].building,
+					room: fMap[mObj].room,
+					draggable: true
+			});
+			
+            image.on("dragstart", function() {
+            	document.body.style.cursor = "pointer";
+            });
+            image.on("dragmove", function() {
+                document.body.style.cursor = "pointer";
+            });
+            image.on("mouseover", function(){
+            	document.body.style.cursor = "pointer";
+            });
+            image.on("mouseout", function() {
+                document.body.style.cursor = "default";              
+                $( "#diagRoom" ).html('---');
+                $( "#diagBed" ).html('---');
+            });
+			
+            image.on("mousemove", function(){
+                $( "#diagRoom" ).html(rom);
+                $( "#diagBed" ).html(bed);
+            });
+
+            layer.add(image);
+		}());
+	  }
+	  layer.draw();
+	  stage.draw();
 	};
 	
 	this.createOccLayerMapInfo = function(stage, layer, day) {
+		
+		console.log("createOccLayerMapInfo called ...");
 		
 		var fMap = floorMgrObj.floorMap;
 		var oMap = floorMgrObj.occMap[day];

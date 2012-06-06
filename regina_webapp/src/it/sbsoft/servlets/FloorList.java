@@ -41,11 +41,11 @@ public class FloorList extends HttpServlet {
 			System.out.println("Configuring properties ...");
 			prop = new Properties();
             //load a properties file
-    		//String cHome = System.getProperty("catalina.home");
-    		//cHome = cHome + "\\conf\\regina.properties";
-    		ServletContext sc =  this.getServletContext();
-    		String cHome = sc.getContextPath();
-    		cHome = this.getServletContext().getRealPath("\\WEB-INF\\regina.properties");
+    		String cHome = System.getProperty("catalina.home");
+    		cHome = cHome + "\\conf\\regina.properties";
+    		//ServletContext sc =  this.getServletContext();
+    		//String cHome = sc.getContextPath();
+    		//cHome = this.getServletContext().getRealPath("\\WEB-INF\\regina.properties");
     		System.out.println("realPath ->" + cHome );
     		prop.load(new FileInputStream(cHome));
  
@@ -90,7 +90,6 @@ public class FloorList extends HttpServlet {
 			}
 			
 			ret.setRet2cli(floorList);
-			out.print(gson.toJson(ret));
 			System.out.println("FloorList exiting doGet [" + gson.toJson(ret) + "]");
 			
 		} catch (Exception e) {
@@ -99,6 +98,8 @@ public class FloorList extends HttpServlet {
 			ret.getError().setErrorDesc("See Tomocat log files");
 			e.printStackTrace();
 		}
+		
+		out.print(gson.toJson(ret));
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
