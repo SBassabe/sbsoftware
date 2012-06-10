@@ -1,63 +1,61 @@
 package it.sbsoft.servlets;
 
 import it.sbsoft.beans.*;
+import it.sbsoft.db.DBTools;
+import it.sbsoft.utility.*;
 
 import com.google.gson.Gson;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
+
 public class FloorList extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
     static Gson gson = new Gson();
-	static Properties prop = null;
+	static PropertiesFile prop;
+	static String simulatorMode;
+	static String persistProp;
+	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
     
     public FloorList() {
         super();
     }
     
-    private void initProps() {
+    public void init() {
+    	
+    	log.info("entered ");
+    	
+		simulatorMode = this.getInitParameter("simulatorMode");
+		log.info(" simulatorMode = " + simulatorMode);
+    	
+		persistProp =  this.getInitParameter("persistProperties");
+		log.info(" persistProp = " + persistProp);
 		
-		String persistProp =  this.getInitParameter("persistProperties");
-		System.out.println("persistProp = " + persistProp);
 		if (persistProp != null && persistProp.compareTo("true") == 0 && prop != null) {
-			System.out.println("Skip Configuring properties ...");
+			log.info("Skip Configuring properties ...");
 			return;
 		}
-
-		try {
-			System.out.println("Configuring properties ...");
-			prop = new Properties();
-            //load a properties file
-    		String cHome = System.getProperty("catalina.home");
-    		cHome = cHome + "\\conf\\regina.properties";
-    		//ServletContext sc =  this.getServletContext();
-    		//String cHome = sc.getContextPath();
-    		//cHome = this.getServletContext().getRealPath("\\WEB-INF\\regina.properties");
-    		System.out.println("realPath ->" + cHome );
-    		prop.load(new FileInputStream(cHome));
- 
-    	} catch (IOException ex) {
-    		ex.printStackTrace();
-        }
+		
+		prop = PropertiesFile.getPropertiesFile();
 		
 	}
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		System.out.println("FloorList into doGet");
+		log.info(" into doGet");
 		Bean2cli ret = new Bean2cli();
 		
 		List<Floor> floorList;
@@ -65,7 +63,9 @@ public class FloorList extends HttpServlet {
 		
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		initProps();
+		String maint = request.getParameter("maint");
+		log.debug(" maint value -> " + maint);
+		//initProps();
 		 
 		try {
 			
@@ -82,7 +82,12 @@ public class FloorList extends HttpServlet {
 				floorBean.setId(floorId);
 				floorBean.setDescription(prop.getProperty(floorId+".desc"));
 				floorBean.setImgSrc(prop.getProperty(floorId+".src"));
-				floorBean.setFloorMap(getMapCoordinates(floorBean.getId()));
+				//floorBean.setFloorMap(getMapCoordinates(floorBean.getId()));
+				if ("true".compareTo(maint) == 0) {
+					floorBean.setFloorMap(getMapCoordinatesFromDB(floorBean.getId()));
+				} else {
+					floorBean.setFloorMap(getMapCoordinatesFromFile(floorBean.getId()));
+				}
 				floorBean.setFeatureMap(getFeatureMap(floorBean.getId()));
 				floorBean.setDoctorMap(getDoctorMap(floorBean.getId()));
 				floorList.add(floorBean);
@@ -90,7 +95,8 @@ public class FloorList extends HttpServlet {
 			}
 			
 			ret.setRet2cli(floorList);
-			System.out.println("FloorList exiting doGet [" + gson.toJson(ret) + "]");
+			log.info(" exiting doGet ");
+			log.debug(" returning -> [" + gson.toJson(ret) + "]");
 			
 		} catch (Exception e) {
 			ret.setError(new Errore());
@@ -106,37 +112,140 @@ public class FloorList extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private List<FloorMap> getMapCoordinates(String buildingId) {
+	public List<FloorMap> getMapCoordinatesFromFile(String buildingId) {
 		
-		FloorMap fMap;
-		String mp;
+		log.info(" called for buildingId -> " + buildingId);
 		List<FloorMap> floorMapList = new ArrayList<FloorMap>();
-		mp = prop.getProperty(buildingId+".bed_map");
-		mp = mp.replaceAll("\"", "");
+		
+		Map<String, String> map2 = prop.floorMaps.get(buildingId);
+		String key, value, ret;
 		
 		try {
-
-			String[] sp = mp.split(",");
-			for (int i=0; i<sp.length; i++) {
+			
+			Iterator<String> it = map2.keySet().iterator();
+			
+			while (it.hasNext()) {
 				
-				String[] sCoords = sp[i].split(";");
+				key = (String)it.next();
+				value = map2.get(key);
+				value = value.replaceAll("\"", "");
 				
-				fMap = new FloorMap();
-				fMap.setCodStanza(sCoords[0]);
-				fMap.setRoom(sCoords[1]);
-				fMap.setBed(sCoords[2]);
-				fMap.setBuilding(sCoords[3]);
-				 
-				fMap.setxVal(sCoords[4]);
-				fMap.setyVal(sCoords[5]);
-				floorMapList.add(fMap); 
+				ret = buildingId+";"+key+";"+value+";P";
+				log.trace(" ret -> " + ret);
+				floorMapList.add(createFMobjectFromString(ret));
+				
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+		log.info(" beds mapped -> " + floorMapList.size());
 		return floorMapList;
+	}
+	
+	public List<FloorMap> getMapCoordinatesFromDB(String buildingId) {
+		
+		log.info(" called for buildingId -> " + buildingId);
+		DBTools db = new DBTools();
+		Map<String, String> mapFloorDB;
+		
+		List<FloorMap> floorMapList = new ArrayList<FloorMap>();
+		String roomRange, sProp, sCodStanNumStan, concat;
+		int roomMin, roomMax;
+		int totalA=0, totalP=0, totalD=0;
+		
+
+		try {
+			
+			// Collect room_range
+			roomRange = prop.getProperty(buildingId+".room_range");
+			roomMin = new Integer(roomRange.split(",")[0]);
+			roomMax = new Integer(roomRange.split(",")[1]);
+			
+			// Call DB and collect bedInfo
+			mapFloorDB = db.getBeds4Floor(roomMin, roomMax); // -> Map<CODLETTO, CODSTAN;NUMSTANZA>
+			
+			// Collect keys from current floormap
+			Object[] tstMpKeys = prop.floorMaps.get(buildingId).keySet().toArray();
+			log.debug(" prop.floorMaps.get(buildingId).keySet() size -> " + tstMpKeys.length);
+			
+			// For every key in prop.floorMaps keyset confront with db data
+			for (int c=0; c<tstMpKeys.length; c++) {
+				
+				sProp = prop.floorMaps.get(buildingId).get(tstMpKeys[c]);  // -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
+				log.trace(" sProp -> " + sProp);
+				String[] aProp = sProp.split(";");
+				String xyVals =  aProp[2] + ";" + aProp[3];
+				
+				// contained in PropFile and DB
+				sCodStanNumStan = mapFloorDB.get(tstMpKeys[c]);
+				if (sCodStanNumStan != null) {
+					
+					concat = buildingId + ";" + tstMpKeys[c] + ";" + sCodStanNumStan + ";" + xyVals + ";A";
+					totalA++;
+					mapFloorDB.remove(tstMpKeys[c]);
+					
+				// contained only in PropFile
+				} else {
+					
+					totalP++;
+					concat = buildingId + ";" + tstMpKeys[c] + ";" + aProp[1] + ";" + xyVals + ";P";
+					
+				}
+				
+				log.trace(" concat1 -> " + concat);
+				floorMapList.add(createFMobjectFromString(concat));
+			}
+			
+			// Whaterver is left in DB just print
+			Object[] mapFloorDBKS = mapFloorDB.keySet().toArray();
+			log.debug(" mapFloorDB.keySet().keySet() size -> " + mapFloorDBKS.length);
+			
+			for (int b=0; b<mapFloorDBKS.length; b++) {
+				
+				// contained in DB and Propfile
+				sCodStanNumStan = mapFloorDB.get(mapFloorDBKS[b]);
+			
+				concat = buildingId + ";" + mapFloorDBKS[b] + ";" + sCodStanNumStan + ";" + b*20 + ";" + 450 + ";D";
+				mapFloorDB.remove(mapFloorDBKS[b]);
+				
+				totalD++;
+				log.trace(" concat2 -> " + concat);
+				floorMapList.add(createFMobjectFromString(concat));
+			
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		log.info(" totals A/P/D -> " + totalA+"/"+totalP+"/"+totalD + " for a grand total of -> " +  floorMapList.size());
+		log.info(" beds mapped -> " + floorMapList.size());
+		return floorMapList;
+	}
+	
+	private FloorMap createFMobjectFromString(String strArr) {
+		
+		FloorMap fMap = new FloorMap();
+		
+		try {
+			
+			String[] sCoords = strArr.split(";");
+			
+			fMap.setBuilding(sCoords[0]);
+			fMap.setBed(sCoords[1]);
+			fMap.setCodStanza(sCoords[2]);
+			fMap.setRoom(sCoords[3]);
+			fMap.setxVal(sCoords[4]);
+			fMap.setyVal(sCoords[5]);
+			fMap.setStatus(sCoords[6]);
+			
+		} catch (Exception e) {
+			
+		}
+		return fMap;
+		
 	}
 	
 	private List<FeatureMap> getFeatureMap(String buildingId) {

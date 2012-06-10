@@ -26,7 +26,7 @@ public final class dbExample
 	  try {
 		  
 		  String db = "localhost/3050:C:/FBDB/CBAOSPITIB.FDB";		  
-		       db = "192.168.0.5/3050:C:/FBDB/CBAOSPITIB.FDB";
+		         //db = "192.168.0.14/3050:C:/FBDB/CBAOSPITIB.FDB";
 		  
 		  //jdbc:subprotocol:subname
 		  String databaseURL = "jdbc:firebirdsql:"+db;
@@ -37,6 +37,8 @@ public final class dbExample
 		  Timestamp tstamp = new Timestamp(000000);
 		  
 		  Class.forName ("org.firebirdsql.jdbc.FBDriver");
+		  System.out.println("databaseURL -> " + databaseURL);
+		  //jdbc:firebirdsql:localhost/3050:C:/FBDB/CBAOSPITIB.FDB
 	      c = java.sql.DriverManager.getConnection (databaseURL, user, password);
 		  
 		  PreparedStatement pstmt = c.prepareStatement("select nomeospite, sesso, stanza, codice_letto from REGINA_LOGISTICA_V where gmadal > ?"); 

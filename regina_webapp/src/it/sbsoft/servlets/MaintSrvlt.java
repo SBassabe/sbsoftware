@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 
 import it.sbsoft.beans.Bean2cli;
 import it.sbsoft.beans.Errore;
-import it.sbsoft.beans.FeatureMap;
-import it.sbsoft.beans.Floor;
+import it.sbsoft.utility.LoggerUtils;
+import it.sbsoft.utility.PropertiesFile;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,53 +17,29 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 public class MaintSrvlt extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
     static Gson gson = new Gson();
-	static Properties prop = null;
+	static PropertiesFile prop;
 	static String cHome;
+	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
     
+	public void init() {
+		prop = PropertiesFile.getPropertiesFile();
+		cHome = prop.cHome;
+	}
+	
     public MaintSrvlt() {
         super();
-    }
-    
-    private void initProps() {
-		
-		String persistProp =  this.getInitParameter("persistProperties");
-		System.out.println("MaintSrvlt -> persistProp = " + persistProp);
-		if (persistProp != null && persistProp.compareTo("true") == 0 && prop != null) {
-			System.out.println("Skip Configuring properties ...");
-			return;
-		}
-
-		try {
-			System.out.println("Configuring properties ...");
-			prop = new Properties();
-            //load a properties file
-    		cHome = System.getProperty("catalina.home");
-    		cHome = cHome + "\\conf\\regina.properties";
-    		//ServletContext sc =  this.getServletContext();
-    		//cHome = sc.getContextPath();
-    		//cHome = this.getServletContext().getRealPath("\\WEB-INF\\regina.properties");
-    		System.out.println("realPath ->" + cHome );
-    		prop.load(new FileInputStream(cHome));
- 
-    	} catch (IOException ex) {
-    		ex.printStackTrace();
-        }
-		
-	}
+    }    
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
@@ -72,12 +47,11 @@ public class MaintSrvlt extends HttpServlet {
     
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		System.out.println("FloorList into doPost");
+		log.info("called");
 		response.setContentType("text/html");
 		
 		Bean2cli ret = new Bean2cli();
 		PrintWriter out = response.getWriter();
-	    initProps();
 		
 		try {
 			
@@ -91,10 +65,10 @@ public class MaintSrvlt extends HttpServlet {
 			String currFloor = request.getParameter("currFloor");
 			String floorMap = request.getParameter("floorMap");
 	
-			System.out.println("FloorList param currFloor --> " + currFloor);
-			System.out.println("FloorList param featureMap --> " + featureMap);
-			System.out.println("FloorList param doctorMap --> " + doctorMap);
-			System.out.println("FloorList param floorMap --> " + floorMap);
+			log.info("MaintSrvlt param currFloor --> " + currFloor);
+			log.info("MaintSrvlt param featureMap --> " + featureMap);
+			log.info("MaintSrvlt param doctorMap --> " + doctorMap);
+			log.info("MaintSrvlt param floorMap --> " + floorMap);
 			
 			String pKey = currFloor + ".floor_feat";
 			String pVal = prop.getProperty(pKey);
@@ -111,6 +85,9 @@ public class MaintSrvlt extends HttpServlet {
 			prop.store(new FileOutputStream(cHome), "myComment");
 			sortFile();
 			
+			prop.cleanFloorMaps();
+		
+			
 		} catch (Exception e) {
 			ret.getError().setErrorCode("1");
 			ret.getError().setErrorDesc("See Tomocat log files");
@@ -122,6 +99,7 @@ public class MaintSrvlt extends HttpServlet {
 	}
 	
 	private void backupFile() {
+		log.info("called");
 		try {
 			Calendar cal = Calendar.getInstance();
 			String DATE_FORMAT = "yyyyMMdd_hhmmss";
@@ -148,7 +126,7 @@ public class MaintSrvlt extends HttpServlet {
 	}
 	
 	private void sortFile() {
-		
+		log.info("called");
 		try {
 		
 			ArrayList<String> rows = new ArrayList<String>();

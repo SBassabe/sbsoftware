@@ -75,6 +75,9 @@ canvasMgr = function(){
 	this.getFloorList = function(_callback) {
 		
 		var method = 'getFloorList';
+		var params = {
+			maint: currObj.maintMode	
+		}
         try {
             
             $.ajax({
@@ -83,7 +86,7 @@ canvasMgr = function(){
                 timeout: 10000,
                 type: 'POST',
                 async: false,
-                //data: params,
+                data: params,
                 context: document.body,
                 success: function(transport){
                 	currObj.getFloorListElab(transport, _callback);

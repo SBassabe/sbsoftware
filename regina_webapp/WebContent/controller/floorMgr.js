@@ -297,68 +297,70 @@ floorMgr = function(){
 		//for (mObj in fMap) {
 		    
 			var cObj = floorMgrObj.getObj4Bed(oMap, fMap[mObj].bed);
-			var rom = fMap[mObj].room;
-			var bed = cObj.bed; 
-			var obj;
-			var zoomFact = 1;
-			
-			if (cObj.status == 0) {
-				obj = canvasMgr.xImgLib;
-				bed = bed + " (libero)";
-			} else {
-				if (cObj.status == 1) {
-					bed = bed + " (occupato)";
-					if (cObj.gender == "M") {
-						obj = canvasMgr.mImgOcc;
-					} else {
-						obj = canvasMgr.fImgOcc;
-					};
+			  if (cObj != undefined) {
+				var rom = fMap[mObj].room;
+				var bed = cObj.bed; 
+				var obj;
+				var zoomFact = 1;
+				
+				if (cObj.status == 0) {
+					obj = canvasMgr.xImgLib;
+					bed = bed + " (libero)";
 				} else {
-					bed = bed + " (prenotato)";
-					if (cObj.gender == "M") {
-						obj = canvasMgr.mImgPre;
+					if (cObj.status == 1) {
+						bed = bed + " (occupato)";
+						if (cObj.gender == "M") {
+							obj = canvasMgr.mImgOcc;
+						} else {
+							obj = canvasMgr.fImgOcc;
+						};
 					} else {
-						obj = canvasMgr.fImgPre; 
-					};					
-				} 	
-			};
-		    
-		    var xVal = fMap[mObj].xVal;
-		    var yVal = fMap[mObj].yVal;
-			var image = new Kinetic.Image({
-					x : xVal*zoomFact,
-					y : yVal*zoomFact,
-					image : obj,
-					width : 20,
-					height : 20,
-					draggable: false,
-					bed: cObj.bed,
-					codStanza: fMap[mObj].codStanza,
-					building: fMap[mObj].building,
-					room: fMap[mObj].room
-			});
-			
-            image.on("dragstart", function() {
-            	document.body.style.cursor = "pointer";
-            });
-            image.on("dragmove", function() {
-                document.body.style.cursor = "pointer";
-            });
-            image.on("mouseover", function(){
-            	document.body.style.cursor = "pointer";
-            });
-            image.on("mouseout", function() {
-                document.body.style.cursor = "default";              
-                $( "#diagRoom" ).html('---');
-                $( "#diagBed" ).html('---');
-            });
-			
-            image.on("mousemove", function(){
-                $( "#diagRoom" ).html(rom);
-                $( "#diagBed" ).html(bed);
-            });
-
-            layer.add(image);
+						bed = bed + " (prenotato)";
+						if (cObj.gender == "M") {
+							obj = canvasMgr.mImgPre;
+						} else {
+							obj = canvasMgr.fImgPre; 
+						};					
+					} 	
+				};
+			    
+			    var xVal = fMap[mObj].xVal;
+			    var yVal = fMap[mObj].yVal;
+				var image = new Kinetic.Image({
+						x : xVal*zoomFact,
+						y : yVal*zoomFact,
+						image : obj,
+						width : 20,
+						height : 20,
+						draggable: false,
+						bed: cObj.bed,
+						codStanza: fMap[mObj].codStanza,
+						building: fMap[mObj].building,
+						room: fMap[mObj].room
+				});
+				
+	            image.on("dragstart", function() {
+	            	document.body.style.cursor = "pointer";
+	            });
+	            image.on("dragmove", function() {
+	                document.body.style.cursor = "pointer";
+	            });
+	            image.on("mouseover", function(){
+	            	document.body.style.cursor = "pointer";
+	            });
+	            image.on("mouseout", function() {
+	                document.body.style.cursor = "default";              
+	                $( "#diagRoom" ).html('---');
+	                $( "#diagBed" ).html('---');
+	            });
+				
+	            image.on("mousemove", function(){
+	                $( "#diagRoom" ).html(rom);
+	                $( "#diagBed" ).html(bed);
+	            });
+	
+	            layer.add(image);
+			  } else {console.log(" WARN: cObj is undefined for mObj -> " + mObj ) ;}  
 		}());
 	  }
 	  layer.draw();

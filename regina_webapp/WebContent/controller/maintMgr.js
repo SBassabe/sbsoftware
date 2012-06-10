@@ -195,6 +195,7 @@ maintMgr = function() {
 			
 			posObj=canvasMgr.occLyr.children[obj].getPosition();
 			//txt= txt+"id:"+currObj.occLyr.children[obj]._id+" X="+posObj.x+" Y="+posObj.y+"\n";
+			// java sctructure -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
 			
 			var X = posObj.x;
 			var Y = posObj.y;
@@ -202,7 +203,8 @@ maintMgr = function() {
 			var NUMSTANZA = canvasMgr.occLyr.children[obj].getAttrs().room;
 			var CODLETTO = canvasMgr.occLyr.children[obj].getAttrs().bed;
 			var IDSEDE = canvasMgr.occLyr.children[obj].getAttrs().building;
-			txt = CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y;
+			//txt = CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y;
+			txt = IDSEDE +';'+ CODLETTO +';'+ CODSTAN +';'+ NUMSTANZA +';'+ X +';'+ Y;
 			retObj.floorMap.push(txt);
 		};
 		

@@ -8,6 +8,7 @@ public class FloorMap {
 	private String xVal;
 	private String yVal;
 	private String codStanza;
+	private String status;
 	
 	public String getBuilding() {
 		return building;
@@ -44,6 +45,12 @@ public class FloorMap {
 	}
 	public void setCodStanza(String codStanza) {
 		this.codStanza = codStanza;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	
