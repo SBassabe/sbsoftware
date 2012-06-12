@@ -29,6 +29,7 @@ public class DBTools {
     private static String password = "masterkey";
     StringBuffer sbQuery = new StringBuffer();
     static Logger log = LoggerUtils.getLogger("sbsoftware");
+    static Logger logDB = LoggerUtils.getLogger("db");
 	
 	public Map<String, String> getOcc4FloorByDate(String bedRange, String dt) {
 		
@@ -37,6 +38,7 @@ public class DBTools {
 		
 		Map<String, String> mp = new HashMap<String, String>();
 		String SESSO, STANZA, COD_LETTO, value="", key="";
+		int recNum=0;
 		
 		try {
 			
@@ -53,22 +55,34 @@ public class DBTools {
 			  log.debug(" databaseURL -> " + databaseURL);
 		      c = java.sql.DriverManager.getConnection (databaseURL, user, password);
 		      
-		      sbQuery.append("SELECT sesso, stanza, codice_letto ");
-		      sbQuery.append("FROM REGINA_LOGISTICA_V ");
-		      sbQuery.append("WHERE ");
-		      sbQuery.append("gmadal <= ? AND (gmaal is null or (gmaal >= ?))");
-		      sbQuery.append("AND codice_letto IN ( "  + bedRange + " ) ");
+		      sbQuery.append("select a.codospite,a.nomeospite,a.sesso,d.sede,d.reparto,d.stanza,d.codice_letto,t.descr  ");
+		      sbQuery.append("from ospiti_a a join ospiti_d d on (a.codospite=d.codospite)  ");
+		      sbQuery.append("left join clin_medico_stanza m on (m.codstan=d.stanza and m.gmadal<=? and (m.gmaal is null or (m.gmaal>=?)))  ");
+		      sbQuery.append("left join teanapers t on (t.progr=m.progmedico)  ");
+		      sbQuery.append("where a.gmaing<=?  ");
+		      sbQuery.append("and (a.gmadim is null or (a.gmadim>?))  ");
+		      sbQuery.append("and d.gmainizioutili<=?  ");
+		      sbQuery.append("and ((d.gmafineutili>?) or d.gmafineutili is null)  ");
+		      sbQuery.append("and d.codice_letto IN ("  + bedRange + ")" );
 		      
-		      System.out.println(sbQuery.toString());
-      
+//		      sbQuery.append("SELECT sesso, stanza, codice_letto ");
+//		      sbQuery.append("FROM REGINA_LOGISTICA_V ");
+//		      sbQuery.append("WHERE ");
+//		      sbQuery.append("gmadal <= ? AND (gmaal is null or (gmaal >= ?))");
+//		      sbQuery.append("AND codice_letto IN ( "  + bedRange + " ) ");
 		      
-		      log.debug(" query -> " + sbQuery.toString());
+		      logDB.trace(" params -> dt=" + dt + "  bedRange=" + bedRange);
+		      logDB.debug(" sql (gmaal= "+ dt + ")-> " + sbQuery.toString());
+      		      
 			  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 
 			  pstmt.setTimestamp(1,tstamp.valueOf(dt));
 			  pstmt.setTimestamp(2,tstamp.valueOf(dt));
+			  pstmt.setTimestamp(3,tstamp.valueOf(dt));
+			  pstmt.setTimestamp(4,tstamp.valueOf(dt));
+			  pstmt.setTimestamp(5,tstamp.valueOf(dt));
+			  pstmt.setTimestamp(6,tstamp.valueOf(dt));
 			  //pstmt.setInt(2, iBed);
 			  //pstmt.setArray(2, iBed);
-
 			  ResultSet rs = pstmt.executeQuery();
 			  
 			  while (rs.next ()) {
@@ -79,11 +93,12 @@ public class DBTools {
 	        	  
 	        	  value = SESSO+";"+STANZA;
 	        	  key = COD_LETTO;
-	        	  System.out.println(SESSO+";"+STANZA+";"+COD_LETTO);
+	        	  logDB.trace("[SESSO;STANZA;COD_LETTO] -> "+ ++recNum +" " + SESSO+";"+STANZA+";"+COD_LETTO);
 	        	  
 	        	  mp.put(key, value);
 	          }
 
+			  logDB.debug("Total records -> " + recNum);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
