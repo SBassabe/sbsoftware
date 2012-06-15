@@ -2,6 +2,7 @@ package it.sbsoft.servlets;
 
 import it.sbsoft.beans.*;
 import it.sbsoft.db.DBTools;
+import it.sbsoft.exceptions.SBException;
 import it.sbsoft.utility.*;
 
 import com.google.gson.Gson;
@@ -58,7 +59,7 @@ public class FloorList extends HttpServlet {
 		log.info(" into doGet");
 		Bean2cli ret = new Bean2cli();
 		
-		List<Floor> floorList;
+		List<Floor> floorList = new ArrayList<Floor>();;
 		Floor floorBean;
 		
 		response.setContentType("text/html");
@@ -70,9 +71,8 @@ public class FloorList extends HttpServlet {
 		try {
 			
 			// Get list of floors
-			String floorProp=prop.getProperty("Floors");
+			String floorProp=prop.getPropertySB("Floors");
 			String[] floorArr = floorProp.split(",");
-			floorList = new ArrayList<Floor>();
 			
 			// For every floor do bed map
 			for (int i=0; i<floorArr.length; i++ ){
@@ -83,7 +83,7 @@ public class FloorList extends HttpServlet {
 				floorBean.setDescription(prop.getProperty(floorId+".desc"));
 				floorBean.setImgSrc(prop.getProperty(floorId+".src"));
 				//floorBean.setFloorMap(getMapCoordinates(floorBean.getId()));
-				if ("true".compareTo(maint) == 0) {
+				if ("false".compareTo(maint) == 0) {
 					floorBean.setFloorMap(getMapCoordinatesFromDB(floorBean.getId()));
 				} else {
 					floorBean.setFloorMap(getMapCoordinatesFromFile(floorBean.getId()));
@@ -94,18 +94,26 @@ public class FloorList extends HttpServlet {
 				
 			}
 			
+		} catch (Exception e) {
+			
+			ret.setError(new Errore());
+			
+			if (e instanceof SBException){
+				ret.getError().setErrorCode("1");
+				ret.getError().setErrorDesc(e.getMessage());
+			} else {
+				ret.getError().setErrorCode("2");
+				ret.getError().setErrorDesc("See Tomocat log files");
+				e.printStackTrace();
+			}
+		
+		} finally {
+			
 			ret.setRet2cli(floorList);
 			log.info(" exiting doGet ");
 			log.debug(" returning -> [" + gson.toJson(ret) + "]");
-			
-		} catch (Exception e) {
-			ret.setError(new Errore());
-			ret.getError().setErrorCode("1");
-			ret.getError().setErrorDesc("See Tomocat log files");
-			e.printStackTrace();
+			out.print(gson.toJson(ret));
 		}
-		
-		out.print(gson.toJson(ret));
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -144,7 +152,7 @@ public class FloorList extends HttpServlet {
 		return floorMapList;
 	}
 	
-	public List<FloorMap> getMapCoordinatesFromDB(String buildingId) {
+	public List<FloorMap> getMapCoordinatesFromDB(String buildingId) throws Exception {
 		
 		log.info(" called for buildingId -> " + buildingId);
 		DBTools db = new DBTools();
@@ -218,6 +226,7 @@ public class FloorList extends HttpServlet {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw e;
 		}
 
 		log.info(" totals A/P/D -> " + totalA+"/"+totalP+"/"+totalD + " for a grand total of -> " +  floorMapList.size());

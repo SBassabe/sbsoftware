@@ -1,5 +1,7 @@
 package it.sbsoft.utility;
 
+import it.sbsoft.exceptions.SBException;
+
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,5 +116,16 @@ public class PropertiesFile extends Properties {
 	    }
 
 	    return ref;
+	  }
+	  
+	  public String getPropertySB(String propKey) throws SBException {
+		  String ret;
+		  
+		  ret = this.getProperty(propKey);
+		  if (ret == null) {
+			  log.debug("Property: '" + propKey + "' not found");
+			  throw new SBException("PROPFILE_MISSINGKEY");
+		  }
+		  return ret;
 	  }
 }

@@ -1,0 +1,134 @@
+<project name="ReginaWeapp" default="deploy" basedir=".">
+    <description>
+    	Regina WebApp build
+    </description>
+
+  <!-- set global properties for this build -->
+  <property name="src_dir" location="src"/>
+  <property name="webapp_dir"  location="WebContent"/>
+  <property name="lib_shared" location=".\librerie_stabilizzazioneOVP\"/>
+  <property name="lib_local" location="${webapp_dir}/WEB-INF/lib"/>
+  <property name="build_dir" location="build"/>
+  <property name="dist_dir"  location="dist"/>
+  <property name="hejb_dir"  location="C:\Users\SO000457\Desktop\IMS\SVN\svn_10_188_40_144_trunk4\HibernateEJB"/>
+  <property name="jboss.as.deploy.dir"  location="C:/_data/_server/jboss-4.2.3.GA/server/OVP/deploy"/>
+
+  <property name="war_name"  location="${dist_dir}/OspitaPlus.war"/>
+
+  <!-- =================================================================== -->
+  <!-- The build classpath                                                 -->
+  <!-- =================================================================== -->
+  <path id="compile_classpath">
+    <fileset dir="${lib_shared}"><include name="*.jar"/> </fileset>
+	<fileset dir="${lib_local}"><include name="*.jar"/> </fileset>
+  </path>
+
+  <target name="init" depends="clean">
+    <!-- Create the time stamp -->
+  	<tstamp>
+  	  <format property="TODAY_HERE" pattern="yyyyMMdd_HHmm"/>
+  	</tstamp>
+    <!-- Create the build directory structure used by compile -->
+  	<delete dir="${build_dir}"/>
+    <mkdir dir="${build_dir}"/>
+	
+	<!-- HibernateEJB 
+  	<ant antfile="${hejb_dir}/build.xml" dir="${hejb_dir}" target="dist" inheritAll="false">
+  	</ant>
+  	-->
+  	<copy todir="${lib_shared}">
+  	  <fileset dir="${hejb_dir}/dist"> <include name="*.jar"/> </fileset>
+  	</copy>
+  </target>
+
+  <target name="compile" depends="init" description="compile the source">
+    <!-- Compile the java code from ${src_dir} into ${build_dir} -->
+    <echo>-----------------------------------</echo>
+    <echo>COMPILING OspitaPlus ...</echo>
+    <echo>-----------------------------------</echo>
+  	
+  	<javac destdir="${build_dir}"
+           classpathref="compile_classpath"
+	       debug="on"
+	       encoding="ISO-8859-1">
+	  <src path="${src_dir}"/>
+    </javac>
+  </target>
+
+  <target name="war_build" depends="compile" description="generate the distribution">
+  	<echo>---------------------------------------------------</echo>
+  	<echo>GENERATING OspitaPlus DISTRIBUTION ...</echo>
+  	<echo>---------------------------------------------------</echo>
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist_dir}"/>
+
+    <war destfile="${war_name}" webxml="${webapp_dir}/WEB-INF/web.xml">
+		<fileset dir="${webapp_dir}">
+			<exclude name="**/WEB-INF/lib/**"/>
+			<exclude name="**/WEB-INF/web.xml"/>
+		</fileset>
+
+		<lib dir="${webapp_dir}/WEB-INF/lib"/>
+
+		<classes dir="${build_dir}"/>
+	</war>
+  </target>
+	
+  <target name="folder_build" depends="compile" description="generate the distribution">
+  	
+  	<echo>---------------------------------------------------</echo>
+  	<echo>GENERATING OspitaPlus FOLDER only DISTRIBUTION  ...</echo>
+  	<echo>---------------------------------------------------</echo>
+
+  	<!-- Cattura versione per ZIP file e fai replace -->
+  	<input
+  	    message="Please enter release version: IMS_OVP_2011_X07_vX.Y.Z"
+  	    addproperty="build.ver"
+  		defaultvalue="IMS_OVP_2011_X07_v1.x.x">
+  	</input>
+  	
+  	<!-- Create the distribution directory -->
+  	<delete dir="${dist_dir}/OspitaPlus.war"/>
+  	<mkdir dir="${dist_dir}/OspitaPlus.war"/>
+
+  	<!-- Copy webapp files -->
+  	<copy todir="${dist_dir}/OspitaPlus.war">
+  		<fileset dir="${webapp_dir}"/>
+  	</copy>
+
+  	<!-- Copy compiled files -->
+  	<copy todir="${dist_dir}/OspitaPlus.war/WEB-INF/classes">
+  		<fileset dir="${build_dir}"/>
+  	</copy>
+  	
+  	<tstamp>
+  	    <format property="TODAY" pattern="d-MMMM-yyyy" locale="it, IT"/>
+  	</tstamp>
+  	
+  	<replace file="${dist_dir}/OspitaPlus.war/loginOspita.jsp" value="${build.ver} / ${TODAY}">
+  	  <replacetoken>@BUILD_VALUE@</replacetoken>
+  	</replace>
+  	
+  	<echo>${build.ver}</echo>
+  	
+  	<!-- Generate ZIP file -->
+  	<zip destfile="${build.ver}.zip"  basedir="${dist_dir}"/>
+  	
+  </target>	
+	
+  <target name="clean" description="clean up">
+    <!-- Delete the ${build_dir} and ${dist_dir} directory trees -->
+    <echo>-----------------------------------</echo>
+    <echo>CLEANING OspitaPlus ...</echo>
+    <echo>-----------------------------------</echo>
+    <delete dir="${build_dir}"/>
+    <delete dir="${dist_dir}"/>
+  </target>
+	
+	<!-- DEPLOY -->
+	<target name="deploy" depends="war_build">
+		<copy todir="${jboss.as.deploy.dir}/" file="${war_name}"/>
+	</target>
+	
+	
+</project>

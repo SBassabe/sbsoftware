@@ -77,7 +77,7 @@ canvasMgr = function(){
 		var method = 'getFloorList';
 		var params = {
 			maint: currObj.maintMode	
-		}
+		};
         try {
             
             $.ajax({
@@ -92,12 +92,14 @@ canvasMgr = function(){
                 	currObj.getFloorListElab(transport, _callback);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    alert("error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown);
+                    var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
+                    canvasMgr.showError(errDesc);
                 }
             });
             
         } catch (e) {
-            alert("ajax call error:" + e);
+        	canvasMgr.showError(" on method:" + method);
+            console.log(e);
             return;
         }
 	};
@@ -128,7 +130,13 @@ canvasMgr = function(){
 			_callback(firstFloor); //currObj.createBuildingPulldown
 			
 		} else {
-			alert("There has been an error. Please trace...");
+			var err = transport.error;
+			if (err.errorCode == 1) {
+				canvasMgr.showError(transport.error.errorDesc);
+			    
+			} else {
+				canvasMgr.showError(" in method -> " + method);
+			};
 		};
 	};
 	
@@ -272,5 +280,11 @@ canvasMgr = function(){
 				document.getElementById("rad1lbl").innerHTML="On";
 			}
 		};
+	};
+	
+	this.showError = function(errDesc) {
+		
+		$("#errMsg").html("There has been an error \n" + errDesc);
+		$("#errDiag").dialog('open');
 	};
 };

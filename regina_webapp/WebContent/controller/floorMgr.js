@@ -83,13 +83,15 @@ floorMgr = function(){
                 	floorMgrObj.getFloorOcc4DateListElab(transport, stage, layer, _callback);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    alert("error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown);
+                    var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
+                    canvasMgr.showError(errDesc);
                 }
             });
             
         } 
         catch (e) {
-            alert("ajax call error:" + e);
+        	canvasMgr.showError(" on method:" + method);
+            console.log(e);
             return;
         }
 		
@@ -99,6 +101,7 @@ floorMgr = function(){
 		
 		console.log("getFloorOcc4DateListElab called ...");
 		console.log("floorMgrObj.id = " + floorMgrObj.id);
+		var method="getFloorOcc4DateListElab";
 		
 		if (transport.error == undefined) {
 			
@@ -108,7 +111,14 @@ floorMgr = function(){
 			//floorMgrObj.createOccLayer(stage, layer, ret.dt);
 			
 		} else {
-			alert("There has been an error. Please trace...");
+			var err = transport.error; 
+			if (err.errorCode == 1) {
+				canvasMgr.showError(transport.error.errorDesc);
+			    
+			} else {
+				canvasMgr.showError(" in method -> " + method);
+			};
+			
 		};
 	};
 	

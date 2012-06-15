@@ -32,6 +32,17 @@ window.onload = function() {
 		    close: function() {$("#infBtn").show();},
 		    open: function() {$("#infBtn").hide();}
 	});
+
+	$( "#errDiag" ).dialog({
+		width: 330,
+		resizable: false,
+		minHeight: 60,
+		position: [125,125], 
+		show: { effect: 'drop', direction: "down" } ,
+		hide: { effect: 'drop', direction: "down" } ,
+	    title: "Errore ...",
+	    autoOpen: false
+	});
 	
 	$( "#radio" ).buttonset();
 	$( "#jbutton" ).button();
@@ -119,6 +130,10 @@ window.onload = function() {
 		  </div>
 		  <!-- button id="jbutton" onclick="canvasMgr.maintMgr.collectLayerData()">Salva Modifiche</button-->
 		  <!-- input value="Save regina.properties ..." type="button" onclick="canvasMgr.maintMgr.collectLayerData()" style="vertical-align: top;"/ -->
+	</div>
+	<div id="errDiag" title="Error Dialog">
+		<div><img src="./images/icon_errore.png"></img></div>
+		<div id="errMsg"></div>
 	</div>
 </body>
 </html>

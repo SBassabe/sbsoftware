@@ -5,6 +5,7 @@ import it.sbsoft.beans.BedOccupancy;
 import it.sbsoft.beans.Errore;
 import it.sbsoft.beans.Floor;
 import it.sbsoft.db.DBTools;
+import it.sbsoft.exceptions.SBException;
 import it.sbsoft.utility.LoggerUtils;
 import it.sbsoft.utility.PropertiesFile;
 import it.sbsoft.utility.constants;
@@ -15,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -59,19 +58,25 @@ public class FloorOccupancy extends HttpServlet {
 			//floor.setOccMap(getOccupancySimu(buildId, dt));
 			floor.setOccMap(getOccupancyDB(buildId, dt));
 			
-			//normal response
-			ret.setRet2cli(floor);
-			log.debug(" returning -> [" + gson.toJson(ret) + "]");
-			out.print(gson.toJson(ret));
-			
 		} catch (Exception e) {
 			
 			ret.setError(new Errore());
-			ret.getError().setErrorCode("1");
-			ret.getError().setErrorDesc("See Tomocat log files");
-			e.printStackTrace();
 			
+			if (e instanceof SBException){
+				ret.getError().setErrorCode("1");
+				ret.getError().setErrorDesc(e.getMessage());
+			} else {
+				ret.getError().setErrorCode("2");
+				ret.getError().setErrorDesc("See Tomocat log files");
+				e.printStackTrace();
+			}
 		}
+		
+		//normal response
+		ret.setRet2cli(floor);
+		log.debug(" returning -> [" + gson.toJson(ret) + "]");
+		out.print(gson.toJson(ret));
+		
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -109,7 +114,7 @@ public class FloorOccupancy extends HttpServlet {
 		return bedOccMap;
 	}
 	
-	private List<BedOccupancy> getOccupancyDB(String buildId, String dt) {
+	private List<BedOccupancy> getOccupancyDB(String buildId, String dt) throws Exception {
 		
 		log.info(" called with params buildId/dt ->" + buildId +"/" + dt);
 		
@@ -119,6 +124,8 @@ public class FloorOccupancy extends HttpServlet {
 		
 		strBMap = prop.getProperty(buildId+".bed_map");
 		log.debug("strBMap ->" + strBMap); //A0;143;733;3;0;200,A0;144;733;3;12;200,A0
+		
+		if (strBMap == null) throw new SBException("PROP_NOTCONFIG");
 		
 		//dt = 20110116   I need -> Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff] 
 		String year, day, month, timestamp;
@@ -132,8 +139,10 @@ public class FloorOccupancy extends HttpServlet {
 		str = str.replace("]", ""); 
 		
 		DBTools db = new DBTools();
-		Map<String,String> occ = db.getOcc4FloorByDate(str, timestamp);
-		
+		Map<String, String> occ;
+
+		occ = db.getOcc4FloorByDate(str, timestamp);
+	
 		String[] sp = strBMap.split(",");
 		for (int i=0; i<sp.length; i++) {
 			
@@ -157,7 +166,7 @@ public class FloorOccupancy extends HttpServlet {
 			log.trace(" bOcc as Gson -> " + gson.toJson(bOcc));
 			bedOccMap.add(bOcc);
 		}
-		
+				
 		return bedOccMap;
 	}
 	

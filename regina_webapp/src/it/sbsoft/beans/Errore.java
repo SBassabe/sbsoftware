@@ -2,7 +2,7 @@ package it.sbsoft.beans;
 
 public class Errore {
 	
-	private String errorCode;
+	private String errorCode; // 0-NoError; 1-SBException; 2-unknown
 	private String errorDesc;
 	public String getErrorCode() {
 		return errorCode;
