@@ -10,8 +10,10 @@ canvasMgr = function(){
 	this.stage = new Kinetic.Stage({
 		container : "container",
 		width : 1164,
-		height : 500
+		height : 500,
+		x : 10
 	});
+	//this.stage.setScale(0.9);
 	this.floorLyr = new Kinetic.Layer({id: "floorLyr"});
 	this.toolTipLyr = new Kinetic.Layer({id: "toolTipLyr"});
 	this.occLyr = new Kinetic.Layer({id: "occLyr"});
@@ -284,7 +286,7 @@ canvasMgr = function(){
 	
 	this.showError = function(errDesc) {
 		
-		$("#errMsg").html("There has been an error \n" + errDesc);
+		$("#errMsg").html("Errore dell'applicativo \n" + errDesc);
 		$("#errDiag").dialog('open');
 	};
 };

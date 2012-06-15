@@ -82,11 +82,18 @@ public class MaintSrvlt extends HttpServlet {
 			pVal = prop.getProperty(pKey);
 			if (pVal != null) prop.setProperty(pKey, floorMap);
 
-			prop.store(new FileOutputStream(cHome), "myComment");
+			StringBuffer sb = new StringBuffer();
+			sb.append("# 1 Configuration file for ReginaWeb app \n");
+			sb.append("# 2 must be located in ${catalina.home}\\conf\\regina.properties \n");
+			sb.append("# 3 Formats: \n");
+			sb.append("# 4 [bed_map] CODSTAN ;NUMSTANZA ;CODLETTO ; IDSEDE ;X ;Y \n");
+			sb.append("# 5 [floor_feat] TYPE; ROOM; X; Y \n");
+			sb.append("# 6 [doctor] DOCID; POLYPOINTS \n");
+			
+			prop.store(new FileOutputStream(cHome), sb.toString());
 			sortFile();
 			
 			prop.cleanFloorMaps();
-		
 			
 		} catch (Exception e) {
 			ret.getError().setErrorCode("1");

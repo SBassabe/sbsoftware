@@ -95,9 +95,7 @@ public class FloorList extends HttpServlet {
 			}
 			
 		} catch (Exception e) {
-			
 			ret.setError(new Errore());
-			
 			if (e instanceof SBException){
 				ret.getError().setErrorCode("1");
 				ret.getError().setErrorDesc(e.getMessage());

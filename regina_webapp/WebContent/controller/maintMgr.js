@@ -255,7 +255,7 @@ maintMgr = function() {
 		if (transport != null && transport.error != "0") {
 			
 			console.log("all good");
-			alert("Config File Saved OK ...");
+			alert("Dati salvati con successo ...");
 			
 		} else {
 			alert("There has been an error. Please trace...");
