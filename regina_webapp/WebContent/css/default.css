@@ -89,3 +89,10 @@ div.right {
 	text-align: center;
 	display: none;
 }
+
+#credits {
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+	color: gray;
+}	
