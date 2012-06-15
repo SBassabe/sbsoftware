@@ -1,7 +1,6 @@
 <project name="ReginaWeapp" default="war_build" basedir=".">
-    <description>
-    	Regina WebApp build
-    </description>
+    
+  <description>Regina WebApp build</description>
 
   <!-- set global properties for this build -->
   <tstamp><format property="TODAY2" pattern="yyyyMMdd_kkmm"/></tstamp>
