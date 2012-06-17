@@ -132,9 +132,10 @@ public class FloorOccupancy extends HttpServlet {
 		year = dt.substring(0, 4);
 		month = dt.substring(4,6);
 		day = dt.substring(6,8);
-		timestamp = year +"-"+ month +"-"+ day +" 00:00:00";
-		
-		String str = prop.floorMaps.get("A1").keySet().toString();
+		//timestamp = year +"-"+ month +"-"+ day +" 00:00:00";
+		timestamp = year +"-"+ month +"-"+ day;
+				
+		String str = prop.floorMaps.get(buildId).keySet().toString();
 		str = str.replace("[", "");
 		str = str.replace("]", ""); 
 		
@@ -152,17 +153,16 @@ public class FloorOccupancy extends HttpServlet {
 			bOcc = new BedOccupancy();
 			bOcc.setBed(sCoords[1]);
 			if (occ.containsKey(sCoords[1])) {
-				bOcc.setStatus("2"); // Occupato
+				bOcc.setStatus("1"); // Occupato
 				sex = occ.get(sCoords[1]).split(";")[0];
 				bOcc.setGender(sex);
+				bOcc.setName(occ.get(sCoords[1]).split(";")[3]);
 				
 			} else {
 				bOcc.setStatus("0"); // Libero
+				bOcc.setName("");
 			}
-			
-			bOcc.setName("Nome_" + i);
-			bOcc.setSurname("Surname_" + i);
-			
+						
 			log.trace(" bOcc as Gson -> " + gson.toJson(bOcc));
 			bedOccMap.add(bOcc);
 		}

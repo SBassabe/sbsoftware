@@ -309,7 +309,7 @@ floorMgr = function(){
 			var cObj = floorMgrObj.getObj4Bed(oMap, fMap[mObj].bed);
 			  if (cObj != undefined) {
 				var rom = fMap[mObj].room;
-				var bed = cObj.bed; 
+				var bed = cObj.bed + "(" + cObj.name + ")"; 
 				var obj;
 				var zoomFact = 1;
 				

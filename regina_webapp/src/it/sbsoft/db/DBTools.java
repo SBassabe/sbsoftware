@@ -28,7 +28,7 @@ public class DBTools {
 		log.debug("bedRange ->" + bedRange);
 		
 		Map<String, String> mp = new HashMap<String, String>();
-		String SESSO, STANZA, COD_LETTO, value="", key="";
+		String SESSO, STANZA, COD_LETTO, NOME, value="", key="";
 		int recNum=0;
 		Connection c = null;
 		
@@ -58,37 +58,33 @@ public class DBTools {
 		      c = java.sql.DriverManager.getConnection (databaseURL, user, password);
 		      
 		      StringBuffer sbQuery = new StringBuffer();
-		      sbQuery.append("select a.codospite,a.nomeospite,a.sesso,d.sede,d.reparto,d.stanza,d.codice_letto,t.descr  ");
-		      sbQuery.append("from ospiti_a a join ospiti_d d on (a.codospite=d.codospite)  ");
-		      sbQuery.append("left join clin_medico_stanza m on (m.codstan=d.stanza and m.gmadal<=? and (m.gmaal is null or (m.gmaal>=?)))  ");
-		      sbQuery.append("left join teanapers t on (t.progr=m.progmedico)  ");
-		      sbQuery.append("where a.gmaing<=?  ");
-		      sbQuery.append("and (a.gmadim is null or (a.gmadim>?))  ");
-		      sbQuery.append("and d.gmainizioutili<=?  ");
-		      sbQuery.append("and ((d.gmafineutili>?) or d.gmafineutili is null)  ");
+		      sbQuery.append("SELECT a.sesso,d.stanza,d.codice_letto,a.gmadim,d.gmainizioutili,d.gmafineutili,a.codospite,a.nomeospite,d.sede,d.reparto ");
+		      sbQuery.append("FROM ospiti_a a ");
+		      sbQuery.append("JOIN ospiti_d d on (a.codospite=d.codospite) ");
+		      sbQuery.append("LEFT JOIN clin_medico_stanza m on (m.codstan=d.stanza and m.gmadal<= CAST('" + dt + "' AS DATE) and (m.gmaal is null or (m.gmaal >= CAST('" + dt + "' AS DATE)))) ");
+		      //sbQuery.append("LEFT JOIN teanapers t on (t.progr=m.progmedico) ");
+		      sbQuery.append("WHERE a.gmaing<=CAST('" + dt + "' AS DATE) ");
+		      sbQuery.append("AND (a.gmadim is null or (a.gmadim>CAST('" + dt + "' AS DATE))) ");
+		      sbQuery.append("AND d.gmainizioutili<=CAST('" + dt + "' AS DATE) ");
+		      sbQuery.append("AND ((d.gmafineutili>CAST('" + dt + "' AS DATE)) or d.gmafineutili is null) ");
 		      sbQuery.append("and d.codice_letto IN ("  + bedRange + ")" );
 		      
 		      logDB.trace(" params -> dt=" + dt + "  bedRange=" + bedRange);
 		      logDB.debug(" sql (gmaal= "+ dt + ")-> " + sbQuery.toString());
       		      
 			  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 
-			  pstmt.setTimestamp(1,tstamp.valueOf(dt));
-			  pstmt.setTimestamp(2,tstamp.valueOf(dt));
-			  pstmt.setTimestamp(3,tstamp.valueOf(dt));
-			  pstmt.setTimestamp(4,tstamp.valueOf(dt));
-			  pstmt.setTimestamp(5,tstamp.valueOf(dt));
-			  pstmt.setTimestamp(6,tstamp.valueOf(dt));
 			  ResultSet rs = pstmt.executeQuery();
 			  
 			  while (rs.next ()) {
-
+				  
 	         	  SESSO = rs.getString ("sesso");        	  
 	        	  STANZA = rs.getString ("stanza");
 	        	  COD_LETTO = rs.getString ("codice_letto");
+	        	  NOME = rs.getString("nomeospite");
 	        	  
-	        	  value = SESSO+";"+STANZA;
+	        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME;
 	        	  key = COD_LETTO;
-	        	  logDB.trace("[SESSO;STANZA;COD_LETTO] -> "+ ++recNum +" " + SESSO+";"+STANZA+";"+COD_LETTO);
+	        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME] -> "+ ++recNum + value);
 	        	  
 	        	  mp.put(key, value);
 	          }
@@ -187,5 +183,4 @@ public class DBTools {
 		logDB.info(" total number of beds processed -> " + numBeds+"");
 		return retMap;
 	}
-
 }

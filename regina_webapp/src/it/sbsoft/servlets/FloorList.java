@@ -83,7 +83,7 @@ public class FloorList extends HttpServlet {
 				floorBean.setDescription(prop.getProperty(floorId+".desc"));
 				floorBean.setImgSrc(prop.getProperty(floorId+".src"));
 				//floorBean.setFloorMap(getMapCoordinates(floorBean.getId()));
-				if ("false".compareTo(maint) == 0) {
+				if ("true".compareTo(maint) == 0) {
 					floorBean.setFloorMap(getMapCoordinatesFromDB(floorBean.getId()));
 				} else {
 					floorBean.setFloorMap(getMapCoordinatesFromFile(floorBean.getId()));
