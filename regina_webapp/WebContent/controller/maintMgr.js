@@ -1,7 +1,8 @@
 maintMgr = function() {
 	
 	var maintObj = this;
-	this.polyArray = new Array(); 
+	this.polyArray = new Array();
+	this.doctorMap = new Array();
 	
 	this.initTst = function(layer, docMap) {
 		
@@ -11,6 +12,8 @@ maintMgr = function() {
 		for (d in docMap) {
 			 maintObj.polyArray.push(docMap[d].polyPoints);
 		}
+		
+		maintObj.doctorMap = docMap.slice();
 		
         //maintObj.polyArray.push(cPoly1);
         //maintObj.polyArray.push(cPoly2);
@@ -34,10 +37,15 @@ maintMgr = function() {
 	this.updateDottedLines = function(layer) {
 		
 		//console.log("updateDotted");
-		var i;
-    	for (i=0; i<maintObj.polyArray.length; i++) {
+		var i=0;
+		for (o in maintObj.doctorMap) {
+    	// for (i=0; i<maintObj.polyArray.length; i++) {
+			
+			var docObj = maintObj.doctorMap[o];
 	        var c = eval("layer.polyPnts" + i);
-	        var polyLine = layer.get('#polyLine'+i)[0];
+	        
+	        //var polyLine = layer.get('#polyLine'+i)[0];
+	        var polyLine = layer.get('#p_'+docObj.docId)[0];
 	        
 	        if (c == undefined || polyLine == undefined) return;
 	        
@@ -49,6 +57,7 @@ maintMgr = function() {
 	          c.control4.attrs.x, c.control4.attrs.y,
 	          c.end.attrs.x, c.end.attrs.y
 	        ]);
+	        i++;    
     	}
 	};
 	
@@ -88,20 +97,28 @@ maintMgr = function() {
 		  var i=0;
 		  var objPriv;
 		  
-		  for (o in maintObj.polyArray) {
+		  //for (o in maintObj.polyArray) {
+		  for (o in maintObj.doctorMap) {
 			  
-			var c = maintObj.polyArray[o].split(",");  
-			var id = "polyLine"+i;
+			//var c = maintObj.polyArray[o].split(",");
+			var docObj = maintObj.doctorMap[o];  
+			var c = docObj.polyPoints.split(",");
+			//var id = "polyLine"+i;
+			var id = "p_" + docObj.docId;
+			console.log("anchor id -> " + id);
+			console.log("docObj.polyPoints -> " + docObj.polyPoints);
 		        
 			// crate polygon and add it to layer
 			poly = new Kinetic.Polygon({
 			        //points: c,
-			        fill: "#00D2F0",
+			        fill: docObj.color,
 			        alpha: 0.2,
-			        stroke: "#00D2F0",
+			        stroke: docObj.color,
 			        strokeWidth: 0,
 			        id: id,
-			        name: "Doc"+i
+			        docName: docObj.docName,
+			        name: docObj.docId,
+			        rooms: docObj.rooms
 		        });
 		        layer.add(poly);
 		        
@@ -145,6 +162,7 @@ maintMgr = function() {
 		
 		var retObj = new returnObj();
 		var doc;
+		var color;
 		var txt;
 		var type;
 		var room;
@@ -152,24 +170,36 @@ maintMgr = function() {
 		var y;
 		var posObj;
 		var id;
-		var preFix="polyLine";
+		var preFix="p_";
 		var polyArr;
 		
 		for (obj in canvasMgr.floorLyr.getChildren()) {
 			
 			var child = canvasMgr.floorLyr.children[obj];
 			// Doctors polyPoints
+			// [doctor] DOCID;COLOR;POLYPOINTS, 
+			// [doctor] DOCID; COLOR; DOCNAME; ROOMS; POLYPOINTS
 			id = child.getAttrs().id;
 			if (id != undefined && id.substr(0, preFix.length) == preFix) {
+				
 				console.log(id);
 				doc = child.getAttrs().name;
+				color = child.getAttrs().fill;
+				docname = child.getAttrs().docName;
+				room = child.getAttrs().rooms;
+				
 				polyArr = new Array();
 				polyArr.push(doc);
+				polyArr.push(color);
+				polyArr.push(docname);
+				polyArr.push(room);
+				
 				for (p in child.getAttrs().points) {
 					pnt = child.getAttrs().points[p];
 					polyArr.push(pnt.x);
 					polyArr.push(pnt.y);
 				}
+				
 				txt=polyArr.join(";");
 				retObj.doctorMap.push(txt);
 				continue;
@@ -248,6 +278,44 @@ maintMgr = function() {
 		
 	};
 	
+	this.callMgmtSrvltDoc = function(reqObj, doc2del, act) {
+		
+		console.log("callMgmtSrvltNewDoc called ...");
+ 
+		var param = {
+			action: act,	
+		    currFloor: canvasMgr.currFloor,
+			doctorMap: reqObj,
+			doc2del: doc2del
+		};	
+		
+		try {
+         
+            $.ajax({
+                url: "MaintSrvlt",
+                dataType: "json",
+                timeout: 10000,
+                type: 'POST',
+                async: false,
+                data: param,
+                context: document.body,
+                success: function(transport){
+                	maintObj.callMgmtSrvltElab(transport);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                	
+                	canvasMgr.showError("error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown);
+                }
+            });
+            
+        } 
+        catch (e) {
+        	canvasMgr.showError("ajax call error:" + e);
+            return;
+        }
+		
+	};
+	
 	this.callMgmtSrvltElab = function(transport) {
 		
 		console.log("callMgmtSrvltElab called ...");
@@ -255,10 +323,10 @@ maintMgr = function() {
 		if (transport != null && transport.error != "0") {
 			
 			console.log("all good");
-			alert("Dati salvati con successo ...");
+			canvasMgr.showMsg("Dati salvati con successo ...");
 			
 		} else {
-			alert("There has been an error. Please trace...");
+			canvasMgr.showError("There has been an error. Please trace...");
 		};
 	};
 	

@@ -13,9 +13,12 @@ import it.sbsoft.utility.constants;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -135,14 +138,19 @@ public class FloorOccupancy extends HttpServlet {
 		//timestamp = year +"-"+ month +"-"+ day +" 00:00:00";
 		timestamp = year +"-"+ month +"-"+ day;
 				
-		String str = prop.floorMaps.get(buildId).keySet().toString();
-		str = str.replace("[", "");
-		str = str.replace("]", ""); 
+//		String str = prop.floorMaps.get(buildId).keySet().toString();
+//		str = str.replace("[", "");
+//		str = str.replace("]", ""); 
+		
+		// Check to see if there are any beds configured ... 
+		Set<String> setBedKeyset = new HashSet<String>(prop.floorMaps.get(buildId).keySet());
+		log.debug(" setBedKeyset.toString -> " + setBedKeyset.toString());
+		if (setBedKeyset.isEmpty()) throw new SBException("FLOORMAP_EMPTY");
 		
 		DBTools db = new DBTools();
 		Map<String, String> occ;
 
-		occ = db.getOcc4FloorByDate(str, timestamp);
+		occ = db.getOcc4FloorByDate(setBedKeyset, timestamp);
 	
 		String[] sp = strBMap.split(",");
 		for (int i=0; i<sp.length; i++) {
@@ -153,7 +161,7 @@ public class FloorOccupancy extends HttpServlet {
 			bOcc = new BedOccupancy();
 			bOcc.setBed(sCoords[1]);
 			if (occ.containsKey(sCoords[1])) {
-				bOcc.setStatus("1"); // Occupato
+				bOcc.setStatus(occ.get(sCoords[1]).split(";")[4]); // Occupato
 				sex = occ.get(sCoords[1]).split(";")[0];
 				bOcc.setGender(sex);
 				bOcc.setName(occ.get(sCoords[1]).split(";")[3]);

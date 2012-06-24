@@ -6,6 +6,8 @@ public class DoctorMap {
 	private String docId;
 	private String polyPoints;
 	private String color;
+	private String docName;
+	private String rooms;
 	
 	public String getBuilding() {
 		return building;
@@ -31,8 +33,17 @@ public class DoctorMap {
 	public void setColor(String color) {
 		this.color = color;
 	}
-	
-	
-	
+	public String getDocName() {
+		return docName;
+	}
+	public void setDocName(String docName) {
+		this.docName = docName;
+	}
+	public String getRooms() {
+		return rooms;
+	}
+	public void setRooms(String rooms) {
+		this.rooms = rooms;
+	}
 	
 }

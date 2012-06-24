@@ -4,12 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
-import it.sbsoft.exceptions.*;
+import it.sbsoft.exceptions.SBException;
 import it.sbsoft.utility.CodeEncodeString;
 import it.sbsoft.utility.LoggerUtils;
 import it.sbsoft.utility.PropertiesFile;
@@ -20,29 +22,24 @@ public class DBTools {
     static Logger logDB = LoggerUtils.getLogger("db");
     static CodeEncodeString decode = CodeEncodeString.getInstance();
 	private PropertiesFile propFile = PropertiesFile.getPropertiesFile();
-    
-	public Map<String, String> getOcc4FloorByDate(String bedRange, String dt) throws Exception {
+	
+	public Map<String, String> getOcc4FloorByDate(Set<String> setBedKeyset, String dt) throws Exception {
 		
-		  log.info("called with params dt/bedRange ->" + dt+"/...");
-		logDB.info("called with params dt/bedRange ->" + dt+"/...");
-		log.debug("bedRange ->" + bedRange);
+		log.info("called with params dt/bedSet ->" + dt+"/...");
 		
+		StringBuffer sbQuery;
+		PreparedStatement pstmt;
+		ResultSet rs;
 		Map<String, String> mp = new HashMap<String, String>();
-		String SESSO, STANZA, COD_LETTO, NOME, value="", key="";
-		int recNum=0;
+		String SESSO, STANZA, COD_LETTO, NOME, STATUS, value="", key="";
+		int occNum=0, preNum=0;
 		Connection c = null;
 		
 		try {
 			
-//            CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y
-//			  CBAREGINA
-//			  SELECT a.SESSO, a.REPARTO, a.STANZA, a.CODICE_LETTO, a.DESCR
-//			  FROM REGINA_LOGISTICA_V a
-
-			  Timestamp tstamp = new Timestamp(000000);
-			  
+			  // Get the connection
+			  //FIREDB.CBAREGINA=jdbc:firebirdsql:localhost/3050:C:/FBDB/CBAOSPITIB.FDB			  
 			  Class.forName ("org.firebirdsql.jdbc.FBDriver");
-			  //FIREDB.CBAREGINA=jdbc:firebirdsql:localhost/3050:C:/FBDB/CBAOSPITIB.FDB
 			  String databaseURL = propFile.getPropertySB("FIREDB.CBAREGINA");
 			  logDB.debug(" databaseURL -> " + databaseURL);
 			  
@@ -57,38 +54,90 @@ public class DBTools {
 			  
 		      c = java.sql.DriverManager.getConnection (databaseURL, user, password);
 		      
-		      StringBuffer sbQuery = new StringBuffer();
+		      // Query for 'Occupato'
+			  String bedRange = setBedKeyset.toString();
+			  
+			  bedRange = bedRange.replace("[", "");
+			  bedRange = bedRange.replace("]", "");
+		      
+		      sbQuery = new StringBuffer();
 		      sbQuery.append("SELECT a.sesso,d.stanza,d.codice_letto,a.gmadim,d.gmainizioutili,d.gmafineutili,a.codospite,a.nomeospite,d.sede,d.reparto ");
 		      sbQuery.append("FROM ospiti_a a ");
 		      sbQuery.append("JOIN ospiti_d d on (a.codospite=d.codospite) ");
 		      sbQuery.append("LEFT JOIN clin_medico_stanza m on (m.codstan=d.stanza and m.gmadal<= CAST('" + dt + "' AS DATE) and (m.gmaal is null or (m.gmaal >= CAST('" + dt + "' AS DATE)))) ");
-		      //sbQuery.append("LEFT JOIN teanapers t on (t.progr=m.progmedico) ");
 		      sbQuery.append("WHERE a.gmaing<=CAST('" + dt + "' AS DATE) ");
 		      sbQuery.append("AND (a.gmadim is null or (a.gmadim>CAST('" + dt + "' AS DATE))) ");
 		      sbQuery.append("AND d.gmainizioutili<=CAST('" + dt + "' AS DATE) ");
 		      sbQuery.append("AND ((d.gmafineutili>CAST('" + dt + "' AS DATE)) or d.gmafineutili is null) ");
 		      sbQuery.append("and d.codice_letto IN ("  + bedRange + ")" );
 		      
-		      logDB.trace(" params -> dt=" + dt + "  bedRange=" + bedRange);
-		      logDB.debug(" sql (gmaal= "+ dt + ")-> " + sbQuery.toString());
+		      logDB.trace(" Occupati Query params -> dt=" + dt + "  bedRange=" + bedRange);
+		      logDB.debug(" Occupati Query sql -> " + sbQuery.toString());
       		      
-			  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 
-			  ResultSet rs = pstmt.executeQuery();
+			  pstmt = c.prepareStatement(sbQuery.toString()); 
+			  rs = pstmt.executeQuery();
 			  
+			  
+			  logDB.info("coll.size = " + setBedKeyset.size());
 			  while (rs.next ()) {
 				  
 	         	  SESSO = rs.getString ("sesso");        	  
 	        	  STANZA = rs.getString ("stanza");
 	        	  COD_LETTO = rs.getString ("codice_letto");
 	        	  NOME = rs.getString("nomeospite");
+	        	  STATUS="2"; // 2=occupato
 	        	  
-	        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME;
+	        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS;
 	        	  key = COD_LETTO;
-	        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME] -> "+ ++recNum + value);
+	        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS] -> "+ ++occNum + value);
 	        	  
 	        	  mp.put(key, value);
+	        	  setBedKeyset.remove(COD_LETTO);
+	        	 
 	          }
+			  logDB.info("coll.size = " + setBedKeyset.size());
+			  
+			  // Query for 'Prenotato'
+			  if (!setBedKeyset.isEmpty()) {
+				  
+				  bedRange = setBedKeyset.toString();
+				  bedRange = bedRange.replace("[", "");
+				  bedRange = bedRange.replace("]", "");
+			      
+			      sbQuery = new StringBuffer();
+			      
+			      sbQuery.append("SELECT distinct a.sesso,p.stanza,p.letto codice_letto,p.dal,p.al,a.CODOSPITE,a.NOMEOSPITE,p.sede,p.reparto  "); 
+			      sbQuery.append("from laospita a  ");
+			      sbQuery.append("join laregole r on (a.codente=r.codente and a.codospite=r.codospite and r.stato='P')  ");
+			      sbQuery.append("join clin_prenotazioni p on (a.codospite=p.codospite ");
+			      sbQuery.append("     and p.al >= CAST('" + dt + "' AS DATE)  ");
+			      sbQuery.append("     and p.dal <= CAST('" + dt + "' AS DATE) and p.letto IN ("  + bedRange + ")) ");
 
+			      logDB.trace(" Prenotati Query params -> dt=" + dt + "  bedRange=" + bedRange);
+			      logDB.debug(" Prenotati Query sql (dt= "+ dt + ")-> " + sbQuery.toString());
+	      		      
+				  pstmt = c.prepareStatement(sbQuery.toString()); 
+				  rs = pstmt.executeQuery();
+				  
+				  while (rs.next ()) {
+					  
+		         	  SESSO = rs.getString ("sesso");        	  
+		        	  STANZA = rs.getString ("stanza");
+		        	  COD_LETTO = rs.getString ("codice_letto");
+		        	  NOME = rs.getString("nomeospite");
+		        	  STATUS="1"; //1=prenotato
+		        	  
+		        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS;
+		        	  key = COD_LETTO;
+		        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS] -> "+ ++preNum + value);
+		        	  
+		        	  mp.put(key, value);
+		        	 
+		          }
+			  }
+			  
+		} catch (SBException e) {
+			throw new SBException(e.getMessage());
 		} catch (Exception e) {
 			if (e instanceof SQLException) {
 				e.printStackTrace();
@@ -97,12 +146,14 @@ public class DBTools {
 				throw new SBException("DB_UNREACHABLE");
 			} else {
 				throw e;
-			}
+			}	
 		} finally {
+			rs=null;
+			pstmt=null;
 			c=null;
 		}
-		log.info("Total records -> " + recNum);
-		logDB.info("Total records -> " + recNum);
+		log.info("Total records occ/pre-> " + occNum+"/"+preNum);
+		logDB.info("Total records occ/pre-> " + occNum+"/"+preNum);
 		return mp;
 	}
 	

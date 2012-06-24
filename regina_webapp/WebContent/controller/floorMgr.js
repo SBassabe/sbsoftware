@@ -140,17 +140,20 @@ floorMgr = function(){
 	 			
 				var poly2 = new Kinetic.Polygon({
 				        points: polyPnts,
-				        fill: "#00D2F0",
+				        fill: dObj.color,
 				        alpha: 0.2,
-				        stroke: "#00D2F0",
-				        strokeWidth: 0
+				        stroke: dObj.color,
+				        strokeWidth: 0,
+				        id: "p_" + dObj.docId,
+				        docName: dObj.docName,
+				        rooms: dObj.rooms
 			    });
 			        
 				poly2.on("mouseout", function() {;
 	                $( "#diagRoom" ).html('---');
 	            });
 				poly2.on("mousemove", function(){
-	                $( "#diagRoom" ).html(dObj.docId);
+	                $( "#diagRoom" ).html("(Doc: " + dObj.docName + ") " + dObj.rooms);
 	            });
 			        
 				layer.add(poly2);
@@ -172,6 +175,7 @@ floorMgr = function(){
 				var rom = fObj.room;
 				var romDesc = rom+"["+ fObj.featDesc + "]";
 				var featType = fObj.featType;
+				console.log("featType -> " + featType);
 				
 				// I;Infermeria,A;Studio Medico,S;Soggiorno Cucinino,T;Vano Tecnico,B;Bagno"
 				switch (featType) {
@@ -183,6 +187,8 @@ floorMgr = function(){
 					  break;
 				  case "T": obj = canvasMgr.featImgT;
 				      break;
+				  case "D": obj = canvasMgr.featImgD;
+			      	  break;    
 				  default: obj = canvasMgr.featImgB;
 				};
 				
@@ -309,7 +315,7 @@ floorMgr = function(){
 			var cObj = floorMgrObj.getObj4Bed(oMap, fMap[mObj].bed);
 			  if (cObj != undefined) {
 				var rom = fMap[mObj].room;
-				var bed = cObj.bed + "(" + cObj.name + ")"; 
+				var bed = cObj.bed; 
 				var obj;
 				var zoomFact = 1;
 				
@@ -318,18 +324,18 @@ floorMgr = function(){
 					bed = bed + " (libero)";
 				} else {
 					if (cObj.status == 1) {
-						bed = bed + " (occupato)";
-						if (cObj.gender == "M") {
-							obj = canvasMgr.mImgOcc;
-						} else {
-							obj = canvasMgr.fImgOcc;
-						};
-					} else {
 						bed = bed + " (prenotato)";
 						if (cObj.gender == "M") {
 							obj = canvasMgr.mImgPre;
 						} else {
-							obj = canvasMgr.fImgPre; 
+							obj = canvasMgr.fImgPre;
+						};
+					} else {
+						bed = bed + " (occupato)";
+						if (cObj.gender == "M") {
+							obj = canvasMgr.mImgOcc;
+						} else {
+							obj = canvasMgr.fImgOcc; 
 						};					
 					} 	
 				};
@@ -366,7 +372,7 @@ floorMgr = function(){
 				
 	            image.on("mousemove", function(){
 	                $( "#diagRoom" ).html(rom);
-	                $( "#diagBed" ).html(bed);
+	                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
 	            });
 	
 	            layer.add(image);
@@ -375,5 +381,143 @@ floorMgr = function(){
 	  }
 	  layer.draw();
 	  stage.draw();
+	};
+	
+	this.getInitials = function(name) {
+		
+		var ret = "";		
+		if (name != undefined && name.length > 0) {
+			var nameArray = name.split(" ");
+			var i=1;
+			for (o in nameArray) {
+				if (i==3) break;
+				ret = ret + nameArray[o].substr(0,3) + " ";
+				i++;
+			};
+			if (ret.length > 0) {
+				ret = "(" + $.trim(ret) + ")";
+			}
+		}
+		return ret;
+	};
+	
+	
+	// Doctor Table
+	// Actions......
+	this.createDoctorTable = function() {
+		
+		var param = {
+			doctorMap: floorMgrObj.doctorMap
+		};
+		
+		// Create the table
+		try {
+			var myejs = new EJS({
+				url : './view/doctorsTable.ejs'
+			});
+			html = myejs.render(param);
+		} catch (e) {
+			if (e.description)
+				e = e.description;
+			console.log('ex : ' + e);
+		}
+		$('#doctorTable').html(html);
+	
+		// Build color pickers
+		console.log("into colorPicker creation ...");
+		$('.colorPal').ColorPicker({
+			color: '#0000ff',
+			onSubmit: function(hsb, hex, rgb, el) {
+				floorMgrObj.updateDoctorTableObj(el,hex);
+			},
+			onShow: function (colpkr) {
+				$(colpkr).fadeIn(500);
+				return false;
+			},
+			onHide: function (colpkr) {
+				$(colpkr).fadeOut(500);
+				console.log('exiting');
+				return false;
+			},
+		});
+		
+	};
+	
+	this.updateDoctorTableObj = function(el,hex) {
+		
+		console.log("updateDoctorTableObj called ... with el.id -> " + el.id);
+		var id = el.id;
+		
+		el.style.backgroundColor='#'+hex;
+		var polyObj = canvasMgr.floorLyr.get("#"+id)[0]; // Caution, this gets every 'p_doc0' in the layer. consider 'p_A0_doc0' as key
+		if (polyObj != undefined) {
+			polyObj.setFill(hex);
+			polyObj.setStroke(hex);
+			canvasMgr.stage.draw();
+		};
+	};
+	
+	this.doDocNew = function() {
+		
+		console.log("doNew");
+
+		var docName = $('#newName').val();
+		var romRang = $('#newRooms').val();
+		var color = $('#colorP').css('background-color');
+		
+		console.log("docName -> " + docName);
+		console.log("romRang -> " + romRang);
+		console.log("color -> " + color);
+		
+		console.log("colorHx -> " + floorMgrObj.rgb2hex(color));
+		
+		// Standard polyPoints:
+		// 452;389;439;337;460;283;515;283;537;341;521;388
+		
+		var sz = floorMgrObj.doctorMap.length+1; 
+		
+		var docObj = {
+			building: canvasMgr.currFloor,
+			color: floorMgrObj.rgb2hex(color),
+			docId: canvasMgr.currFloor + "Doc" + sz,
+			docName: docName,
+			polyPoints: "452;389;439;337;460;283;515;283;537;341;521;388",
+			//polyPoints: "452,389,439,337,460,283,515,283,537,341,521,388",
+			rooms: romRang
+		}; 
+		
+		floorMgrObj.doctorMap.push(docObj);
+		
+		// DOCID; COLOR; DOCNAME; ROOMS; POLYPOINTS
+		// polyPoints: "452;389;439;337;460;283;515;283;537;341;521;388",
+		var docObj4Call = docObj.docId + ";" + docObj.color + ";" + docObj.docName + ";" + docObj.rooms + ";" + docObj.polyPoints;
+		canvasMgr.maintMgr.callMgmtSrvltDoc(docObj4Call, "", "newDoc");
+		canvasMgr.checkMaintRadio("off");
+		canvasMgr.checkMaintRadio("on");
+		
+		$('#doctorTable').empty();
+		floorMgrObj.createDoctorTable();
+		
+	};
+	this.doDocUpdate = function(id) {
+		
+		console.log("doDocUpdate called with id -> " + id);
+		
+	};
+	this.doDocDelete = function(id) {
+		
+		console.log("doDocDelete called with id -> " + id);
+		canvasMgr.maintMgr.callMgmtSrvltDoc("placemark", id, "delDoc");
+		canvasMgr.checkMaintRadio("off");
+		canvasMgr.checkMaintRadio("on");
+	};
+	
+	this.rgb2hex = function(rgb) {
+	    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+	    function hex(x) {
+	        return ("0" + parseInt(x).toString(16)).slice(-2);
+	    }
+	    return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+	    //  return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
 	};
 };

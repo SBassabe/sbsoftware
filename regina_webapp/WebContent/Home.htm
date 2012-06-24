@@ -7,11 +7,16 @@
 <!--
 @import url("./css/default.css");
 @import url("./css/smoothness/jquery-ui-1.8.20.custom.css");
+@import url("./css/doctorTable.css");
+@import url("./css/colorpicker.css");
+
 -->
 </style>
 <script src="./libraries/kinetic-v3.9.5.js"></script>
 <script src="./libraries/jquery-1.7.2.min.js"></script>
 <script src="./libraries/jquery-ui-1.8.20.custom.min.js"></script>
+<script src="./libraries/colorpicker.js"></script>
+<script type="text/javascript" src="./libraries/ejs_production.js"></script>
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
 <script type="text/javascript" src="controller/maintMgr.js"></script>
@@ -21,7 +26,7 @@ window.onload = function() {
 	
 	$( "#dialog" ).show();
 	$( "#dialog" ).dialog({
-			width: 330,
+			width: 450,
 			resizable: false,
 			minHeight: 60,
 			position: [70,125], 
@@ -37,10 +42,21 @@ window.onload = function() {
 		width: 330,
 		resizable: false,
 		minHeight: 60,
-		position: [125,125], 
+		position: [125,300], 
 		show: { effect: 'drop', direction: "down" } ,
 		hide: { effect: 'drop', direction: "down" } ,
 	    title: "Errore ...",
+	    autoOpen: false
+	});
+
+	$( "#msgDiag" ).dialog({
+		width: 330,
+		resizable: false,
+		minHeight: 60,
+		position: [125,300], 
+		show: { effect: 'drop', direction: "down" } ,
+		hide: { effect: 'drop', direction: "down" } ,
+	    title: "Informazione",
 	    autoOpen: false
 	});
 	
@@ -52,7 +68,7 @@ window.onload = function() {
 			width: 330,
 			resizable: false,
 			minHeight: 60,
-			position: [300,125], 
+			position: [600,125], 
 			show: { effect: 'drop', direction: "down" } ,
 			hide: { effect: 'drop', direction: "down" } ,
 		    title: "Modalita' Configurazione",
@@ -60,13 +76,11 @@ window.onload = function() {
 		    close: function() {$("#mntBtn").show();},
 		    open: function() {$("#mntBtn").hide();}
 	});	
-	//app = null;
-	//$('#container').innerHTML = "";
+
 	canvasMgr = new canvasMgr();
 	canvasMgr.init();
-	//app = new applicationMgr();
-	//app.start();
-	
+
+
 };
 </script>
 </head>
@@ -114,10 +128,6 @@ window.onload = function() {
 		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/>
 	</div>
 	<div class="credits">sbsoftware - build @build_ver@</div>
-	<div style="display:block;" class="config">
-		<input value="pressMe" type="button" onclick="canvasMgr.clickMe()" style="vertical-align: top;"/>
-		<textarea rows="10" cols="50" id="area"></textarea> 
-	</div>
 		<div id="dialog" title="Basic dialog">
 		<div class="left">Piano:</div><div class="right" id="diagFloor"></div><br>
 		<div class="left">Letti per Piano:</div><div class="right" id="diagNumBeds">16</div><br>
@@ -136,5 +146,11 @@ window.onload = function() {
 		<div><img src="./images/icon_errore.png"></img></div>
 		<div id="errMsg"></div>
 	</div>
+	<div id="msgDiag" title="Message Dialog">
+		<div><img src="./images/success.png"></img></div>
+		<div id="msgMsg"></div>
+	</div>
+	
+	<div id="doctorTable"></div>
 </body>
 </html>

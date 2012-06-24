@@ -85,7 +85,7 @@ div.right {
 	width: 80px;
 }
 
-#maintDiag, #errDiag {
+#maintDiag, #errDiag, #msgDiag {
 	text-align: center;
 	display: none;
 }

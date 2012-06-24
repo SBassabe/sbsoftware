@@ -213,7 +213,7 @@ public class FloorList extends HttpServlet {
 				// contained in DB and Propfile
 				sCodStanNumStan = mapFloorDB.get(mapFloorDBKS[b]);
 			
-				concat = buildingId + ";" + mapFloorDBKS[b] + ";" + sCodStanNumStan + ";" + b*20 + ";" + 450 + ";D";
+				concat = buildingId + ";" + mapFloorDBKS[b] + ";" + sCodStanNumStan + ";" + b*12 + ";" + 450 + ";D";
 				mapFloorDB.remove(mapFloorDBKS[b]);
 				
 				totalD++;
@@ -309,21 +309,25 @@ public class FloorList extends HttpServlet {
 
 		try {
 			mp = prop.getProperty(buildingId+".doctor");
-			if (mp != null) { 
+			if (mp != null && mp.length() > 0) { 
 				mp = mp.replaceAll("\"", "");
 	
 				String[] sp = mp.split(",");
 				for (int i=0; i<sp.length; i++) {
 					
 					String[] sCoords = sp[i].split(";");
-					
+					// [doctor] DOCID; COLOR; DOCNAME; ROOMS; POLYPOINTS 
+					//          A0Doc0;00ff1e;DSSA. ZANOTTI;123-134;635;423;635;347;822;346;1001;344;1004;424;738;418
 					dMap = new DoctorMap();
 					dMap.setBuilding(buildingId);
 					dMap.setDocId(sCoords[0]);
+					dMap.setColor(sCoords[1]);
+					dMap.setDocName(sCoords[2]);
+					dMap.setRooms(sCoords[3]);
 					
 					String polyPoints="";
-					for (int j=1; j<sCoords.length; j++) {
-						if (j == 1) {
+					for (int j=4; j<sCoords.length; j++) {
+						if (j == 4) {
 							polyPoints = sCoords[j];
 						} else {
 							polyPoints = polyPoints + "," + sCoords[j];

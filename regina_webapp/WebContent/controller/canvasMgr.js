@@ -42,6 +42,7 @@ canvasMgr = function(){
 	this.featImgS = new Image();
 	this.featImgT = new Image();
 	this.featImgB = new Image();
+	this.featImgD = new Image();
 	
 	this.mImgOcc.src = "./images/male_occ_20.png";
 	this.fImgOcc.src = "./images/female_occ_20.png";
@@ -54,6 +55,7 @@ canvasMgr = function(){
 	this.featImgS.src ="./images/letter_S_blue.png";
 	this.featImgT.src ="./images/letter_T_blue.png";
 	this.featImgB.src ="./images/letter_B_blue.png";
+	this.featImgD.src ="./images/tv.png";
 	
 	// start here
 	this.init = function() {
@@ -191,6 +193,11 @@ canvasMgr = function(){
 			}			
 		}
 
+		if (currObj.maintMode) {
+			$('#doctorTable').empty();
+			currObj.floorArr[currObj.currFloor].createDoctorTable();
+		}
+		
 		currObj.toolTipLyr.moveToTop();
 	};
 
@@ -263,6 +270,10 @@ canvasMgr = function(){
 				// initialize Selectors here if necessary.
 				currObj.selectorsChanged();
 				document.getElementById("rad1lbl").innerHTML="Salva";
+				
+				// draw doctor info
+				currObj.floorArr[currObj.currFloor].createDoctorTable();
+				
 			} else {
 				currObj.maintMgr.collectLayerData();
 			}
@@ -280,6 +291,10 @@ canvasMgr = function(){
 				// initialize Selectors here if necessary.
 				currObj.selectorsChanged();
 				document.getElementById("rad1lbl").innerHTML="On";
+				
+				// close doctor info
+				$('#doctorTable').empty();
+				
 			}
 		};
 	};
@@ -289,4 +304,11 @@ canvasMgr = function(){
 		$("#errMsg").html("Errore dell'applicativo \n" + errDesc);
 		$("#errDiag").dialog('open');
 	};
+	
+	this.showMsg = function(msgDesc) {
+		
+		$("#msgMsg").html(msgDesc);
+		$("#msgDiag").dialog('open');
+	};
+	
 };
