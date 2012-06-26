@@ -372,7 +372,7 @@ floorMgr = function(){
 				
 	            image.on("mousemove", function(){
 	                $( "#diagRoom" ).html(rom);
-	                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
+	                $( "#diagBed" ).html(bed);
 	            });
 	
 	            layer.add(image);
@@ -383,6 +383,7 @@ floorMgr = function(){
 	  stage.draw();
 	};
 	
+	// helper function to get 3 intials from Name and Lastname ...
 	this.getInitials = function(name) {
 		
 		var ret = "";		
@@ -465,6 +466,10 @@ floorMgr = function(){
 		var romRang = $('#newRooms').val();
 		var color = $('#colorP').css('background-color');
 		
+		// Just in case
+		romRang = romRang.replace(',',' ');
+		romRang = romRang.replace(';',' ');
+		
 		console.log("docName -> " + docName);
 		console.log("romRang -> " + romRang);
 		console.log("color -> " + color);
@@ -499,11 +504,7 @@ floorMgr = function(){
 		floorMgrObj.createDoctorTable();
 		
 	};
-	this.doDocUpdate = function(id) {
-		
-		console.log("doDocUpdate called with id -> " + id);
-		
-	};
+
 	this.doDocDelete = function(id) {
 		
 		console.log("doDocDelete called with id -> " + id);

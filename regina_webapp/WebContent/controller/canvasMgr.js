@@ -168,13 +168,23 @@ canvasMgr = function(){
 		var year="";
 		var month="";
 		var day="";
-
+		
 		buildId = $('#building').val();
 		year = $('#year').val();
 		month = $('#month').val();
 		day = $('#day').val();
-		$('#dayvalue').text(day);
 		
+		// Get the max days in month and set the slider accordingly
+		var lastDayOfMonth = new Date(year,month,0);
+		$('#day').attr('max',lastDayOfMonth.getDate());
+		
+		if (parseInt(day) > parseInt(lastDayOfMonth.getDate())) {
+			$('#day').val(lastDayOfMonth.getDate());
+			day = $('#day').val();
+		};
+
+		// collect values
+		$('#dayvalue').text(day);
 		if (day.length == 1) day="0"+day;
 		var dt = year+month+day;
 		
