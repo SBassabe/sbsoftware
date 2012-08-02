@@ -292,7 +292,8 @@ floorMgr = function(){
 			
             image.on("mousemove", function(){
                 $( "#diagRoom" ).html(rom);
-                $( "#diagBed" ).html(bed);
+                //$( "#diagBed" ).html(bed);
+                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
             });
 
             layer.add(image);
@@ -372,7 +373,8 @@ floorMgr = function(){
 				
 	            image.on("mousemove", function(){
 	                $( "#diagRoom" ).html(rom);
-	                $( "#diagBed" ).html(bed);
+	                //$( "#diagBed" ).html(bed);
+	                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
 	            });
 	
 	            layer.add(image);
