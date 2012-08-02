@@ -75,11 +75,23 @@ window.onload = function() {
 		    autoOpen: false,
 		    close: function() {$("#mntBtn").show();},
 		    open: function() {$("#mntBtn").hide();}
-	});	
+	});
+
+	$( "#lgndDiag" ).dialog({
+			width: 245,
+			resizable: false,
+			minHeight: 60,
+			position: [600,125], 
+			show: { effect: 'drop', direction: "down" } ,
+			hide: { effect: 'drop', direction: "down" } ,
+		    title: "Legenda",
+		    autoOpen: false,
+		    close: function() {$("#lgndBtn").show();},
+		    open: function() {$("#lgndBtn").hide();}
+	});		
 
 	canvasMgr = new canvasMgr();
-	canvasMgr.init();
-
+	setTimeout(function(){canvasMgr.init()},1);
 
 };
 </script>
@@ -88,6 +100,7 @@ window.onload = function() {
     <div id="head">
     	<img id="infBtn" alt="informazione" src="./images/icon_info.png" onclick="canvasMgr.showDiag()">
     	<img id="mntBtn" alt="configurazione" src="./images/icon_make.png" onclick="canvasMgr.showMntDiag()">
+    	<img id="lgndBtn" alt="legenda" src="./images/icon_legenda_32.png" onclick="canvasMgr.showLgndDiag()">
     	<img height="80px" src="./images/logo_regina_logistica_02.gif">
     </div>
 	<div id="cont_border">
@@ -139,8 +152,6 @@ window.onload = function() {
 		  		<input type="radio" id="radio2" name="radio" value="off" onclick="canvasMgr.checkMaintRadio(this.value)" checked="checked" /><label for="radio2">Off</label>
 				<input type="radio" id="radio1" name="radio" value="on" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio1"><div id="rad1lbl">On</div></label>
 		  </div>
-		  <!-- button id="jbutton" onclick="canvasMgr.maintMgr.collectLayerData()">Salva Modifiche</button-->
-		  <!-- input value="Save regina.properties ..." type="button" onclick="canvasMgr.maintMgr.collectLayerData()" style="vertical-align: top;"/ -->
 	</div>
 	<div id="errDiag" title="Error Dialog">
 		<div><img src="./images/icon_errore.png"></img></div>
@@ -150,7 +161,7 @@ window.onload = function() {
 		<div><img src="./images/success.png"></img></div>
 		<div id="msgMsg"></div>
 	</div>
-	
+	<div id="lgndDiag" title="legenda"></div>
 	<div id="doctorTable"></div>
 </body>
 </html>

@@ -48,6 +48,26 @@ body {
 	left: 35px;
 }
 
+#lgndBtn {
+	position: absolute; 
+	top: 25px; 
+	left: 125px;
+}
+
+#lgndDiag li {
+	list-style: none;
+}
+
+#lgndDiag ul {
+	padding-left: 5px;
+}
+
+#lgndDiag B {
+	display: inline;
+	padding-left: 10px;
+	vertical-align: 6px;
+}
+
 #mntBtn {
 	position: absolute; 
 	top: 25px; 

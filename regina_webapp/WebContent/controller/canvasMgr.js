@@ -3,6 +3,8 @@ canvasMgr = function(){
 	console.log("canvasMgr obj created ...");
 	var currObj = this;
 	this.currFloor = "";
+	this.currMonth = "";
+	this.currYear = "";
 	this.maintMode = false;
 	this.maintMgr = new maintMgr();
 
@@ -188,8 +190,20 @@ canvasMgr = function(){
 		if (day.length == 1) day="0"+day;
 		var dt = year+month+day;
 		
+		// flag used to empty occupancy array
+		if (this.currMonth != month || this.currYear != year) {
+			currObj.floorArr[buildId].occMap=[];
+			this.currMonth = month;
+			this.currYear = year;
+			console.log(" occMapArray empty for floor -> " + buildId);
+		}
+		
 		// flag used to capture current floor change
 		if (this.currFloor != buildId) {
+			if (this.currFloor != "") {
+				currObj.floorArr[this.currFloor].occMap=[];
+				console.log(" occMapArray empty for floor -> " + this.currFloor);
+			}
 			this.currFloor=buildId;
 			//currObj.populateFloorLayer(buildId);
 			currObj.floorArr[buildId].populateFloorLayer(currObj.stage, currObj.floorLyr, currObj.occLyr, dt);
@@ -262,6 +276,24 @@ canvasMgr = function(){
 	this.showMntDiag = function() {
 		$( "#maintDiag" ).dialog('open');
 	};
+
+	this.showLgndDiag = function() {
+		
+		try {
+			var myejs = new EJS({
+				url : './view/legenda.ejs'
+			});
+			html = myejs.render();
+		} catch (e) {
+			if (e.description)
+				e = e.description;
+			console.log('ex : ' + e);
+		}
+		$('#lgndDiag').html(html);
+		$('#lgndDiag').dialog('open');
+		
+	};
+	
 	
 	this.checkMaintRadio = function(val) {
 		
