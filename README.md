@@ -25,7 +25,7 @@ Feedback from users
 - Tried hot-deploy of app just by replacing the 'regina_webapp.war' file.
 
 ------------------------------------------------------------------------
-Ver 1.2.1 - 26/06/2012 [Bugfixing RC]
+Ver 1.2.1_RC - 26/06/2012 [Bugfixing RC]
 ------------------------------------------------------------------------
 Implemented
 - Fixed bug on non-existent dates. Eg. February 30th would cause a DB 
@@ -44,3 +44,15 @@ TO_DO and Brainstorms
   dissabled bed info. This object would be updated everytime the user
   changes the floor (buildingId) by invoking the selectorsChanged()
   method.  
+  
+------------------------------------------------------------------------
+Ver 1.2.1_Final - 26/06/2012 [Final GA]
+------------------------------------------------------------------------
+Released
+- Fixed bug on non-existent dates. Eg. February 30th would cause a DB 
+  error that propagates to GUI. Fixed problem by checking date (using 
+  javascript Date object) on dateChange() method call.
+- Fixed potential bug new doctor creation. If for the room number the
+  user inputs the characters ',' or ';' it would save this info in the 
+  properties file key.
+- RolledBack on 3 letter name/lastname initials as per users requests. 
