@@ -46,7 +46,7 @@ TO_DO and Brainstorms
   method.  
   
 ------------------------------------------------------------------------
-Ver 1.2.1_Final - 24/07/2012 [Final GA]
+Ver 1.2.2_Final - 24/07/2012 [Final GA]
 ------------------------------------------------------------------------
 Released
 - Fixed bug on non-existent dates. Eg. February 30th would cause a DB 
@@ -56,3 +56,11 @@ Released
   user inputs the characters ',' or ';' it would save this info in the 
   properties file key.
 - RolledBack on 3 letter name/lastname initials as per users requests. 
+
+------------------------------------------------------------------------
+Ver 1.2.3_Final - 03/08/2012 [Final GA]
+------------------------------------------------------------------------
+Released
+- Implemented legend
+- Implemented timer for canvasMgr init
+- Performance improvements (delete occArray on widgetChange)
