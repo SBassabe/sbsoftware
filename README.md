@@ -46,7 +46,7 @@ TO_DO and Brainstorms
   method.  
   
 ------------------------------------------------------------------------
-Ver 1.2.1_Final - 26/06/2012 [Final GA]
+Ver 1.2.1_Final - 24/07/2012 [Final GA]
 ------------------------------------------------------------------------
 Released
 - Fixed bug on non-existent dates. Eg. February 30th would cause a DB 
