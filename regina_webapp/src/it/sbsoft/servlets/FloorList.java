@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +31,8 @@ public class FloorList extends HttpServlet {
 	static PropertiesFile prop;
 	static String simulatorMode;
 	static String persistProp;
-	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
+	static Logger log = LoggerUtils.getLogger("sbsoftware");
+	static Set<String> availBeds;
     
     public FloorList() {
         super();
@@ -93,6 +96,7 @@ public class FloorList extends HttpServlet {
 				floorList.add(floorBean);
 				
 			}
+			availBeds=null;
 			
 		} catch (Exception e) {
 			ret.setError(new Errore());
@@ -127,18 +131,25 @@ public class FloorList extends HttpServlet {
 		String key, value, ret;
 		
 		try {
+					
+			if (availBeds == null) {
+				DBTools db = new DBTools();
+				availBeds =  db.getAvailableBeds();
+			}
 			
 			Iterator<String> it = map2.keySet().iterator();
 			
 			while (it.hasNext()) {
 				
 				key = (String)it.next();
-				value = map2.get(key);
-				value = value.replaceAll("\"", "");
-				
-				ret = buildingId+";"+key+";"+value+";P";
-				log.trace(" ret -> " + ret);
-				floorMapList.add(createFMobjectFromString(ret));
+				if (availBeds.contains(key)) {	
+					value = map2.get(key);
+					value = value.replaceAll("\"", "");
+					
+					ret = buildingId+";"+key+";"+value+";P";
+					log.trace(" ret -> " + ret);
+					floorMapList.add(createFMobjectFromString(ret));
+				}
 				
 			}
 			

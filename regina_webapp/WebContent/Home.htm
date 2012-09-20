@@ -9,7 +9,6 @@
 @import url("./css/smoothness/jquery-ui-1.8.20.custom.css");
 @import url("./css/doctorTable.css");
 @import url("./css/colorpicker.css");
-
 -->
 </style>
 <script src="./libraries/kinetic-v3.9.5.js"></script>
@@ -23,6 +22,14 @@
 <script type="text/javascript" src="controller/returnObj.js"></script>
 <script>
 window.onload = function() {
+
+	$("#day").slider({
+		 min: 1,
+		 max: 30,
+		 slide: function(event, ui) {$("#dayvalue").html(ui.value);},
+		 change: function(event, ui) {canvasMgr.selectorsChanged();},
+		 animate: true
+	});
 	
 	$( "#dialog" ).show();
 	$( "#dialog" ).dialog({
@@ -91,7 +98,7 @@ window.onload = function() {
 	});		
 
 	canvasMgr = new canvasMgr();
-	setTimeout(function(){canvasMgr.init()},1);
+	setTimeout(function(){canvasMgr.init()},100);
 
 };
 </script>
@@ -138,8 +145,9 @@ window.onload = function() {
 	</div>
 	<div class="selectors" id="dayvalue">15</div>
 	<div class="selectors">
-		<input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/>
+		<div id="day" style="width: 433px" onchange="canvasMgr.selectorsChanged()"></div>
 	</div>
+	<!-- input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/> -->
 	<div class="credits">sbsoftware - build @build_ver@</div>
 		<div id="dialog" title="Basic dialog">
 		<div class="left">Piano:</div><div class="right" id="diagFloor"></div><br>

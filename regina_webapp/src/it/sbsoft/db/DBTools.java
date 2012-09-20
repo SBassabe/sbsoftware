@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -168,14 +169,7 @@ public class DBTools {
 		Connection c = null;
 		
 		try {
-						
-//          CBADATIIB
-//			SELECT a.CODLETTO, b.CODSTAN, b.NUMSTANZA
-//			FROM GELETTI a, GESTANZE b
-//			where a.codstan = b.codstan
-//			     and b.numstanza between 100 and 200
-//			order by 1			
-		  
+
 		  Class.forName ("org.firebirdsql.jdbc.FBDriver");
 		  //FIREDB.CBADATIIB=jdbc:firebirdsql:localhost/3050:C:/FBDB/CBADATIIB.FDB
 		  String databaseURL = propFile.getPropertySB("FIREDB.CBADATIIB");
@@ -197,6 +191,7 @@ public class DBTools {
 	      sbQuery.append("FROM GELETTI a, GESTANZE b ");
 	      sbQuery.append("where a.codstan = b.codstan ");
 	      sbQuery.append("and b.numstanza between cast(? as integer) and cast(? as integer) ");
+	      sbQuery.append("and ((b.ANNULLATO IS NULL or b.ANNULLATO != 'T') and (a.ANNULLATO IS NULL or a.ANNULLATO != 'T')) ");
 	      sbQuery.append("order by 1, 2 ");
 		  
 	      logDB.debug(" query -> " + sbQuery.toString());
@@ -234,4 +229,62 @@ public class DBTools {
 		logDB.info(" total number of beds processed -> " + numBeds+"");
 		return retMap;
 	}
+	
+	public Set<String> getAvailableBeds() throws Exception {
+		
+		log.info(" getAvailableBeds called ... ");
+		logDB.info(" getAvailableBeds called ... ");
+		Map<String, String> retMap = new HashMap<String, String>();
+		Set<String> retSet = new HashSet<String>();
+
+		Connection c = null;
+		
+		try {
+
+		  Class.forName ("org.firebirdsql.jdbc.FBDriver");
+		  //FIREDB.CBADATIIB=jdbc:firebirdsql:localhost/3050:C:/FBDB/CBADATIIB.FDB
+		  String databaseURL = propFile.getPropertySB("FIREDB.CBADATIIB");
+		  
+		  // retreive and decode credentials
+		  String cred = propFile.getPropertySB("FIREDB.CBADATIIB.credentials");
+		  String user = cred.split(";")[0];
+		  String password = cred.split(";")[1];
+		  
+		  user = decode.decrypt(user);
+		  password = decode.decrypt(password);
+		  
+		  logDB.debug(" databaseURL -> " + databaseURL);
+		  c = java.sql.DriverManager.getConnection (databaseURL, user, password);
+	      
+	      StringBuffer sbQuery = new StringBuffer();
+	      sbQuery.append("SELECT a.CODLETTO, b.CODSTAN, b.NUMSTANZA ");
+	      sbQuery.append("FROM GELETTI a, GESTANZE b ");
+	      sbQuery.append("where a.codstan = b.codstan ");
+	      sbQuery.append("and ((b.ANNULLATO IS NULL or b.ANNULLATO != 'T') and (a.ANNULLATO IS NULL or a.ANNULLATO != 'T')) ");
+	      sbQuery.append("order by 1, 2 ");
+		  
+	      logDB.debug(" query -> " + sbQuery.toString());
+		  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 
+		  ResultSet rs = pstmt.executeQuery();
+		  
+          while (rs.next ()) {
+        	  retSet.add(rs.getString ("CODLETTO"));
+          }
+			
+		} catch (Exception e) {
+			if (e instanceof SQLException) {
+				e.printStackTrace();
+				log.info("DB_UNREACHABLE");
+				logDB.info("DB_UNREACHABLE");
+				throw new SBException("DB_UNREACHABLE");
+			} else {
+				throw e;
+			}
+		} finally {
+			c=null;
+		}
+
+		return retSet;
+	}
+	
 }

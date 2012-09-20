@@ -172,22 +172,33 @@ canvasMgr = function(){
 		var day="";
 		
 		buildId = $('#building').val();
+		day = $('#day').slider( "option", "value");
+		
+		// On first run, day equals 0. Set it to the current date.
+		if (day==0) {
+			var curDt = new Date();
+			day = 1;
+			$('#year').val(curDt.getFullYear().toString());
+			$('#month').val((curDt.getMonth()+1).toString().length == 1 ? "0"+(curDt.getMonth()+1).toString() : (curDt.getMonth()+1).toString());
+		}
+		
 		year = $('#year').val();
 		month = $('#month').val();
-		day = $('#day').val();
 		
 		// Get the max days in month and set the slider accordingly
 		var lastDayOfMonth = new Date(year,month,0);
-		$('#day').attr('max',lastDayOfMonth.getDate());
+		$('#day').slider("option","max",lastDayOfMonth.getDate());
 		
+		// This watch dog tells me if the slider has gone beyond the max days for the month
 		if (parseInt(day) > parseInt(lastDayOfMonth.getDate())) {
-			$('#day').val(lastDayOfMonth.getDate());
-			day = $('#day').val();
+			$('#day').slider( "option", "max", lastDayOfMonth.getDate());
+			day = $('#day').slider( "option", "max");
 		};
 
 		// collect values
 		$('#dayvalue').text(day);
-		if (day.length == 1) day="0"+day;
+		if (day.toString.length == 1) day="0"+day;
+		if (month.toString.length == 1) month="0"+month;
 		var dt = year+month+day;
 		
 		// flag used to empty occupancy array
@@ -224,7 +235,7 @@ canvasMgr = function(){
 		
 		currObj.toolTipLyr.moveToTop();
 	};
-
+	
 	// Maintenance mode ...
 	this.clickMe = function() {
 
