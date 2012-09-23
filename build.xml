@@ -7,7 +7,7 @@
   <property name="build_ver" value="1.2.3 GA ${TODAY2}"/>
   <property name="src_dir" location=".\regina_webapp\src"/>
   <property name="webapp_dir"  location=".\regina_webapp\WebContent"/>
-  <property name="tomcat_dir"  location="C:\Program Files\apache-tomcat-7.0.14\"/>
+  <property name="tomcat_dir"  location="L:\Program Files\Apache Software Foundation\Tomcat_7.0\"/>
   <property name="lib_local" location="${webapp_dir}\WEB-INF\lib"/>
   <property name="build_dir" location="build"/>
   <property name="dist_dir"  location="dist"/>

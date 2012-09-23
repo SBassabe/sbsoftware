@@ -19,6 +19,10 @@
     <display-name>FloorOccupancy</display-name>
     <servlet-name>FloorOccupancy</servlet-name>
     <servlet-class>it.sbsoft.servlets.FloorOccupancy</servlet-class>
+    <init-param>
+      <param-name>simulatorMode</param-name>
+      <param-value>false</param-value>
+    </init-param>
   </servlet>
   <servlet>
     <display-name>MaintSrvlt</display-name>

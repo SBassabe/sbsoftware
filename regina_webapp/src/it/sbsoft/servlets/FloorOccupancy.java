@@ -32,6 +32,7 @@ public class FloorOccupancy extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	private Random generator = new Random();
+	static String simulatorMode;
 	private PropertiesFile prop = PropertiesFile.getPropertiesFile();
 	static Gson gson = new Gson();
 	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
@@ -40,6 +41,13 @@ public class FloorOccupancy extends HttpServlet {
         super();
     }
 
+    public void init() {
+    	
+    	log.info("entered ");
+		simulatorMode = this.getInitParameter("simulatorMode");
+		log.info(" simulatorMode = " + simulatorMode);
+	}
+    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		Gson gson = new Gson();
@@ -58,8 +66,11 @@ public class FloorOccupancy extends HttpServlet {
 			
 			floor.setId(buildId);
 			floor.setDt(dt);
-			//floor.setOccMap(getOccupancySimu(buildId, dt));
-			floor.setOccMap(getOccupancyDB(buildId, dt));
+			if ("true".compareTo(simulatorMode) == 0) {
+				floor.setOccMap(getOccupancySimu(buildId, dt));
+			} else {
+				floor.setOccMap(getOccupancyDB(buildId, dt));
+			}
 			
 		} catch (Exception e) {
 			
