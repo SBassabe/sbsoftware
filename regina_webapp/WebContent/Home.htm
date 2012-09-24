@@ -25,9 +25,9 @@ window.onload = function() {
 
 	$("#day").slider({
 		 min: 1,
-		 max: 30,
-		 slide: function(event, ui) {$("#dayvalue").html(ui.value);},
-		 change: function(event, ui) {canvasMgr.selectorsChanged();},
+		 max: 31,
+		 //slide: function(event, ui) {$("#dayvalue").html(ui.value);},
+		 slide: function(event, ui) {$("#day").slider("option","value",ui.value); canvasMgr.selectorsChanged();},
 		 animate: true
 	});
 	

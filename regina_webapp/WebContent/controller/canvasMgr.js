@@ -188,6 +188,7 @@ canvasMgr = function(){
 		// Get the max days in month and set the slider accordingly
 		var lastDayOfMonth = new Date(year,month,0);
 		$('#day').slider("option","max",lastDayOfMonth.getDate());
+		$('#day').slider("option","min",1);
 		
 		// This watch dog tells me if the slider has gone beyond the max days for the month
 		if (parseInt(day) > parseInt(lastDayOfMonth.getDate())) {
@@ -196,9 +197,10 @@ canvasMgr = function(){
 		};
 
 		// collect values
+		day=day+"";
 		$('#dayvalue').text(day);
-		if (day.toString.length == 1) day="0"+day;
-		if (month.toString.length == 1) month="0"+month;
+		if (day.toString().length == 1) day="0"+day;
+		if (month.toString().length == 1) month="0"+month;
 		var dt = year+month+day;
 		
 		// flag used to empty occupancy array

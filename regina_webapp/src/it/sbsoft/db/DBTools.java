@@ -190,14 +190,14 @@ public class DBTools {
 	      sbQuery.append("SELECT a.CODLETTO, b.CODSTAN, b.NUMSTANZA ");
 	      sbQuery.append("FROM GELETTI a, GESTANZE b ");
 	      sbQuery.append("where a.codstan = b.codstan ");
-	      sbQuery.append("and b.numstanza between cast(? as integer) and cast(? as integer) ");
+	      sbQuery.append("and cast(b.numstanza as integer) between ? and ? ");
 	      sbQuery.append("and ((b.ANNULLATO IS NULL or b.ANNULLATO != 'T') and (a.ANNULLATO IS NULL or a.ANNULLATO != 'T')) ");
 	      sbQuery.append("order by 1, 2 ");
 		  
 	      logDB.debug(" query -> " + sbQuery.toString());
 		  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 
-		  pstmt.setString(1, bedFrom+"");
-		  pstmt.setString(2, bedTo+"");
+		  pstmt.setInt(1, bedFrom);
+		  pstmt.setInt(2, bedTo);
 
 		  ResultSet rs = pstmt.executeQuery();
 		  
