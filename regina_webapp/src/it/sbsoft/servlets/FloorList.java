@@ -132,9 +132,11 @@ public class FloorList extends HttpServlet {
 		
 		try {
 					
-			if (availBeds == null) {
-				DBTools db = new DBTools();
-				availBeds =  db.getAvailableBeds();
+			if ("true".compareTo(simulatorMode) != 0) {
+				if (availBeds == null) {
+					DBTools db = new DBTools();
+					availBeds =  db.getAvailableBeds();
+				}
 			}
 			
 			Iterator<String> it = map2.keySet().iterator();
@@ -142,7 +144,7 @@ public class FloorList extends HttpServlet {
 			while (it.hasNext()) {
 				
 				key = (String)it.next();
-				if (availBeds.contains(key)) {	
+				if (availBeds == null || availBeds.contains(key)) {	
 					value = map2.get(key);
 					value = value.replaceAll("\"", "");
 					
@@ -150,7 +152,6 @@ public class FloorList extends HttpServlet {
 					log.trace(" ret -> " + ret);
 					floorMapList.add(createFMobjectFromString(ret));
 				}
-				
 			}
 			
 		} catch (Exception e) {
@@ -165,7 +166,7 @@ public class FloorList extends HttpServlet {
 		
 		log.info(" called for buildingId -> " + buildingId);
 		DBTools db = new DBTools();
-		Map<String, String> mapFloorDB;
+		Map<String, String> mapFloorDB = new HashMap<String, String>();
 		
 		List<FloorMap> floorMapList = new ArrayList<FloorMap>();
 		String roomRange, sProp, sCodStanNumStan, concat;
@@ -181,7 +182,7 @@ public class FloorList extends HttpServlet {
 			roomMax = new Integer(roomRange.split(",")[1]);
 			
 			// Call DB and collect bedInfo
-			mapFloorDB = db.getBeds4Floor(roomMin, roomMax); // -> Map<CODLETTO, CODSTAN;NUMSTANZA>
+			if ("true".compareTo(simulatorMode) != 0) mapFloorDB = db.getBeds4Floor(roomMin, roomMax); // -> Map<CODLETTO, CODSTAN;NUMSTANZA>
 			
 			// Collect keys from current floormap
 			Object[] tstMpKeys = prop.floorMaps.get(buildingId).keySet().toArray();

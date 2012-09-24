@@ -3,7 +3,7 @@
 		<tr>
 			<th>Medico</th>        
 			<th>Stanza(e)</th>
-			<th>Colore</th>
+			<!--th>Colore</th-->
 			<th>Azione</th>
 		</tr>
     </thead>
@@ -12,7 +12,7 @@
 		<tr>
 			<td id="n_<%=doctorMap[i].docId%>"><%=doctorMap[i].docName%></td>
 			<td id="r_<%=doctorMap[i].docId%>"><%=doctorMap[i].rooms%></td>        
-			<td class="colorPal" style="background-color: #<%=doctorMap[i].color%>;" id="p_<%=doctorMap[i].docId%>"></td>
+			<!--td class="colorPal" style="background-color: #<%=doctorMap[i].color%>;" id="p_<%=doctorMap[i].docId%>"></td-->
 			<td>
 				<div>
 					<img title="Cancella" src="images/icon-del.png" onclick="canvasMgr.floorArr[canvasMgr.currFloor].doDocDelete('<%=doctorMap[i].docId%>')">
@@ -25,9 +25,18 @@
 		<th colspan="4">Nuovo Medico</th>
 	</tr>	
 	<tr id="newDoc">
-		<td><input type="text" id="newName"></input></td>        
+		<!--td><input type="text" id="newName"></input></td-->
+		<td>
+			<select id="newName">
+				<option style="background-color: orange;">DR.SSA DORIGONI</option>
+				<option style="background-color: cyan;">DR MININNO</option>
+				<option style="background-color: yellow;">DR.SSA DALBOSCO</option>
+				<option style="background-color: red;">DR.SSA TONET</option>
+				<option style="background-color: green;">DR.SSA PATTON</option>
+			</select>
+		</td>        
 		<td><input type="text" id="newRooms"></input></td>
-		<td class="colorPal" style="background-color: #ffffff; " id="colorP" ></td>
+		<!--td class="colorPal" style="background-color: #ffffff; " id="colorP" ></td-->
 		<td><div><img title="Crea" src="images/icon-add.png" id="doc01" onclick="canvasMgr.floorArr[canvasMgr.currFloor].doDocNew()" title="cancella"></div></td>
 	</tr>
 </table>	

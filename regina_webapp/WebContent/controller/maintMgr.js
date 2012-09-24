@@ -112,8 +112,9 @@ maintMgr = function() {
 			poly = new Kinetic.Polygon({
 			        //points: c,
 			        fill: docObj.color,
-			        alpha: 0.2,
-			        stroke: docObj.color,
+			        //alpha: 0.2,
+			        opacity: 0.5,
+			        //stroke: docObj.color,
 			        strokeWidth: 0,
 			        id: id,
 			        docName: docObj.docName,

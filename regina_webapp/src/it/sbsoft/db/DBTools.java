@@ -192,7 +192,7 @@ public class DBTools {
 	      sbQuery.append("where a.codstan = b.codstan ");
 	      sbQuery.append("and cast(b.numstanza as integer) between ? and ? ");
 	      sbQuery.append("and ((b.ANNULLATO IS NULL or b.ANNULLATO != 'T') and (a.ANNULLATO IS NULL or a.ANNULLATO != 'T')) ");
-	      sbQuery.append("order by 1, 2 ");
+	      sbQuery.append("order by cast(b.NUMSTANZA as integer), numero_letto ");
 		  
 	      logDB.debug(" query -> " + sbQuery.toString());
 		  PreparedStatement pstmt = c.prepareStatement(sbQuery.toString()); 

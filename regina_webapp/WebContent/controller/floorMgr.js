@@ -141,8 +141,9 @@ floorMgr = function(){
 				var poly2 = new Kinetic.Polygon({
 				        points: polyPnts,
 				        fill: dObj.color,
-				        alpha: 0.2,
-				        stroke: dObj.color,
+				        //alpha: 0.2,
+				        opacity: 0.5,
+				        //stroke: dObj.color,
 				        strokeWidth: 0,
 				        id: "p_" + dObj.docId,
 				        docName: dObj.docName,
@@ -466,7 +467,21 @@ floorMgr = function(){
 
 		var docName = $('#newName').val();
 		var romRang = $('#newRooms').val();
-		var color = $('#colorP').css('background-color');
+		//var color = $('#colorP').css('background-color');
+		
+		/*
+				<option style="background-color: orange;">DR.SSA DORIGONI</option>
+				<option style="background-color: cyan;">DR MININNO</option>
+				<option style="background-color: yellow;">DR.SSA DALBOSCO</option>
+				<option style="background-color: red;">DR.SSA TONET</option>
+				<option style="background-color: green;">DR.SSA PATTON</option> 
+		 */
+		
+		if (docName == "DR.SSA DORIGONI") color="orange";
+		if (docName == "DR MININNO") color="cyan";
+		if (docName == "DR.SSA DALBOSCO") color="yellow";
+		if (docName == "DR.SSA TONET") color="red";
+		if (docName == "DR.SSA PATTON") color="green";
 		
 		// Just in case
 		romRang = romRang.replace(',',' ');
@@ -476,7 +491,7 @@ floorMgr = function(){
 		console.log("romRang -> " + romRang);
 		console.log("color -> " + color);
 		
-		console.log("colorHx -> " + floorMgrObj.rgb2hex(color));
+		//console.log("colorHx -> " + floorMgrObj.rgb2hex(color));
 		
 		// Standard polyPoints:
 		// 452;389;439;337;460;283;515;283;537;341;521;388
@@ -485,7 +500,8 @@ floorMgr = function(){
 		
 		var docObj = {
 			building: canvasMgr.currFloor,
-			color: floorMgrObj.rgb2hex(color),
+			//color: floorMgrObj.rgb2hex(color),
+			color: color,
 			docId: canvasMgr.currFloor + "Doc" + sz,
 			docName: docName,
 			polyPoints: "452;389;439;337;460;283;515;283;537;341;521;388",

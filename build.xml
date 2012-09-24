@@ -4,14 +4,15 @@
 
   <!-- set global properties for this build -->
   <tstamp><format property="TODAY2" pattern="yyyyMMdd_kkmm"/></tstamp>
-  <property name="build_ver" value="1.2.6 GA ${TODAY2}"/>
+  <property name="b_ver" value="1.2.6"/>
+  <property name="build_ver" value="${b_ver} GA ${TODAY2}"/>
   <property name="src_dir" location=".\regina_webapp\src"/>
   <property name="webapp_dir"  location=".\regina_webapp\WebContent"/>
   <property name="tomcat_dir"  location="C:\Program Files\apache-tomcat-7.0.14\"/>
   <property name="lib_local" location="${webapp_dir}\WEB-INF\lib"/>
   <property name="build_dir" location="build"/>
   <property name="dist_dir"  location="dist"/>
-  <property name="war_name"  location="${dist_dir}/regina_webapp.war"/>
+  <property name="war_name"  location="${dist_dir}/regina_webapp_${b_ver}.war"/>
 
   <!-- =================================================================== -->
   <!-- The build classpath                                                 -->
