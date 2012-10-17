@@ -52,7 +52,7 @@ body {
 #lgndBtn {
 	position: absolute; 
 	top: 25px; 
-	left: 125px;
+	left: 80px;
 }
 
 #lgndDiag li {
@@ -72,7 +72,7 @@ body {
 #mntBtn {
 	position: absolute; 
 	top: 25px; 
-	left: 80px;
+	left: 125px;
 }
 
 #dialog {

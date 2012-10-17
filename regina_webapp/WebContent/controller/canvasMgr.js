@@ -151,16 +151,16 @@ canvasMgr = function(){
 
 		if ($('#building').val() == null) {
 		
-		for (obj in currObj.floorArr) {
-			
-			$('#building').append($("<option/>", {
-				 value: currObj.floorArr[obj].id,
-				 text: currObj.floorArr[obj].desc
-			}));
-			
-		}
-		$('#building').val(buildId);
-	};
+			for (obj in currObj.floorArr) {
+				
+				$('#building').append($("<option/>", {
+					 value: currObj.floorArr[obj].id,
+					 text: currObj.floorArr[obj].desc
+				}));
+				
+			}
+			$('#building').val(buildId);
+		};
 	};
 	
 	this.selectorsChanged = function() {
