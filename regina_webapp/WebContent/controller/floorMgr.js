@@ -268,7 +268,6 @@ floorMgr = function(){
 					image : obj,
 					width : 20,
 					height : 20,
-					//draggable: false,
 					bed: bed,
 					codStanza: fMap[mObj].codStanza,
 					building: fMap[mObj].building,
@@ -276,25 +275,16 @@ floorMgr = function(){
 					draggable: true
 			});
 			
-            image.on("dragstart", function() {
-            	document.body.style.cursor = "pointer";
-            });
-            image.on("dragmove", function() {
-                document.body.style.cursor = "pointer";
-            });
-            image.on("mouseover", function(){
-            	document.body.style.cursor = "pointer";
-            });
             image.on("mouseout", function() {
                 document.body.style.cursor = "default";              
                 $( "#diagRoom" ).html('---');
                 $( "#diagBed" ).html('---');
             });
-			
+		
             image.on("mousemove", function(){
+            document.body.style.cursor = "pointer";
                 $( "#diagRoom" ).html(rom);
-                //$( "#diagBed" ).html(bed);
-                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
+                $( "#diagBed" ).html(bed);
             });
 
             layer.add(image);
