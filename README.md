@@ -64,3 +64,11 @@ Released
 - Implemented legend
 - Implemented timer for canvasMgr init
 - Performance improvements (delete occArray on widgetChange)
+
+------------------------------------------------------------------------
+Ver 1.2.8_Final - 08/02/2012 [Final GA]
+------------------------------------------------------------------------
+Released
+- Implemente 'Confirmed Dismission'
+- Added new icons
+- Added new icons to legends
