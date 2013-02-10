@@ -35,6 +35,8 @@ canvasMgr = function(){
 
 	this.mImgOcc = new Image();
 	this.fImgOcc = new Image();
+	this.mImgOccConf = new Image();
+	this.fImgOccConf = new Image();
 	this.mImgPre = new Image();
 	this.fImgPre = new Image();
 	this.xImgLib = new Image();
@@ -48,6 +50,8 @@ canvasMgr = function(){
 	
 	this.mImgOcc.src = "./images/male_occ_20.png";
 	this.fImgOcc.src = "./images/female_occ_20.png";
+	this.mImgOccConf.src = "./images/male_occ_20_conf.png";
+	this.fImgOccConf.src = "./images/female_occ_20_conf.png";
 	this.mImgPre.src = "./images/male_pre_20.png";
 	this.fImgPre.src = "./images/female_pre_20.png";
 	this.xImgLib.src = "./images/stanza_lib_20.png";

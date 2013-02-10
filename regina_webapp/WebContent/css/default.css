@@ -83,7 +83,7 @@ div.left {
 	text-align: right;
 	position: absolute;
 	display: inline;
-	width: 120px;
+	width: 180px;
 }
 
 div.right {
@@ -91,7 +91,7 @@ div.right {
 	position: absolute;
 	display: inline;
 	width: 55%;
-	left: 142px;
+	left: 200px;
 }
 
 #jbutton {

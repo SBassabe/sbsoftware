@@ -16,12 +16,14 @@ import it.sbsoft.exceptions.SBException;
 import it.sbsoft.utility.CodeEncodeString;
 import it.sbsoft.utility.LoggerUtils;
 import it.sbsoft.utility.PropertiesFile;
+import it.sbsoft.utility.DateHelper;
 
 public class DBTools {
 	
     static Logger log = LoggerUtils.getLogger("sbsoftware");
     static Logger logDB = LoggerUtils.getLogger("db");
     static CodeEncodeString decode = CodeEncodeString.getInstance();
+    static DateHelper dh = new DateHelper();
 	private PropertiesFile propFile = PropertiesFile.getPropertiesFile();
 	
 	public Map<String, String> getOcc4FloorByDate(Set<String> setBedKeyset, String dt) throws Exception {
@@ -32,7 +34,7 @@ public class DBTools {
 		PreparedStatement pstmt;
 		ResultSet rs;
 		Map<String, String> mp = new HashMap<String, String>();
-		String SESSO, STANZA, COD_LETTO, NOME, STATUS, value="", key="";
+		String SESSO, STANZA, COD_LETTO, NOME, STATUS, value="", key="", ALTRO;
 		int occNum=0, preNum=0;
 		Connection c = null;
 		
@@ -62,7 +64,7 @@ public class DBTools {
 			  bedRange = bedRange.replace("]", "");
 		      
 		      sbQuery = new StringBuffer();
-		      sbQuery.append("SELECT a.sesso,d.stanza,d.codice_letto,a.gmadim,d.gmainizioutili,d.gmafineutili,a.codospite,a.nomeospite,d.sede,d.reparto ");
+		      sbQuery.append("SELECT a.sesso,d.stanza,d.codice_letto,a.gmadim,d.gmainizioutili,d.gmafineutili,a.codospite,a.nomeospite,d.sede,d.reparto,coalesce(d.FINECONFERMATA,'F') as fineconfermata ");
 		      sbQuery.append("FROM ospiti_a a ");
 		      sbQuery.append("JOIN ospiti_d d on (a.codospite=d.codospite) ");
 		      sbQuery.append("LEFT JOIN clin_medico_stanza m on (m.codstan=d.stanza and m.gmadal<= CAST('" + dt + "' AS DATE) and (m.gmaal is null or (m.gmaal >= CAST('" + dt + "' AS DATE)))) ");
@@ -87,10 +89,11 @@ public class DBTools {
 	        	  COD_LETTO = rs.getString ("codice_letto");
 	        	  NOME = rs.getString("nomeospite");
 	        	  STATUS="2"; // 2=occupato
-	        	  
-	        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS;
+                  ALTRO = rs.getString("fineconfermata") + "_" + dh.getDtAsStr(rs.getDate("gmainizioutili")) + "_" + dh.getDtAsStr(rs.getDate("gmafineutili"));	        	  
+
+	        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS+";"+ALTRO;
 	        	  key = COD_LETTO;
-	        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS] -> "+ ++occNum + value);
+	        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS;ALTRO] -> "+ ++occNum + value);
 	        	  
 	        	  mp.put(key, value);
 	        	  setBedKeyset.remove(COD_LETTO);
@@ -127,10 +130,11 @@ public class DBTools {
 		        	  COD_LETTO = rs.getString ("codice_letto");
 		        	  NOME = rs.getString("nomeospite");
 		        	  STATUS="1"; //1=prenotato
+					  ALTRO="P_NODAT_NODAT";
 		        	  
-		        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS;
+		        	  value = SESSO+";"+STANZA+";"+COD_LETTO+";"+NOME+";"+STATUS+";"+ALTRO;
 		        	  key = COD_LETTO;
-		        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS] -> "+ ++preNum + value);
+		        	  logDB.trace("[<key>COD_LETTO <value>SESSO;STANZA;COD_LETTO;NOME;STATUS;ALTRO] -> "+ ++preNum + value);
 		        	  
 		        	  mp.put(key, value);
 		        	 

@@ -2,6 +2,8 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
+<meta HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<meta HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
 <title>Regina Logistics</title>
 <style type="text/css">
 <!--
@@ -33,7 +35,7 @@ window.onload = function() {
 	
 	$( "#dialog" ).show();
 	$( "#dialog" ).dialog({
-			width: 450,
+			width: 550,
 			resizable: false,
 			minHeight: 60,
 			position: [70,125], 
@@ -85,7 +87,7 @@ window.onload = function() {
 	});
 
 	$( "#lgndDiag" ).dialog({
-			width: 245,
+			width: 300,
 			resizable: false,
 			minHeight: 60,
 			position: [600,125], 
@@ -154,6 +156,7 @@ window.onload = function() {
 		<div class="left">Letti per Piano:</div><div class="right" id="diagNumBeds">16</div><br>
 		<div class="left">Stanza:</div><div class="right" id="diagRoom">501</div><br>
 		<div class="left">Letto:</div><div class="right" id="diagBed">1</div><br>
+		<div class="left">Dimissione Confermata:</div><div class="right" id="dimConf"></div><br>
 	</div>
 	<div id="maintDiag">
 		  <div id="radio">

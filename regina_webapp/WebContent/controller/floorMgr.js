@@ -308,6 +308,7 @@ floorMgr = function(){
 			  if (cObj != undefined) {
 				var rom = fMap[mObj].room;
 				var bed = cObj.bed; 
+				var conf = "No";
 				var obj;
 				var zoomFact = 1;
 				
@@ -323,12 +324,32 @@ floorMgr = function(){
 							obj = canvasMgr.fImgPre;
 						};
 					} else {
+						
+						if (cObj.altro != undefined && cObj.altro.split("_")[0] == "T") {
+							conf="Si (" + cObj.altro.split("_")[2] + ")";
+						}
+						
 						bed = bed + " (occupato)";
 						if (cObj.gender == "M") {
+							if (conf == "No") {
 							obj = canvasMgr.mImgOcc;
 						} else {
+							    obj = canvasMgr.mImgOccConf;
+							}
+						} else {
+							if (conf == "No") {
 							obj = canvasMgr.fImgOcc; 
+							} else {
+								obj = canvasMgr.fImgOccConf;
+							}
+							 
 						};					
+						if (cObj.altro != undefined) {
+						    var spl=cObj.altro.split("_");
+						    if (spl[0] == "T") {
+						    	
+						    } 
+						}  
 					} 	
 				};
 			    
@@ -360,12 +381,14 @@ floorMgr = function(){
 	                document.body.style.cursor = "default";              
 	                $( "#diagRoom" ).html('---');
 	                $( "#diagBed" ).html('---');
+	                $( "#dimConf" ).html('---');
 	            });
 				
 	            image.on("mousemove", function(){
 	                $( "#diagRoom" ).html(rom);
 	                //$( "#diagBed" ).html(bed);
 	                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
+	                $( "#dimConf" ).html(conf);
 	            });
 	
 	            layer.add(image);

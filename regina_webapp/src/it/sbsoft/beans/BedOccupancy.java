@@ -7,6 +7,7 @@ public class BedOccupancy {
 	private String surname;
 	private String gender;
 	private String status;
+	private String altro;
 	
 	public String getStatus() {
 		return status;
@@ -37,5 +38,12 @@ public class BedOccupancy {
 	}
 	public void setGender(String gender) {
 		this.gender = gender;
-	}	
+	}
+	public String getAltro() {
+		return altro;
+	}
+	public void setAltro(String altro) {
+		this.altro = altro;
+	}
+	
 }

@@ -172,10 +172,13 @@ public class FloorOccupancy extends HttpServlet {
 			bOcc = new BedOccupancy();
 			bOcc.setBed(sCoords[1]);
 			if (occ.containsKey(sCoords[1])) {
-				bOcc.setStatus(occ.get(sCoords[1]).split(";")[4]); // Occupato
-				sex = occ.get(sCoords[1]).split(";")[0];
-				bOcc.setGender(sex);
-				bOcc.setName(occ.get(sCoords[1]).split(";")[3]);
+				
+				String[] arrVals = ((String)occ.get(sCoords[1])).split(";");
+				
+				bOcc.setStatus(arrVals[4]); // Occupato
+				bOcc.setGender(arrVals[0]);
+				bOcc.setName(arrVals[3]);
+				bOcc.setAltro(arrVals[5]);
 				
 			} else {
 				bOcc.setStatus("0"); // Libero
