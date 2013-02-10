@@ -181,9 +181,10 @@ canvasMgr = function(){
 		// On first run, day equals 0. Set it to the current date.
 		if (day==0) {
 			var curDt = new Date();
-			day = 1;
+			day = curDt.getDate();
 			$('#year').val(curDt.getFullYear().toString());
 			$('#month').val((curDt.getMonth()+1).toString().length == 1 ? "0"+(curDt.getMonth()+1).toString() : (curDt.getMonth()+1).toString());
+			$('#day').slider( "option", "value", day);
 		}
 		
 		year = $('#year').val();

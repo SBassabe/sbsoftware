@@ -7,7 +7,8 @@ utest = function() {
 		 
 		 console.log("into changeDate ...");
 		 var month = parseInt($('#month').val());
-		 var day = parseInt($('#day').val());
+		 var day = $('#day').slider( "option", "value");
+		 
 		 day+=1;
 		 
 		 if(month == 10) month=1;
@@ -17,7 +18,7 @@ utest = function() {
 		 }
 		 
 		 $('#month').val('0'+month);
-		 $('#day').val(''+day);
+		 $('#day').slider( "option", "value", day);
 		 $('#dayvalue').text(''+day);
 		 canvasMgr.selectorsChanged();
 		 
@@ -25,7 +26,13 @@ utest = function() {
 	 
 	 this.startSmart = function() {
 		 
-		 tmr=setInterval(function() {currUtstObj.changeDate();}, 700);
+		 tmr=setInterval(function() {currUtstObj.changeDate();}, 500);
+		 
+	 };
+	 
+	 this.stopSmart = function() {
+		 
+		 clearInterval(tmr);
 		 
 	 };
 	 
