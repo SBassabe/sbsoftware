@@ -3,11 +3,9 @@ package it.sbsoft.servlets;
 import com.google.gson.Gson;
 
 import it.sbsoft.beans.Bean2cli;
-import it.sbsoft.beans.DoctorMap;
 import it.sbsoft.beans.Errore;
+import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.utility.LoggerUtils;
-import it.sbsoft.utility.PropertiesFile;
-
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -29,12 +27,12 @@ public class MaintSrvlt extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
     static Gson gson = new Gson();
-	static PropertiesFile prop;
+	static PropertiesCommon prop;
 	static String cHome;
 	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
     
 	public void init() {
-		prop = PropertiesFile.getPropertiesFile();
+		prop = PropertiesCommon.getPropertiesFile();
 		cHome = prop.cHome;
 	}
 	

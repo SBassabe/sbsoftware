@@ -2,13 +2,17 @@ package it.sbsoft.servlets;
 
 import it.sbsoft.beans.*;
 import it.sbsoft.db.DBTools;
+import it.sbsoft.doctors.DocOccupancy;
 import it.sbsoft.exceptions.SBException;
+import it.sbsoft.propfiles.PropertiesCommon;
+import it.sbsoft.propfiles.PropertiesRooms;
 import it.sbsoft.utility.*;
 
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,11 +32,13 @@ public class FloorList extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
     static Gson gson = new Gson();
-	static PropertiesFile prop;
+	static PropertiesCommon propCommon;
+	static PropertiesRooms propRooms;
 	static String simulatorMode;
 	static String persistProp;
 	static Logger log = LoggerUtils.getLogger("sbsoftware");
 	static Set<String> availBeds;
+	private static DocOccupancy dOcc = new DocOccupancy();
     
     public FloorList() {
         super();
@@ -48,12 +54,15 @@ public class FloorList extends HttpServlet {
 		persistProp =  this.getInitParameter("persistProperties");
 		log.info(" persistProp = " + persistProp);
 		
-		if (persistProp != null && persistProp.compareTo("true") == 0 && prop != null) {
+		if (persistProp != null && persistProp.compareTo("true") == 0 && propCommon != null) {
 			log.info("Skip Configuring properties ...");
 			return;
 		}
 		
-		prop = PropertiesFile.getPropertiesFile();
+		propRooms = PropertiesRooms.getPropertiesFile();
+		propCommon = PropertiesCommon.getPropertiesFile();
+		Connection conn = (Connection)getServletContext().getAttribute("connection");
+		dOcc.h2Help.initConn(conn);
 		
 	}
     
@@ -62,7 +71,7 @@ public class FloorList extends HttpServlet {
 		log.info(" into doGet");
 		Bean2cli ret = new Bean2cli();
 		
-		List<Floor> floorList = new ArrayList<Floor>();;
+		List<Floor> floorList = new ArrayList<Floor>();
 		Floor floorBean;
 		
 		response.setContentType("text/html");
@@ -73,18 +82,24 @@ public class FloorList extends HttpServlet {
 		 
 		try {
 			
+			// Just purge in memory db tables...
+			dOcc.purgeAllTables();
+			dOcc.populateTables();
+			
 			// Get list of floors
-			String floorProp=prop.getPropertySB("Floors");
+			String floorProp=propCommon.getPropertySB("Floors");
 			String[] floorArr = floorProp.split(",");
 			
-			// For every floor do bed map
+			// For every floor do bed and room maps
 			for (int i=0; i<floorArr.length; i++ ){
 				
 				String floorId=floorArr[i];
 				floorBean = new Floor();
+				
+				// bed map
 				floorBean.setId(floorId);
-				floorBean.setDescription(prop.getProperty(floorId+".desc"));
-				floorBean.setImgSrc(prop.getProperty(floorId+".src"));
+				floorBean.setDescription(propCommon.getProperty(floorId+".desc"));
+				floorBean.setImgSrc(propCommon.getProperty(floorId+".src"));
 				//floorBean.setFloorMap(getMapCoordinates(floorBean.getId()));
 				if ("true".compareTo(maint) == 0) {
 					floorBean.setFloorMap(getMapCoordinatesFromDB(floorBean.getId()));
@@ -93,9 +108,21 @@ public class FloorList extends HttpServlet {
 				}
 				floorBean.setFeatureMap(getFeatureMap(floorBean.getId()));
 				floorBean.setDoctorMap(getDoctorMap(floorBean.getId()));
-				floorList.add(floorBean);
 				
+				// room map
+				floorBean.getRoomMap(); // just call it to create the empty list object
+				for (String s : propRooms.getKeyListForPrefix(floorId)) {
+					String valS =  propRooms.getPropertySB(s);
+					if (valS != null) {
+						DoctorInfoBean dib = new DoctorInfoBean();
+						dib.setNumStanza(s.substring((floorId+"_").length()));
+						dib.setPolyPoints(valS.split(","));
+						floorBean.getRoomMap().add(dib);
+					}
+				}
+				floorList.add(floorBean);
 			}
+			
 			availBeds=null;
 			
 		} catch (Exception e) {
@@ -105,7 +132,7 @@ public class FloorList extends HttpServlet {
 				ret.getError().setErrorDesc(e.getMessage());
 			} else {
 				ret.getError().setErrorCode("2");
-				ret.getError().setErrorDesc("See Tomocat log files");
+				ret.getError().setErrorDesc("See Tomcat log files");
 				e.printStackTrace();
 			}
 		
@@ -127,7 +154,7 @@ public class FloorList extends HttpServlet {
 		log.info(" called for buildingId -> " + buildingId);
 		List<FloorMap> floorMapList = new ArrayList<FloorMap>();
 		
-		Map<String, String> map2 = prop.floorMaps.get(buildingId);
+		Map<String, String> map2 = propCommon.floorMaps.get(buildingId);
 		String key, value, ret;
 		
 		try {
@@ -177,7 +204,7 @@ public class FloorList extends HttpServlet {
 		try {
 			
 			// Collect room_range
-			roomRange = prop.getProperty(buildingId+".room_range");
+			roomRange = propCommon.getProperty(buildingId+".room_range");
 			roomMin = new Integer(roomRange.split(",")[0]);
 			roomMax = new Integer(roomRange.split(",")[1]);
 			
@@ -185,13 +212,13 @@ public class FloorList extends HttpServlet {
 			if ("true".compareTo(simulatorMode) != 0) mapFloorDB = db.getBeds4Floor(roomMin, roomMax); // -> Map<CODLETTO, CODSTAN;NUMSTANZA>
 			
 			// Collect keys from current floormap
-			Object[] tstMpKeys = prop.floorMaps.get(buildingId).keySet().toArray();
+			Object[] tstMpKeys = propCommon.floorMaps.get(buildingId).keySet().toArray();
 			log.debug(" prop.floorMaps.get(buildingId).keySet() size -> " + tstMpKeys.length);
 			
 			// For every key in prop.floorMaps keyset confront with db data
 			for (int c=0; c<tstMpKeys.length; c++) {
 				
-				sProp = prop.floorMaps.get(buildingId).get(tstMpKeys[c]);  // -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
+				sProp = propCommon.floorMaps.get(buildingId).get(tstMpKeys[c]);  // -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
 				log.trace(" sProp -> " + sProp);
 				String[] aProp = sProp.split(";");
 				String xyVals =  aProp[2] + ";" + aProp[3];
@@ -276,7 +303,7 @@ public class FloorList extends HttpServlet {
 		List<FeatureMap> featMapList = new ArrayList<FeatureMap>();
 		try {
 			//B1.floor_feat="I;509;10;10,S;515;11;11,T;508;12;12,B;500;13;13"
-			mp = prop.getProperty(buildingId+".floor_feat");
+			mp = propCommon.getProperty(buildingId+".floor_feat");
 			mp = mp.replaceAll("\"", "");
 			String[] sp = mp.split(",");
 			for (int i=0; i<sp.length; i++) {
@@ -303,7 +330,7 @@ public class FloorList extends HttpServlet {
 	private Map<String,String> getFeatureTypeMap() {
 		
 		Map<String,String> featTypeMap = new HashMap<String,String>();
-		String mp = prop.getProperty("FeatureType");
+		String mp = propCommon.getProperty("FeatureType");
 		mp = mp.replaceAll("\"", "");
 		String[] sp = mp.split(",");
 		for (int i=0; i<sp.length; i++) {
@@ -320,7 +347,7 @@ public class FloorList extends HttpServlet {
 		List<DoctorMap> docMapList = new ArrayList<DoctorMap>();
 
 		try {
-			mp = prop.getProperty(buildingId+".doctor");
+			mp = propCommon.getProperty(buildingId+".doctor");
 			if (mp != null && mp.length() > 0) { 
 				mp = mp.replaceAll("\"", "");
 	

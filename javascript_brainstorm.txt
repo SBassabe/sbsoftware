@@ -1,0 +1,103 @@
+
+// on first run, this is what happens.
+canvasMgr.selectorsChanged
+	floorMgrObj.populateFloorLayer(currObj.stage, currObj.floorLyr, currObj.occLyr, dt);
+		floorMgrObj.getFloorOcc4DateList(stage, occLayer, dt, floorMgrObj.createOccLayer);
+			floorMgrObj.getFloorOcc4DateListElab(transport, stage, layer, _callback);
+				floorMgrObj.createOccLayer(stage, layer, ret.dt)
+					floorMgrObj.createOccLayerMapInfo(stage, layer, day);
+		floorMgrObj.getDoctorInfo(stage, canvasMgr.floorLyr);
+			// for (f in floorMgrObj.doctorMap)
+			// draw stuff ....
+		floorMgrObj.getFeatureInfo(stage, canvasMgr.floorLyr);
+		
+
+// on maintMode this is what happens...
+canvasMgr.maintObj.initTst
+	createPolyAnchors(layer)
+			// creates polygons with no points info
+			
+		createAncorObjects(layer, c) [n-times] returns _objPriv
+			buildAnchor [m-times]
+				// creates circles, one for every point
+				
+	// saves polygon point info as layer attribute with the following code	
+	// eval("layer.polyPnts"+i+" = _objPriv");
+	// can be queried by: canvasMgr.floorLyr.polyPnts+i
+				
+	captureBeforeDraw
+		updateDottedLines
+		// gets polygon point info
+		// gets actual polygon object
+		// updates polygon object 'polyLine.setPoints([])' with polygon point info
+		
+		
+------------------------------------------------------------------------------------
+Maintenance layer, poly with handlebars 2.0
+10:36 sabato 9 marzo 2013
+------------------------------------------------------------------------------------
+var roomMap = {[roomId],[polyPoints]}  -> eg. {[A0123],[244,132,287,137,291,254,146,258,144,183,243,177]}
+
+init = function() {
+	// for each 'roomMap'
+	//     createPoly(roomId)
+	//     createAnchors(roomId)
+		
+createPoly = function(roomId) {
+	// poly = new Kinetic.Polygon({
+    //     name: 'p_'+roomId
+	//	   draggable: true
+	// poly.setPoints(roomMap[roomId])
+	// poly.on("dragstart") {
+	//		deleteAnchors(roomId)	
+	// poly.on("dragend") {
+	//		calculate new polygon points and update roomMap[roomId] polypoints
+	//		deletePoly(roomId)
+	//		createPoly(roomId)
+	//		createAnchors(roomId);
+	//		layer.draw();
+	// add Poly to layer;
+	
+createAnchors = function(roomId) {
+	// for each 'polyPoints' in 'roomId'
+	//		anchor = new Kinetic.Circle({
+	//			name: 'c_'+roomId
+	//		anchor.on("dragend", function() {
+	//			for all circles shapes with same name 'c_'+roomId,  
+	//			calculate new polygon points and update roomMap[roomId] polypoints
+	//			deletePoly(roomId)
+	//			createPoly(roomId)
+	//			deleteAnchors(roomId);
+	//			createAnchors(roomId);
+	//			layer.draw();
+	//		add Circle to layer;
+
+deleteAnchors = function(roomId) {
+	// delete anchors by name '.c_'+roomId
+	
+deletePoly = function(roomId) {
+	// delete polygons by name '.p_'+roomId
+		
+------------------------------------------------------------------------------------
+Running developer TODO list
+07:47 lunedì 11 marzo 2013
+------------------------------------------------------------------------------------
+\WebContent\controller\canvasMgr.js
+	-- deprecate 'this.toolTipLyr = new Kinetic.Layer({id: "toolTipLyr"});' if not used
+	-- refactor 'canvasMgr.floorArr = new Array();' just brainstorm
+	-- deprecate 'floorMgr.doDocNew()' and all other methods that deal with doctors ...
+	
+------------------------------------------------------------------------------------
+Running developer TODO list
+08:28 venerdì 15 marzo 2013
+------------------------------------------------------------------------------------	
+floorMgr (226) -> to avoid double doctor problem
+
+var occDoc=floorMgrObj.occDocMap[dt];
+			var tmpArr = new Array();
+			for (f in occDoc) {( function() {    
+				
+				var dObj = occDoc[f];
+				if ($.inArray(dObj.numStanza, tmpArr) > 0) {
+				    
+				} else {	

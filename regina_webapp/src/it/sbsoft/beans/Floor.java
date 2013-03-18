@@ -1,5 +1,6 @@
 package it.sbsoft.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Floor {
@@ -11,8 +12,9 @@ public class Floor {
 	// map context
 	private String imgSrc;
 	private List<FloorMap> floorMap;
+	private List<DoctorInfoBean> roomMap;
 	private List<FeatureMap> featureMap;
-	private List<DoctorMap> doctorMap;
+	private List<DoctorMap> doctorMap; // TODO: deprecate me please
 	
 	// occupancy context
 	private String dt; // <yyyymmdd>
@@ -66,4 +68,12 @@ public class Floor {
 	public void setDoctorMap(List<DoctorMap> doctorMap) {
 		this.doctorMap = doctorMap;
 	}
+	public List<DoctorInfoBean> getRoomMap() {
+		if (roomMap == null) this.roomMap = new ArrayList<DoctorInfoBean>();
+		return roomMap;
+	}
+	public void setRoomMap(List<DoctorInfoBean> roomMap) {
+		this.roomMap = roomMap;
+	}
+	
 }

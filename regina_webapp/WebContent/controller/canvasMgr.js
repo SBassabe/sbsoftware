@@ -5,8 +5,10 @@ canvasMgr = function(){
 	this.currFloor = "";
 	this.currMonth = "";
 	this.currYear = "";
-	this.maintMode = false;
-	this.maintMgr = new maintMgr();
+	this.maintMode = false; // false, letti, stanze
+	this.maintModeType = "";
+	this.maintMgrBeds = new maintMgrBeds();
+	this.maintMgrRooms = new maintMgrRooms();
 
 	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
@@ -132,7 +134,12 @@ canvasMgr = function(){
 				floor.floorMap = flr.floorMap;
 				floor.featMap = flr.featureMap;
 				floor.doctorMap = flr.doctorMap;
-				currObj.floorArr[flr.id] = floor;
+				
+				$.each(flr.roomMap, function(index, value) {
+					floor.roomMap[value.numStanza]=value.polyPoints.toString();
+				});
+				
+				currObj.floorArr[flr.id] = floor;  // <-- Important piece of code!
 				
 				if (i==0) firstFloor=flr.id;
 			}
@@ -216,15 +223,20 @@ canvasMgr = function(){
 			console.log(" occMapArray empty for floor -> " + buildId);
 		}
 		
-		// flag used to capture current floor change
+		// If floor selector changes (or on first run)
 		if (this.currFloor != buildId) {
+			
+			// Note: The occupation array gets emptied on every floor change. 
+			// This is done to spare some memory on the client and to keep info from getting stale.
 			if (this.currFloor != "") {
 				currObj.floorArr[this.currFloor].occMap=[];
 				console.log(" occMapArray empty for floor -> " + this.currFloor);
 			}
+			
 			this.currFloor=buildId;
-			//currObj.populateFloorLayer(buildId);
 			currObj.floorArr[buildId].populateFloorLayer(currObj.stage, currObj.floorLyr, currObj.occLyr, dt);
+		
+		// If floor selector does NOT change, just get occupancy info	
 		} else {
 			
 			// populateOccLayer
@@ -235,10 +247,10 @@ canvasMgr = function(){
 			}			
 		}
 
-		if (currObj.maintMode) {
-			$('#doctorTable').empty();
-			currObj.floorArr[currObj.currFloor].createDoctorTable();
-		}
+//		if (currObj.maintMode) {
+//			$('#doctorTable').empty();
+//			currObj.floorArr[currObj.currFloor].createDoctorTable();
+//		}
 		
 		currObj.toolTipLyr.moveToTop();
 	};
@@ -292,7 +304,15 @@ canvasMgr = function(){
 	};
 	
 	this.showMntDiag = function() {
-		$( "#maintDiag" ).dialog('open');
+		
+		$("#maintDiag").dialog('open');
+		if (currObj.maintMode) {
+			$("#radio2").button("enable"); //off
+			$("#radio4").button("enable"); //salva
+		} else {
+			$("#radio2").button("disable");
+			$("#radio4").button("disable");
+		}
 	};
 
 	this.showLgndDiag = function() {
@@ -312,50 +332,59 @@ canvasMgr = function(){
 		
 	};
 	
-	
 	this.checkMaintRadio = function(val) {
 		
 		console.log("checkMaintRadio -> " + val);
 		//if ($("#radio1").attr('checked') != undefined) {
-		if (val == "on") {	
-			console.log("maint ON");
-			if (!currObj.maintMode) {
-				currObj.maintMode=true;
-				currObj.currFloor = "";
-				currObj.floorLyr.removeChildren();
-				currObj.occLyr.removeChildren();
-				// get all floor info from server
-				currObj.getFloorList(currObj.createBuildingPulldown);
-				
-				// initialize Selectors here if necessary.
-				currObj.selectorsChanged();
-				document.getElementById("rad1lbl").innerHTML="Salva";
-				
-				// draw doctor info
-				currObj.floorArr[currObj.currFloor].createDoctorTable();
-				
+		if (val == "letti" || val == "stanze") {	
+			
+			currObj.maintMode=true;
+			currObj.maintModeType=val;
+
+			// get all floor info from server
+			currObj.getFloorList(currObj.createBuildingPulldown);
+			
+			// initialize Selectors here if necessary.
+			$("#radio3").button( "disable" );
+			$("#radio1").button( "disable" );
+			$("#radio4").button( "enable" );
+			$("#radio2").button( "enable" );
+			
+			currObj.occLyr.removeChildren();
+			
+			if (currObj.maintModeType == "stanze") {
+				currObj.maintMgrRooms.initTst(currObj.currFloor);
+				currObj.occLyr.draw();
 			} else {
-				currObj.maintMgr.collectLayerData();
+				currObj.maintMgrBeds.createOccLayerMaintInfo(currObj.stage, currObj.occLyr, currObj.currFloor);
+			}
+						
+		} else if (val == "off" || val == "salva") {
+			
+			if (val == "salva") {
+				if (currObj.maintModeType == "stanze") {
+					currObj.maintMgrRooms.saveFloorMap4FloorPrepare();
+					return;
+				} else {
+					currObj.maintMgrBeds.collectLayerData();
+					return;
+				}				
 			}
 			
-		} else {
-			console.log("maint OFF");
-			if (currObj.maintMode) {
-				currObj.maintMode=false;
-				currObj.currFloor = "";
-				currObj.floorLyr.removeChildren();
-				currObj.occLyr.removeChildren();
-				// get all floor info from server
-				currObj.getFloorList(currObj.createBuildingPulldown);
-				
-				// initialize Selectors here if necessary.
-				currObj.selectorsChanged();
-				document.getElementById("rad1lbl").innerHTML="On";
-				
-				// close doctor info
-				$('#doctorTable').empty();
-				
-			}
+			currObj.maintMode=false;
+			currObj.currFloor = "";
+			currObj.floorLyr.removeChildren();
+			currObj.occLyr.removeChildren();
+			// get all floor info from server
+			currObj.getFloorList(currObj.createBuildingPulldown);
+			
+			// initialize Selectors here if necessary.
+			currObj.selectorsChanged();
+			$("#radio3").button( "enable" );
+			$("#radio1").button( "enable" );
+			$("#radio4").button( "disable" );
+			$("#radio2").button( "disable" );
+			
 		};
 	};
 	

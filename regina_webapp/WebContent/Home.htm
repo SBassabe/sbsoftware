@@ -20,7 +20,8 @@
 <script type="text/javascript" src="./libraries/ejs_production.js"></script>
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
-<script type="text/javascript" src="controller/maintMgr.js"></script>
+<script type="text/javascript" src="controller/maintMgrBeds.js"></script>
+<script type="text/javascript" src="controller/maintMgrRooms.js"></script>
 <script type="text/javascript" src="controller/returnObj.js"></script>
 <script type="text/javascript" src="controller/utest.js"></script>
 <script>
@@ -36,7 +37,7 @@ window.onload = function() {
 	
 	$( "#dialog" ).show();
 	$( "#dialog" ).dialog({
-			width: 550,
+			width: 900,
 			resizable: false,
 			minHeight: 60,
 			position: [70,125], 
@@ -75,7 +76,7 @@ window.onload = function() {
 
 	$( "#maintDiag" ).show();
 	$( "#maintDiag" ).dialog({
-			width: 330,
+			width: 380,
 			resizable: false,
 			minHeight: 60,
 			position: [600,125], 
@@ -161,8 +162,10 @@ window.onload = function() {
 	</div>
 	<div id="maintDiag">
 		  <div id="radio">
-		  		<input type="radio" id="radio2" name="radio" value="off" onclick="canvasMgr.checkMaintRadio(this.value)" checked="checked" /><label for="radio2">Off</label>
-				<input type="radio" id="radio1" name="radio" value="on" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio1"><div id="rad1lbl">On</div></label>
+		  		<input type="radio" id="radio2" name="radio" value="off" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio2">off</label>
+				<input type="radio" id="radio1" name="radio" value="letti" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio1"><div id="rad1lbl">letti</div></label>
+				<input type="radio" id="radio3" name="radio" value="stanze" onclick="canvasMgr.checkMaintRadio(this.value)" /><label for="radio3"><div id="rad2lbl">stanze</div></label>
+				<input type="radio" id="radio4" name="radio" value="salva" onclick="canvasMgr.checkMaintRadio(this.value)"/><label for="radio4"><div id="rad3lbl">salva</div></label>
 		  </div>
 	</div>
 	<div id="errDiag" title="Error Dialog">

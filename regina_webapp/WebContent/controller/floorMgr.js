@@ -8,6 +8,25 @@ floorMgr = function(){
     this.occMap = new Array();
     this.featMap = new Array();
     this.doctorMap = new Array();
+    this.roomMap = new Array();
+    this.occDocMap = new Array();
+    
+	/*
+	16173	 DR.SSA DORIGONI SABINA
+	16169	 DR. MININNO RAFFAELE
+	16170	 DR.SSA DALBOSCO BARBARA
+	16168	 DR.SSA PATTON LAURA
+	16172	 DR.SSA TONET SILVANA
+	16205	 STANZE STAND BY
+	16174	 DR.SSA GUELLA VERONICA
+	*/				
+	this.docColors = new Array();
+	this.docColors[16173]="green";
+	this.docColors[16169]="cyan";
+	this.docColors[16170]="yellow";
+	this.docColors[16168]="orange";
+	this.docColors[16172]="red";
+	this.docColors[16174]="blue";
 
     this.getObj4Bed = function(occArr, bed) {
     	
@@ -39,15 +58,13 @@ floorMgr = function(){
 			stage.draw();
 			
 			occLayer.removeChildren();
-			if (!canvasMgr.maintMode && floorMgrObj.occMap[dt] == undefined ) {
+			if (floorMgrObj.occMap[dt] == undefined ) {
 					floorMgrObj.getFloorOcc4DateList(stage, occLayer, dt, floorMgrObj.createOccLayer);
-				} else {
-				// Maint or Real logic in method
-					floorMgrObj.createOccLayer(stage, occLayer, dt);
-				}
+			} else {
+			   // Maint or Real logic in method
+			   floorMgrObj.createOccLayer(stage, occLayer, dt);
+		    }
 
-			// Doctor info
-			floorMgrObj.getDoctorInfo(stage, canvasMgr.floorLyr);
 			// Floor features
 			floorMgrObj.getFeatureInfo(stage, canvasMgr.floorLyr);
 		
@@ -99,16 +116,14 @@ floorMgr = function(){
 	
 	this.getFloorOcc4DateListElab = function(transport, stage, layer, _callback) {
 		
-		console.log("getFloorOcc4DateListElab called ...");
-		console.log("floorMgrObj.id = " + floorMgrObj.id);
 		var method="getFloorOcc4DateListElab";
+		console.log(method + " called ...");
 		
 		if (transport.error == undefined) {
 			
 			ret = transport.ret2cli;
 			floorMgrObj.occMap[ret.dt] = ret.occMap;
 			_callback(stage, layer, ret.dt);
-			//floorMgrObj.createOccLayer(stage, layer, ret.dt);
 			
 		} else {
 			var err = transport.error; 
@@ -122,42 +137,128 @@ floorMgr = function(){
 		};
 	};
 	
-	this.getDoctorInfo = function(stage, layer) {
+	// doctor occupancy functions(START)
+   this.getDoctorOcc4DateList = function(stage, layer, dt, _callback) {
+		
+	    var method = 'getDoctorOcc4DateList';
+		console.log(method + " called ...");
+		
+        try {
+        	
+        	var params = {
+        	    floor: this.id, 
+        	    date: dt,
+        	    action: "occ"};
+            
+            $.ajax({
+                url: "DoctorInfoSrvlt",
+                dataType: "json",
+                timeout: 10000,
+                type: 'POST',
+                async: false,
+                data: params,
+                context: document.body,
+                success: function(transport){
+                	floorMgrObj.getDoctorOcc4DateListElab(transport, stage, layer, _callback);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
+                    canvasMgr.showError(errDesc);
+                }
+            });
+            
+        } 
+        catch (e) {
+        	canvasMgr.showError(" on method:" + method);
+            console.log(e);
+            return;
+        }
+		
+	};
+	
+	this.getDoctorOcc4DateListElab = function(transport, stage, layer, _callback) {
+	
+		var method="getDoctorOcc4DateListElab";
+		console.log(method + " called ...");
+		
+		if (transport.error == undefined) {
+			
+			floorMgrObj.occDocMap[transport.date]=transport.ret2cli;
+			_callback(stage, layer, transport.date);
+			
+		} else {
+			var err = transport.error; 
+			if (err.errorCode == 1) {
+				canvasMgr.showError(transport.error.errorDesc);
+			    
+			} else {
+				canvasMgr.showError(" in method -> " + method);
+			};
+			
+		};
+	};
+	
+	this.getDoctorOccupancyInfo = function(stage, layer, dt, _callback) {
+		
+		// check the occDocMap for occupancy info for the given date ...
+		if (floorMgrObj.occDocMap[dt] == undefined) {
+			floorMgrObj.getDoctorOcc4DateList(stage, layer, dt, _callback);
+		} else {
+			_callback(stage, layer, dt);
+		}
+	};
+	
+	this.paintDoctorOccupancyInfo = function(stage, layer, dt) {
 		
 		console.log("getDoctorInfo called ...");
 		
 		if (canvasMgr.maintMode) {
-			canvasMgr.maintMgr.clearDoctorInfo(layer);
-			canvasMgr.maintMgr.initTst(layer, floorMgrObj.doctorMap);
+			
+			// canvasMgr.maintMgr.initTst(layer, floorMgrObj.doctorMap); <-- original
+			// canvasMgr.maintMgr.clearDoctorInfo(layer); <-- not needed....
+			//if (canvasMgr.maintModeType == "stanze") {
+			//	canvasMgr.maintMgrRooms.initTst(floorMgrObj.id);
+			//}
+			
 		} else {
 		
 			// Doctor info
-			for (f in floorMgrObj.doctorMap) {( function() {
+			var occDoc=floorMgrObj.occDocMap[dt];
+			var tmpArr = new Array();
+			for (f in occDoc) {( function() {    
 				
-				var dObj = floorMgrObj.doctorMap[f];
-				//var polyPnts = "[" + dObj.polyPoints + "]";
-				var polyPnts = dObj.polyPoints.split(",");
-	 			
-				var poly2 = new Kinetic.Polygon({
-				        points: polyPnts,
-				        fill: dObj.color,
-				        //alpha: 0.2,
-				        opacity: 0.6,
-				        //stroke: dObj.color,
-				        strokeWidth: 0,
-				        id: "p_" + dObj.docId,
-				        docName: dObj.docName,
-				        rooms: dObj.rooms
-			    });
-			        
-				poly2.on("mouseout", function() {;
-	                $( "#diagRoom" ).html('---');
-	            });
-				poly2.on("mousemove", function(){
-	                $( "#diagRoom" ).html("(Doc: " + dObj.docName + ") " + dObj.rooms);
-	            });
-			        
-				layer.add(poly2);
+				var dObj = occDoc[f];
+					if ($.inArray(dObj.numStanza, tmpArr) > -1) {
+						// Do next record ... pitty continue does not work
+					} else {
+						
+						tmpArr.push(dObj.numStanza);
+					    var polyPnts = floorMgrObj.roomMap[dObj.numStanza];
+					
+						if (floorMgrObj.docColors[dObj.docId] != undefined && polyPnts != undefined) {
+			 			
+							var poly2 = new Kinetic.Polygon({
+						        points: polyPnts.split(","),
+						        fill: floorMgrObj.docColors[dObj.docId],
+						        opacity: 0.6,
+						        strokeWidth: 0,
+						        id: "p_" + dObj.docId,
+						        docName: dObj.docName,
+						        rooms: "rooms_dont_know",
+						        draggable: true
+						    });
+						        
+							poly2.on("mouseout", function() {;
+				                $( "#diagRoom" ).html('---');
+				            });
+							poly2.on("mousemove", function(){
+								var toDate=dObj.gmaal=="2030-01-01"?"---":dObj.gmaal;	
+				                $( "#diagRoom" ).html(dObj.numStanza + " (Doc: " + dObj.docName + "[Dal: "+dObj.gmadal +" Al: "+toDate+"])");
+				            });
+						        
+							layer.add(poly2);
+						}
+					}		
 				
 				}());
 			};
@@ -165,6 +266,8 @@ floorMgr = function(){
 			stage.draw();
 		}
 	};
+	// doctor occupancy functions(END)
+	
 	
 	this.getFeatureInfo = function(stage, layer) {
 		
@@ -238,9 +341,16 @@ floorMgr = function(){
 		layer.removeChildren();
 		
 		if (!canvasMgr.maintMode) {
+			// Doctor info
+			floorMgrObj.getDoctorOccupancyInfo(stage, layer, day, floorMgrObj.paintDoctorOccupancyInfo);
 			floorMgrObj.createOccLayerMapInfo(stage, layer, day);
 		} else {
-			floorMgrObj.createOccLayerMaintInfo(stage, layer);
+			if (canvasMgr.maintModeType == "letti") {
+				floorMgrObj.createOccLayerMaintInfo(stage, layer);
+			} else { // for sure canvasMgr.maintModeType == "stanze" 
+				canvasMgr.maintMgrRooms.initTst(this.id);
+				// do nothing
+			}	
 		}
 		
 	};
@@ -251,6 +361,7 @@ floorMgr = function(){
 		
 		var fMap = floorMgrObj.floorMap;
 		
+		// populates with bed dots ...
 		for (mObj in fMap) {( function() {
 		    
 			var rom = fMap[mObj].room;
@@ -416,132 +527,6 @@ floorMgr = function(){
 			}
 		}
 		return ret;
-	};
-	
-	
-	// Doctor Table
-	// Actions......
-	this.createDoctorTable = function() {
-		
-		var param = {
-			doctorMap: floorMgrObj.doctorMap
-		};
-		
-		// Create the table
-		try {
-			var myejs = new EJS({
-				url : './view/doctorsTable.ejs'
-			});
-			html = myejs.render(param);
-		} catch (e) {
-			if (e.description)
-				e = e.description;
-			console.log('ex : ' + e);
-		}
-		$('#doctorTable').html(html);
-	
-		// Build color pickers
-		console.log("into colorPicker creation ...");
-		$('.colorPal').ColorPicker({
-			color: '#0000ff',
-			onSubmit: function(hsb, hex, rgb, el) {
-				floorMgrObj.updateDoctorTableObj(el,hex);
-			},
-			onShow: function (colpkr) {
-				$(colpkr).fadeIn(500);
-				return false;
-			},
-			onHide: function (colpkr) {
-				$(colpkr).fadeOut(500);
-				console.log('exiting');
-				return false;
-			},
-		});
-		
-	};
-	
-	this.updateDoctorTableObj = function(el,hex) {
-		
-		console.log("updateDoctorTableObj called ... with el.id -> " + el.id);
-		var id = el.id;
-		
-		el.style.backgroundColor='#'+hex;
-		var polyObj = canvasMgr.floorLyr.get("#"+id)[0]; // Caution, this gets every 'p_doc0' in the layer. consider 'p_A0_doc0' as key
-		if (polyObj != undefined) {
-			polyObj.setFill(hex);
-			polyObj.setStroke(hex);
-			canvasMgr.stage.draw();
-		};
-	};
-	
-	this.doDocNew = function() {
-		
-		console.log("doNew");
-
-		var docName = $('#newName').val();
-		var romRang = $('#newRooms').val();
-		//var color = $('#colorP').css('background-color');
-		
-		/*
-				<option style="background-color: orange;">DR.SSA DORIGONI</option>
-				<option style="background-color: cyan;">DR MININNO</option>
-				<option style="background-color: yellow;">DR.SSA DALBOSCO</option>
-				<option style="background-color: red;">DR.SSA TONET</option>
-				<option style="background-color: green;">DR.SSA PATTON</option> 
-		 */
-		
-		if (docName == "DR.SSA DORIGONI") color="orange";
-		if (docName == "DR MININNO") color="cyan";
-		if (docName == "DR.SSA DALBOSCO") color="yellow";
-		if (docName == "DR.SSA TONET") color="red";
-		if (docName == "DR.SSA PATTON") color="green";
-		
-		// Just in case
-		romRang = romRang.replace(',',' ');
-		romRang = romRang.replace(';',' ');
-		
-		console.log("docName -> " + docName);
-		console.log("romRang -> " + romRang);
-		console.log("color -> " + color);
-		
-		//console.log("colorHx -> " + floorMgrObj.rgb2hex(color));
-		
-		// Standard polyPoints:
-		// 452;389;439;337;460;283;515;283;537;341;521;388
-		
-		var sz = floorMgrObj.doctorMap.length+1; 
-		
-		var docObj = {
-			building: canvasMgr.currFloor,
-			//color: floorMgrObj.rgb2hex(color),
-			color: color,
-			docId: canvasMgr.currFloor + "Doc" + sz,
-			docName: docName,
-			polyPoints: "452;389;439;337;460;283;515;283;537;341;521;388",
-			//polyPoints: "452,389,439,337,460,283,515,283,537,341,521,388",
-			rooms: romRang
-		}; 
-		
-		floorMgrObj.doctorMap.push(docObj);
-		
-		// DOCID; COLOR; DOCNAME; ROOMS; POLYPOINTS
-		// polyPoints: "452;389;439;337;460;283;515;283;537;341;521;388",
-		var docObj4Call = docObj.docId + ";" + docObj.color + ";" + docObj.docName + ";" + docObj.rooms + ";" + docObj.polyPoints;
-		canvasMgr.maintMgr.callMgmtSrvltDoc(docObj4Call, "", "newDoc");
-		canvasMgr.checkMaintRadio("off");
-		canvasMgr.checkMaintRadio("on");
-		
-		$('#doctorTable').empty();
-		floorMgrObj.createDoctorTable();
-		
-	};
-
-	this.doDocDelete = function(id) {
-		
-		console.log("doDocDelete called with id -> " + id);
-		canvasMgr.maintMgr.callMgmtSrvltDoc("placemark", id, "delDoc");
-		canvasMgr.checkMaintRadio("off");
-		canvasMgr.checkMaintRadio("on");
 	};
 	
 	this.rgb2hex = function(rgb) {

@@ -4,18 +4,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import it.sbsoft.exceptions.SBException;
+import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.utility.CodeEncodeString;
 import it.sbsoft.utility.LoggerUtils;
-import it.sbsoft.utility.PropertiesFile;
 import it.sbsoft.utility.DateHelper;
 
 public class DBTools {
@@ -24,7 +21,7 @@ public class DBTools {
     static Logger logDB = LoggerUtils.getLogger("db");
     static CodeEncodeString decode = CodeEncodeString.getInstance();
     static DateHelper dh = new DateHelper();
-	private PropertiesFile propFile = PropertiesFile.getPropertiesFile();
+	private PropertiesCommon propFile = PropertiesCommon.getPropertiesFile();
 	
 	public Map<String, String> getOcc4FloorByDate(Set<String> setBedKeyset, String dt) throws Exception {
 		
@@ -99,7 +96,6 @@ public class DBTools {
 	        	  setBedKeyset.remove(COD_LETTO);
 	        	 
 	          }
-			  logDB.info("coll.size = " + setBedKeyset.size());
 			  
 			  // Query for 'Prenotato'
 			  if (!setBedKeyset.isEmpty()) {
@@ -238,7 +234,6 @@ public class DBTools {
 		
 		log.info(" getAvailableBeds called ... ");
 		logDB.info(" getAvailableBeds called ... ");
-		Map<String, String> retMap = new HashMap<String, String>();
 		Set<String> retSet = new HashSet<String>();
 
 		Connection c = null;

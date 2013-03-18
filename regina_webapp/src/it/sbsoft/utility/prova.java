@@ -1,6 +1,7 @@
 package it.sbsoft.utility;
 
 import it.sbsoft.db.DBTools;
+import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.servlets.FloorList;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class prova {
 		String act = args[0];
 		System.out.println("arg[0] -> " + act);
 		
-		PropertiesFile prop = PropertiesFile.getPropertiesFile();
+		PropertiesCommon prop = PropertiesCommon.getPropertiesFile();
 		DBTools db = new DBTools();
 	
 		
