@@ -72,3 +72,14 @@ Released
 - Implemente 'Confirmed Dismission'
 - Added new icons
 - Added new icons to legends
+
+------------------------------------------------------------------------
+Ver 1.3.0_Final - 18/03/2013 [Final GA]
+------------------------------------------------------------------------
+Released
+- Doctor info captured from DB
+- Introduction of H2dB for inMemory persistance
+- Rewrote prop file helper classes
+- Rewrote DB helper classes
+- Rewrote maintenance mechanism for capturing polyshapes
+- Split maintenance js files for rooms and beds
