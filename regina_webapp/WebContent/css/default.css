@@ -1,9 +1,11 @@
 @CHARSET "ISO-8859-1";
 
+:root{-webkit-print-color-adjust:exact}
+
 body {
 	padding-top: 20px;
 	margin: 0 auto;
-	width: 1164px;
+	width: 1185px;
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:14px;
 	border-radius: 10px;

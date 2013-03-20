@@ -5,10 +5,12 @@ canvasMgr = function(){
 	this.currFloor = "";
 	this.currMonth = "";
 	this.currYear = "";
+	this.lastDayOfMonth=0;
 	this.maintMode = false; // false, letti, stanze
 	this.maintModeType = "";
 	this.maintMgrBeds = new maintMgrBeds();
 	this.maintMgrRooms = new maintMgrRooms();
+	this.daysInMonthArray = new Array();
 
 	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
@@ -198,13 +200,14 @@ canvasMgr = function(){
 		month = $('#month').val();
 		
 		// Get the max days in month and set the slider accordingly
-		var lastDayOfMonth = new Date(year,month,0);
-		$('#day').slider("option","max",lastDayOfMonth.getDate());
+		var d = new Date(year,month,0);
+		currObj.lastDayOfMonth = d.getDate();
+		$('#day').slider("option","max",currObj.lastDayOfMonth);
 		$('#day').slider("option","min",1);
 		
 		// This watch dog tells me if the slider has gone beyond the max days for the month
-		if (parseInt(day) > parseInt(lastDayOfMonth.getDate())) {
-			$('#day').slider( "option", "max", lastDayOfMonth.getDate());
+		if (parseInt(day) > parseInt(currObj.lastDayOfMonth)) {
+			$('#day').slider( "option", "max", currObj.lastDayOfMonth);
 			day = $('#day').slider( "option", "max");
 		};
 
@@ -221,6 +224,12 @@ canvasMgr = function(){
 			this.currMonth = month;
 			this.currYear = year;
 			console.log(" occMapArray empty for floor -> " + buildId);
+			this.daysInMonthArray = new Array();
+			for (var i=1; i<=currObj.lastDayOfMonth; i++) {
+				var d=i;
+				if (i.toString().length == 1) d="0"+i;
+				this.daysInMonthArray.push(this.currYear+""+this.currMonth+""+d);
+			};
 		}
 		
 		// If floor selector changes (or on first run)

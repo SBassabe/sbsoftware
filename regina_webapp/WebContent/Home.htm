@@ -93,7 +93,7 @@ window.onload = function() {
 			resizable: false,
 			minHeight: 60,
 			position: [600,125], 
-			show: { effect: 'drop', direction: "down" } ,
+			//show: { effect: 'drop', direction: "down" } ,
 			hide: { effect: 'drop', direction: "down" } ,
 		    title: "Legenda",
 		    autoOpen: false,
@@ -149,7 +149,7 @@ window.onload = function() {
 	</div>
 	<div class="selectors" id="dayvalue">0</div>
 	<div class="selectors">
-		<div id="day" style="width: 433px" onchange="canvasMgr.selectorsChanged()"></div>
+		<div id="day" style="width: 441px" onchange="canvasMgr.selectorsChanged()"></div>
 	</div>
 	<!-- input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/> -->
 	<div class="credits">sbsoftware - build @build_ver@</div>
@@ -177,6 +177,14 @@ window.onload = function() {
 		<div id="msgMsg"></div>
 	</div>
 	<div id="lgndDiag" title="legenda"></div>
-	<div id="doctorTable"></div>
+	<div id="doctorTable">
+		<ul>	
+			<li style="background-color: rgba(0,200,1,0.4)">DR.SSA DORIGONI</li>
+			<li style="background-color: rgba(0,255,255,0.4)">DR MININNO</li>
+			<li style="background-color: rgba(255,255,0,0.4)">DR.SSA DALBOSCO</li>
+			<li style="background-color: rgba(255,0,0,0.4)">DR.SSA TONET</li>
+			<li style="background-color: rgba(255,165,0,0.4)">DR.SSA PATTON</li>
+		</ul>
+	</div>
 </body>
 </html>

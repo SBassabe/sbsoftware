@@ -8,6 +8,15 @@
     color: #444;
 }
 
+@media screen 
+{
+	#doctorTable {display: none;}
+}
+
+#doctorTable ul {
+	list-style-type: none;
+}
+
 table {
     *border-collapse: collapse; /* IE7 and lower */
     border-spacing: 0;
