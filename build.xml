@@ -4,7 +4,7 @@
 
   <!-- set global properties for this build -->
   <tstamp><format property="TODAY2" pattern="yyyyMMdd_kkmm"/></tstamp>
-  <property name="b_ver" value="1.3.0"/>
+  <property name="b_ver" value="1.3.1"/>
   <property name="build_ver" value="${b_ver} GA ${TODAY2}"/>
   <property name="src_dir" location=".\regina_webapp\src"/>
   <property name="webapp_dir"  location=".\regina_webapp\WebContent"/>

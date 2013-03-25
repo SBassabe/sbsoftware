@@ -11,6 +11,7 @@ canvasMgr = function(){
 	this.maintMgrBeds = new maintMgrBeds();
 	this.maintMgrRooms = new maintMgrRooms();
 	this.daysInMonthArray = new Array();
+	this.legendObj = new legendMgr();
 
 	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
@@ -83,6 +84,7 @@ canvasMgr = function(){
 		
 		// initialize Selectors here if necessary.
 		currObj.selectorsChanged();
+		currObj.legendObj.populateStage();
 	};
 
 	// get floor list from server and load array...
@@ -255,11 +257,6 @@ canvasMgr = function(){
 				currObj.floorArr[buildId].createOccLayer(currObj.stage, currObj.occLyr, dt);
 			}			
 		}
-
-//		if (currObj.maintMode) {
-//			$('#doctorTable').empty();
-//			currObj.floorArr[currObj.currFloor].createDoctorTable();
-//		}
 		
 		currObj.toolTipLyr.moveToTop();
 	};
@@ -267,7 +264,7 @@ canvasMgr = function(){
 	// Maintenance mode ...
 	this.clickMe = function() {
 
-		console.log("clickMeDeprecate called....")
+		console.log("clickMeDeprecate called....");
 		// I need: //CODSTAN ;	NUMSTANZA ;	CODLETTO ; IDSEDE ;	X ;	Y,
 		var txt="";
 		for (obj in currObj.occLyr.getChildren()) {

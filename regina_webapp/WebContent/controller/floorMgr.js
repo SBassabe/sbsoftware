@@ -10,23 +10,6 @@ floorMgr = function(){
     this.doctorMap = new Array();
     this.roomMap = new Array();
     this.occDocMap = new Array();
-    
-	/*
-	16173	 DR.SSA DORIGONI SABINA
-	16169	 DR. MININNO RAFFAELE
-	16170	 DR.SSA DALBOSCO BARBARA
-	16168	 DR.SSA PATTON LAURA
-	16172	 DR.SSA TONET SILVANA
-	16205	 STANZE STAND BY
-	16174	 DR.SSA GUELLA VERONICA
-	*/				
-	this.docColors = new Array();
-	this.docColors[16173]="green";
-	this.docColors[16169]="cyan";
-	this.docColors[16170]="yellow";
-	this.docColors[16168]="orange";
-	this.docColors[16172]="red";
-	this.docColors[16174]="blue";
 
     this.getObj4Bed = function(occArr, bed) {
     	
@@ -212,59 +195,48 @@ floorMgr = function(){
 		
 		console.log("getDoctorInfo called ...");
 		
-		if (canvasMgr.maintMode) {
+		// Doctor info
+		var occDoc=floorMgrObj.occDocMap[dt];
+		var tmpArr = new Array();
+		for (f in occDoc) {( function() {    
 			
-			// canvasMgr.maintMgr.initTst(layer, floorMgrObj.doctorMap); <-- original
-			// canvasMgr.maintMgr.clearDoctorInfo(layer); <-- not needed....
-			//if (canvasMgr.maintModeType == "stanze") {
-			//	canvasMgr.maintMgrRooms.initTst(floorMgrObj.id);
-			//}
-			
-		} else {
-		
-			// Doctor info
-			var occDoc=floorMgrObj.occDocMap[dt];
-			var tmpArr = new Array();
-			for (f in occDoc) {( function() {    
-				
-				var dObj = occDoc[f];
-					if ($.inArray(dObj.numStanza, tmpArr) > -1) {
-						// Do next record ... pitty continue does not work
-					} else {
-						
-						tmpArr.push(dObj.numStanza);
-					    var polyPnts = floorMgrObj.roomMap[dObj.numStanza];
+			var dObj = occDoc[f];
+				if ($.inArray(dObj.numStanza, tmpArr) > -1) {
+					// Do next record ... pitty continue does not work
+				} else {
 					
-						if (floorMgrObj.docColors[dObj.docId] != undefined && polyPnts != undefined) {
-			 			
-							var poly2 = new Kinetic.Polygon({
-						        points: polyPnts.split(","),
-						        fill: floorMgrObj.docColors[dObj.docId],
-						        opacity: 0.6,
-						        strokeWidth: 0,
-						        id: "p_" + dObj.docId,
-						        docName: dObj.docName,
-						        rooms: "rooms_dont_know",
-						        draggable: true
-						    });
-						        
-							poly2.on("mouseout", function() {;
-				                $( "#diagRoom" ).html('---');
-				            });
-							poly2.on("mousemove", function(){
-								var toDate=dObj.gmaal=="2030-01-01"?"---":dObj.gmaal;	
-				                $( "#diagRoom" ).html(dObj.numStanza + " (Doc: " + dObj.docName + "[Dal: "+dObj.gmadal +" Al: "+toDate+"])");
-				            });
-						        
-							layer.add(poly2);
-						}
-					}		
+					tmpArr.push(dObj.numStanza);
+				    var polyPnts = floorMgrObj.roomMap[dObj.numStanza];
 				
-				}());
-			};
-			layer.draw();
-			stage.draw();
-		}
+					if (canvasMgr.legendObj.docColors[dObj.docId] != undefined && polyPnts != undefined) {
+		 			
+						var poly2 = new Kinetic.Polygon({
+					        points: polyPnts.split(","),
+					        fill: canvasMgr.legendObj.docColors[dObj.docId].color,
+					        opacity: 0.6,
+					        strokeWidth: 0,
+					        id: "p_" + dObj.docId,
+					        docName: dObj.docName,
+					        rooms: "rooms_dont_know",
+					        draggable: false
+					    });
+					        
+						poly2.on("mouseout", function() {;
+			                $( "#diagRoom" ).html('---');
+			            });
+						poly2.on("mousemove", function(){
+							var toDate=dObj.gmaal=="2030-01-01"?"---":dObj.gmaal;	
+			                $( "#diagRoom" ).html(dObj.numStanza + " (Doc: " + dObj.docName + "[Dal: "+dObj.gmadal +" Al: "+toDate+"])");
+			            });
+					        
+						layer.add(poly2);
+					}
+				}		
+			
+			}());
+		};
+		layer.draw();
+		stage.draw();
 	};
 	// doctor occupancy functions(END)
 	
