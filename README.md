@@ -83,3 +83,17 @@ Released
 - Rewrote DB helper classes
 - Rewrote maintenance mechanism for capturing polyshapes
 - Split maintenance js files for rooms and beds
+
+------------------------------------------------------------------------
+Ver 1.3.1_Final - 25/03/2013 [Final GA]
+------------------------------------------------------------------------
+Released
+- Legend via canvas layer to match colors ofDoctors
+- JavaScript code cleanup
+- Fix Room Polygons for final floor (configuration)
+
+------------------------------------------------------------------------
+Ver 1.3.2_Final - 18/04/2013 [Final GA]
+------------------------------------------------------------------------
+Released
+- [Bug sb002] - problem with doctors list on query. 

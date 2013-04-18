@@ -110,14 +110,14 @@ public class DocOccupancy {
 			sql = new StringBuffer();
 			sql.append("SELECT a.GMADAL, a.GMAAL, b.PROGR as DOCID, b.DESCR as DOCNAME, a.CODSTAN");
 			sql.append("  FROM CLIN_MEDICO_STANZA a, TEANAPERS b");
-			sql.append(" WHERE a.PROGMEDICO = b.PROGR");
+			sql.append(" WHERE a.PROGMEDICO = b.PROGR ");
 			sql.append(" ORDER BY 5, 1 desc, 2 desc");
 			
 			log.debug("sql.toString() " + sql.toString());
 			ResultSet rs = fbStmt.executeQuery(sql.toString());
 			i=0;
-			
-			if (rs.next()) { // if the result set is not empty do this
+
+			if (rs != null) {
 			
 				log.info("Records found now just cleanup DOCDTMAP ...");
 				Statement h2Stmt = h2Help.getConn().createStatement();
@@ -194,6 +194,8 @@ public class DocOccupancy {
 				log.info("Records processed -> " + i);
 				
 				h2Help.getConn().commit();
+			} else {
+				log.info("rs is NULL");
 			}
 			
 			fbOspitiCon.close();
