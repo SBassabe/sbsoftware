@@ -42,4 +42,41 @@ legendMgr = function(){
 		 }
 		 canvasMgr.stage.draw();
 	};
+	
+	this.populateToolTipLyrWithUniqueDocs = function(floorId) {
+		
+		 console.log("populateToolTipLyrWithUniqueDocs called ...");
+		 canvasMgr.toolTipLyr.removeChildren();
+		 var i=0;
+		 for (var o in canvasMgr.floorArr[floorId].uniqueDocArr) {
+			 
+			 var docDesc=this.docColors[canvasMgr.floorArr[floorId].uniqueDocArr[o]];
+			 if (docDesc != undefined) {
+			 
+				 var simpleText = new Kinetic.Text({
+				        x: 940+22,
+				        y: (i*14)+3,
+				        text: docDesc.name,
+				        fontSize: 18,
+				        fontFamily: 'Calibri',
+				        fill: 'black'
+				 });
+				 
+				 var rect = new Kinetic.Rect({
+				        x: 940+0,
+				        y: (i*14)+7,
+				        width: 20,
+				        height: 12,
+				        fill: docDesc.color,
+				        stroke: 'black',
+				        strokeWidth: 0.1,
+				        opacity: 0.6
+				 });
+			 
+				 canvasMgr.toolTipLyr.add(rect);
+				 canvasMgr.toolTipLyr.add(simpleText);
+				 i++;
+			 }
+		 }
+	};
 };

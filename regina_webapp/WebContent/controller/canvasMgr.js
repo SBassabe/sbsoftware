@@ -84,7 +84,7 @@ canvasMgr = function(){
 		
 		// initialize Selectors here if necessary.
 		currObj.selectorsChanged();
-		currObj.legendObj.populateStage();
+		//currObj.legendObj.populateStage(); // Old code with complete DoctorsList deprecated
 	};
 
 	// get floor list from server and load array...

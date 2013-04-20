@@ -10,6 +10,7 @@ floorMgr = function(){
     this.doctorMap = new Array();
     this.roomMap = new Array();
     this.occDocMap = new Array();
+    this.uniqueDocArr = new Array();
 
     this.getObj4Bed = function(occArr, bed) {
     	
@@ -197,15 +198,23 @@ floorMgr = function(){
 		
 		// Doctor info
 		var occDoc=floorMgrObj.occDocMap[dt];
-		var tmpArr = new Array();
+		var uniqueRoomArray = new Array();
+		floorMgrObj.uniqueDocArr = new Array();
 		for (f in occDoc) {( function() {    
 			
 			var dObj = occDoc[f];
-				if ($.inArray(dObj.numStanza, tmpArr) > -1) {
+			 
+			    // Capture distinct room numbers
+				if ($.inArray(dObj.numStanza, uniqueRoomArray) > -1) {
 					// Do next record ... pitty continue does not work
 				} else {
 					
-					tmpArr.push(dObj.numStanza);
+				    // Capture distinct doctor list
+				    if ($.inArray(dObj.docId, floorMgrObj.uniqueDocArr) < 0) {
+				    	floorMgrObj.uniqueDocArr.push(dObj.docId);
+				    }
+					
+					uniqueRoomArray.push(dObj.numStanza);
 				    var polyPnts = floorMgrObj.roomMap[dObj.numStanza];
 				
 					if (canvasMgr.legendObj.docColors[dObj.docId] != undefined && polyPnts != undefined) {
@@ -235,11 +244,11 @@ floorMgr = function(){
 			
 			}());
 		};
+		canvasMgr.legendObj.populateToolTipLyrWithUniqueDocs(floorMgrObj.id);
 		layer.draw();
 		stage.draw();
 	};
 	// doctor occupancy functions(END)
-	
 	
 	this.getFeatureInfo = function(stage, layer) {
 		

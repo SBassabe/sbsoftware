@@ -68,5 +68,4 @@ doctorsMgr = function(){
 			
 		};
 	};
-	
 };
