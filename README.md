@@ -96,4 +96,12 @@ Released
 Ver 1.3.2_Final - 18/04/2013 [Final GA]
 ------------------------------------------------------------------------
 Released
-- [Bug sb002] - problem with doctors list on query. 
+- [Bug sb002] - problem with doctors list on query.
+- Upgraded 'jaybird-full-2.1.6.jar' to version 'jaybird-full-2.2.2.jar'
+
+------------------------------------------------------------------------
+Ver 1.3.3_Final - 20/04/2013 [Final GA]
+------------------------------------------------------------------------
+Released
+- Doctors legend taylored to actual doctors on floor 
+- RolledBack 'jaybird-full-2.2.2.jar' to version 'jaybird-full-2.1.6.jar'
