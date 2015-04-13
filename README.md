@@ -105,3 +105,13 @@ Ver 1.3.3_Final - 20/04/2013 [Final GA]
 Released
 - Doctors legend taylored to actual doctors on floor 
 - RolledBack 'jaybird-full-2.2.2.jar' to version 'jaybird-full-2.1.6.jar'
+
+------------------------------------------------------------------------
+Ver 1.0.0_Final - 13/04/2015 [Final GA]
+------------------------------------------------------------------------
+Released [Too many changes to list!!]
+- Revamped object model
+- Reworked all javascript objects
+- Reworked all java servlet objects
+- introduction of Cleaning Layer
+- indroduction of Excel file creation (Cleaning Schedule)

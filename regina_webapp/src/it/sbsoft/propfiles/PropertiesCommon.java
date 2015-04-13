@@ -5,11 +5,14 @@ import it.sbsoft.utility.LoggerUtils;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 
 public class PropertiesCommon extends Properties {
@@ -29,7 +32,7 @@ public class PropertiesCommon extends Properties {
 		try {
 			
 	  		cHome = System.getProperty("catalina.home");
-	  		cHome = cHome + "\\conf\\regina.properties";
+	  		cHome = cHome + "\\conf\\regina2.properties";
 			System.out.println("using realPath ->" + cHome);
 	  		log.info("using realPath ->" + cHome );
 			ref.load(new FileInputStream(cHome));
@@ -42,16 +45,16 @@ public class PropertiesCommon extends Properties {
 	 
 	  public static synchronized PropertiesCommon getPropertiesFile() {
 		
-		log.info("called");  
+		//log.info("called");  
 	    if (ref == null) {
 	        // it's ok, we can call this constructor
-	    	System.out.println("PropertiesFile getPropertiesFile() -> generating new object ...");
+	    	log.info("PropertiesFile getPropertiesFile() -> generating new object ...");
 	        ref = new PropertiesCommon();
 	        ref.initializePropFile();
 	        ref.cleanFloorMaps();
 	        
 	    } else {
-	    	System.out.println("PropertiesFile getPropertiesFile() -> returning existing object ...");
+	    	//System.out.println("PropertiesFile getPropertiesFile() -> returning existing object ...");
 	    }
 
 	    return ref;
@@ -59,7 +62,7 @@ public class PropertiesCommon extends Properties {
 	  
 	  public String getPropertySB(String propKey) throws SBException {
 		  
-		  log.debug("called");
+		  //log.debug("called");
 		  String ret;
 		  
 		  ret = this.getProperty(propKey);
@@ -68,6 +71,21 @@ public class PropertiesCommon extends Properties {
 			  throw new SBException("PROPFILE_MISSINGKEY");
 		  }
 		  return ret;
+	  }
+	  
+	  public Set<String> getRoomKeySet(String floorId) throws SBException {
+		  
+		  Set<String> setBedKeySet = null;
+		  try {
+			  
+			  setBedKeySet = new HashSet<String>(this.floorMaps.get((String) floorId).keySet());
+			  log.info("keySet empty -> " + setBedKeySet.isEmpty());
+			  
+		  } catch(Exception e) {
+			  e.printStackTrace();
+			  throw new SBException("Broken KeySet");
+		  }
+		  return setBedKeySet;
 	  }
 	  
 	  public void cleanFloorMaps() {

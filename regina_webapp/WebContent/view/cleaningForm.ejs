@@ -1,0 +1,16 @@
+<table>
+    <tr><td class="rtd">Descrizione:</td><td class="ltd">Stanza <%=desc%></td></tr>
+  	<!-- tr><td class="rtd">Tipo Scelta:</td><td class="ltd"><%=autMan%></td></tr -->
+   	<tr><td class="rtd">Valore Impostato:</td>
+	   	<td class="ltd"><select id="cleanSelection" loc_id=<%=loc_id%>>
+	   	<% for(i in vals) { %>
+	   		<%if (vals[i] == cval) { %>
+			    <option value="<%=vals[i]%>" selected><%=vals[i]%></option>
+			<%} else {%>
+				<option value="<%=vals[i]%>"><%=vals[i]%></option>
+			<%}%>  
+		<%}%>	
+		</select></td>
+	</tr>
+   	<tr><td colspan=2 style="text-align: center; padding: 15px;"><input type="button" value="Salva" onclick="canvasMgr.cleaningMgr.getSelectedCVal();"></input></td></tr>
+</table>

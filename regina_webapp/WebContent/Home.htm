@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta charset="ISO-8859-1">
@@ -11,20 +11,31 @@
 @import url("./css/smoothness/jquery-ui-1.8.20.custom.css");
 @import url("./css/doctorTable.css");
 @import url("./css/colorpicker.css");
+@import url("./css/flapper.css");
 -->
 </style>
-<script src="./libraries/kinetic-v4.3.2.min.js"></script>
+<script src="./libraries/kinetic-v5.1.0.min.js"></script>
 <script src="./libraries/jquery-1.7.2.min.js"></script>
 <script src="./libraries/jquery-ui-1.8.20.custom.min.js"></script>
-<script src="./libraries/colorpicker.js"></script>
+<script type="text/javascript" src="./libraries/jquery.flapper.js"></script>
+<script src="./libraries/jquery.transform-0.9.3.min.js"></script>
+<script src="./libraries/jquery.numberformatter-1.2.3.min.js"></script>
+
 <script type="text/javascript" src="./libraries/ejs_production.js"></script>
 <script type="text/javascript" src="controller/canvasMgr.js"></script>
 <script type="text/javascript" src="controller/floorMgr.js"></script>
+<script type="text/javascript" src="controller/doctorsMgr.js"></script>
+<script type="text/javascript" src="controller/legendMgr.js"></script>
 <script type="text/javascript" src="controller/maintMgrBeds.js"></script>
 <script type="text/javascript" src="controller/maintMgrRooms.js"></script>
 <script type="text/javascript" src="controller/returnObj.js"></script>
-<script type="text/javascript" src="controller/utest.js"></script>
-<script type="text/javascript" src="controller/legendMgr.js"></script>
+<script type="text/javascript" src="controller/cleaningMgr.js"></script>
+
+    <!-- menu items start -->
+	<link type="text/css" href="menu/menu.css" rel="stylesheet" />
+	<script type="text/javascript" src="menu/menu.js"></script>
+    <!-- menu items end -->
+    
 <script>
 window.onload = function() {
 
@@ -32,6 +43,7 @@ window.onload = function() {
 		 min: 1,
 		 max: 31,
 		 //slide: function(event, ui) {$("#dayvalue").html(ui.value);},
+		 step: 1,
 		 slide: function(event, ui) {$("#day").slider("option","value",ui.value); canvasMgr.selectorsChanged();},
 		 animate: true
 	});
@@ -39,7 +51,7 @@ window.onload = function() {
 	$( "#dialog" ).show();
 	$( "#dialog" ).dialog({
 			width: 900,
-			resizable: false,
+			resizable: true,
 			minHeight: 60,
 			position: [70,125], 
 			show: { effect: 'drop', direction: "down" } ,
@@ -62,9 +74,9 @@ window.onload = function() {
 	});
 
 	$( "#msgDiag" ).dialog({
-		width: 330,
-		resizable: false,
-		minHeight: 60,
+		width: 450,
+		resizable: true,
+		minHeight: 100,
 		position: [125,300], 
 		show: { effect: 'drop', direction: "down" } ,
 		hide: { effect: 'drop', direction: "down" } ,
@@ -95,10 +107,30 @@ window.onload = function() {
 			minHeight: 60,
 			position: [600,125], 
 		    title: "Legenda",
+		    modal: false,
 		    autoOpen: false,
 		    close: function() {$("#lgndBtn").show();},
 		    open: function() {$("#lgndBtn").hide();}
 	});		
+	
+	$( "#cleaningForm" ).dialog({
+			width: 350,
+			resizable: true,
+			//minHeight: 600,
+			position: [600,125],
+			//$('#cleaningForm').parent().css("top","80px");
+		    title: "Pulizia Stanza",
+		    modal: true,
+		    autoOpen: false,
+		    //close: function() {$("#cleaningForm").show();},
+		    //open: function() {$("#cleaningForm").hide();}
+	});
+	
+	$('#header_display').flapper({
+		width:6,
+		chars_preset:'alpha'
+		//chars: [0,1,2,3,4,5,6,7,8,9]
+	});
 
 	canvasMgr = new canvasMgr();
 	setTimeout(function(){canvasMgr.init()},100);
@@ -107,11 +139,49 @@ window.onload = function() {
 </script>
 </head>
 <body>
+    <!-- menu items start -->
+    <div id="menu" style="width: 1166px; padding-bottom: 4px;">
+		<ul class="menu">
+			<li><a href="#" class="parent"><span>Visualizza</span></a>
+				<div>
+				   <ul>
+					 <li onclick="canvasMgr.toggleVis()"><a href="#" id="visualizza"><span>Pulizia Giornaliera</span></a>
+				     <li><a href="#"><span onclick="canvasMgr.showLgndDiag()">Legenda</span></a></li>
+					 <li><a href="#"><span onclick="canvasMgr.showDiag()">Informazione</span></a></li>
+				   </ul>
+				</div>
+			</li>
+			<li><a href="#"><span>Azioni</span></a>
+				<div>
+				  <ul>
+					<li><a href="#" class="parent"><span>Pulizie</span></a>
+					  <div>
+					    <ul>
+						  <li><a href="#"><span onclick="canvasMgr.cleaningMgr.generateExcel()">Genera Excel Odierno</span></a></li>
+						</ul>
+					  </div>
+					</li>
+					<!--li><a href="#" class="parent"><span>Occupazione</span></a-->
+					<li><a href="#"><span onclick="canvasMgr.showMntDiag()">Configurazione</span></a></li>
+					<!-- /li -->
+				</ul></div>
+			</li>
+		</ul>
+	</div>
+	<!-- menu items end -->
+
     <div id="head">
+        <div id="dayOfWeek" style="position: absolute; left: 860px; top: 18px;font-size: x-large;color: white; background: black; padding: 8px; font-family: monospace;border-radius: 5px; width: 270px;">GGG-NN-MMM</br>YYYY</div>
+        <div id="flipContainer" style="position: relative; left: 16px; display: none">
+        <div id="dayVerbose" style="position: relative; top: 42px; left: 410px; font-family: monospace; font-size: xx-large; display: none"></div>
+        <input class="M" id="header_display"/>
+        <!--
     	<img id="infBtn" alt="informazione" src="./images/icon_info.png" onclick="canvasMgr.showDiag()">
     	<img id="mntBtn" alt="configurazione" src="./images/icon_make.png" onclick="canvasMgr.showMntDiag()" style="visibility: hidden">
     	<img id="lgndBtn" alt="legenda" src="./images/icon_legenda_32.png" onclick="canvasMgr.showLgndDiag()">
-    	<img height="80px" src="./images/logo_regina_logistica_02.gif">
+    	-->
+    	</div>
+    	<img height="80px" src="./images/logo_regina_logistica_02.gif" style="position: relative; top: 9px;">
     </div>
 	<div id="cont_border">
 		<div id="container"></div>
@@ -124,9 +194,6 @@ window.onload = function() {
 	<div class="selectors" style="float: left">
 		<label>Anno</label>
 		<select id="year" onchange="canvasMgr.selectorsChanged()">
-			<option value="2011">2011</option>
-			<option value="2012">2012</option>
-			<option value="2013">2013</option>
 		</select>
 	</div>
 	<div class="selectors">
@@ -146,9 +213,10 @@ window.onload = function() {
 			<option value="12">Dicembre</option>
 		</select>
 	</div>
-	<div class="selectors" id="dayvalue">0</div>
-	<div class="selectors">
-		<div id="day" style="width: 441px" onchange="canvasMgr.selectorsChanged()"></div>
+	<div class="selectors" id="dayvalue" style="display:none;">0</div>
+	<div class="selectors" style="width: 530px">
+		<div id="day" style="width: 526px; margin-top: -4px;" onchange="canvasMgr.selectorsChanged()"></div>
+		<div id="daysTable" style="padding: 9px 0px 0px 3px; margin-left: -5px; position: absolute; width: 550px"></div>
 	</div>
 	<!-- input type="range" id="day" min="1" max="31" style="width: 433px" onchange="canvasMgr.selectorsChanged()"/> -->
 	<div class="credits">sbsoftware - build @build_ver@</div>
@@ -173,8 +241,10 @@ window.onload = function() {
 	</div>
 	<div id="msgDiag" title="Message Dialog">
 		<div><img src="./images/success.png"></img></div>
-		<div id="msgMsg"></div>
+		<div><textarea id="msgMsg" rows="4" cols="50" style="border: none; width: 100%;" readonly></textarea></div>
 	</div>
 	<div id="lgndDiag" title="legenda"></div>
+	<div id="cleaningForm" title="Pulizia Stanza"></div>
+	<a href="http://apycom.com/" style="visibility: hidden">Apycom jQuery Menus</a>
 </body>
 </html>

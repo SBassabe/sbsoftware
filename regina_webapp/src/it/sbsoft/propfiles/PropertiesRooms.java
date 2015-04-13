@@ -36,7 +36,7 @@ public class PropertiesRooms extends Properties {
 		try {
 			
 	  		cHome = System.getProperty("catalina.home");
-	  		cHome = cHome + "\\conf\\reginaRooms.properties";
+	  		cHome = cHome + "\\conf\\reginaRooms2.properties";
 			System.out.println("using realPath ->" + cHome);
 	  		log.info("using realPath ->" + cHome );
 			ref.load(new FileInputStream(cHome));
@@ -49,15 +49,15 @@ public class PropertiesRooms extends Properties {
 	 
 	  public static synchronized PropertiesRooms getPropertiesFile() {
 		
-		log.info("called");  
+		//log.info("called");  
 	    if (ref == null) {
 	        // it's ok, we can call this constructor
-	    	System.out.println("PropertiesFile getPropertiesFile() -> generating new object ...");
+	    	log.info("PropertiesFile getPropertiesFile() -> generating new object ...");
 	        ref = new PropertiesRooms();
 	        ref.initializePropFile();
 	        
 	    } else {
-	    	System.out.println("PropertiesFile getPropertiesFile() -> returning existing object ...");
+	    	//System.out.println("PropertiesFile getPropertiesFile() -> returning existing object ...");
 	    }
 
 	    return ref;
@@ -65,7 +65,7 @@ public class PropertiesRooms extends Properties {
 	  
 	  public String getPropertySB(String propKey) throws SBException {
 		  
-		  log.debug("called");
+		  //log.debug("called");
 		  String ret;
 		  
 		  ret = this.getProperty(propKey);

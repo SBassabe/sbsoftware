@@ -11,6 +11,9 @@ floorMgr = function(){
     this.roomMap = new Array();
     this.occDocMap = new Array();
     this.uniqueDocArr = new Array();
+    
+    this.worker = new Worker("controller/workerFile.js");
+    this.workerTransport = null;
 
     this.getObj4Bed = function(occArr, bed) {
     	
@@ -19,9 +22,10 @@ floorMgr = function(){
     	}
     };
     
-	this.populateFloorLayer = function(stage, flrLayer, occLayer, dt) {
+	this.populateFloorLayer = function(buildId) {
 
 		console.log("populateFloorLayer called ...");
+
 		// Floor Image
 		imageObj = new Image();
 		imageObj.onload = function() {
@@ -33,43 +37,44 @@ floorMgr = function(){
 				height : 500,
 				name:  this.desc
 			});
-			$( "#diagFloor" ).html(floorMgrObj.desc);
+			$( "#diagFloor" ).html(canvasMgr.floorArr[buildId].description);
             $( "#diagRoom" ).html('---');
             $( "#diagBed" ).html('---');
-            $( "#diagNumBeds" ).html(floorMgrObj.floorMap.length);
-            flrLayer.removeChildren();
-            flrLayer.add(image);
-			stage.draw();
-			
-			occLayer.removeChildren();
-			if (floorMgrObj.occMap[dt] == undefined ) {
-					floorMgrObj.getFloorOcc4DateList(stage, occLayer, dt, floorMgrObj.createOccLayer);
-			} else {
-			   // Maint or Real logic in method
-			   floorMgrObj.createOccLayer(stage, occLayer, dt);
-		    }
-
-			// Floor features
-			floorMgrObj.getFeatureInfo(stage, canvasMgr.floorLyr);
+            $( "#diagNumBeds" ).html(canvasMgr.floorArr[buildId].num_beds);
+            canvasMgr.floorLyr.removeChildren();
+            canvasMgr.floorLyr.add(image);
+			//canvasMgr.stage.draw();
 		
 		};
-		imageObj.src = this.imgSrc;
-		stage.draw();
+		imageObj.src = canvasMgr.floorArr[buildId].img_src;
+		//canvasMgr.stage.draw();
 
 	};
 	
+ 	this.getAndPaintFloorOccupancyInfo = function() {
+ 		
+ 		// check the 'bedByDate' array for the given date ...
+ 		if (canvasMgr.floorArr[canvasMgr.currFloor].bedByDate[canvasMgr.dt] == undefined) {
+ 			floorMgrObj.getFloorOcc4DateList();
+ 		}
+ 		floorMgrObj.createOccLayerMapInfo();
+ 	};
+    
+	
 	// get occupancy for specific date and load array...
-	this.getFloorOcc4DateList = function(stage, layer, dt, _callback) {
+	this.getFloorOcc4DateList = function() {
 		
-		console.log("getFloorOcc4DateList called ...");
-		console.log("floorMgrObj.id =" + floorMgrObj.id);
+		console.log('SRVR_call -> ' + "getFloorOcc4DateList called ... with param floorMgrObj.id =" + floorMgrObj.id);
+		var buildId = canvasMgr.currFloor;
+		var dt = canvasMgr.dt;
 		
 		var method = 'getFloorOcc4DateList';
         try {
         	
         	var params = {
-                    buildId: this.id,
-                    dt: dt
+                    buildId: buildId,
+                    dt: dt,
+                    currVis: canvasMgr.currVis
                 };
             
             $.ajax({
@@ -81,7 +86,7 @@ floorMgr = function(){
                 data: params,
                 context: document.body,
                 success: function(transport){
-                	floorMgrObj.getFloorOcc4DateListElab(transport, stage, layer, _callback);
+                	floorMgrObj.getFloorOcc4DateListElab(transport);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
@@ -98,16 +103,25 @@ floorMgr = function(){
 		
 	};
 	
-	this.getFloorOcc4DateListElab = function(transport, stage, layer, _callback) {
+	this.getFloorOcc4DateListElab = function(transport) {
 		
 		var method="getFloorOcc4DateListElab";
 		console.log(method + " called ...");
 		
+		var buildId = canvasMgr.currFloor;
+		//var dt = canvasMgr.dt;
+		var dt = transport.date;
+		
 		if (transport.error == undefined) {
 			
-			ret = transport.ret2cli;
-			floorMgrObj.occMap[ret.dt] = ret.occMap;
-			_callback(stage, layer, ret.dt);
+			canvasMgr.floorArr[buildId].bedByDate[dt] = transport.ret2cli.occByBedMp;
+			
+			if (!$.isEmptyObject(transport.ret2cli.cleanByLocMp)) {
+				canvasMgr.floorArr[buildId].cleanByDate[dt] = transport.ret2cli.cleanByLocMp;
+			}
+			
+			canvasMgr.daysLoaded++;
+			canvasMgr.colorDay(dt.substring(6));
 			
 		} else {
 			var err = transport.error; 
@@ -121,21 +135,99 @@ floorMgr = function(){
 		};
 	};
 	
-	// doctor occupancy functions(START)
-   this.getDoctorOcc4DateList = function(stage, layer, dt, _callback) {
+	// WebWorker code (START)
+	// worker listener method
+	this.worker.addEventListener('message', function(e) {
+
+		if (e.data.error != undefined) {
+			floorMgrObj.workerTransport.error = e.data.error;
+			console.log('e.data.error -> ' + e.data.error);
+		} else {
 		
-	    var method = 'getDoctorOcc4DateList';
-		console.log(method + " called ...");
+			floorMgrObj.workerTransport = {ret2cli: {occByBedMp: undefined, cleanByLocMp: undefined}};
+			if (e.data.ret2cli.occByBedMp != undefined) {
+				floorMgrObj.workerTransport.ret2cli.occByBedMp = e.data.ret2cli.occByBedMp;
+			} 
+			if (e.data.ret2cli.cleanByLocMp != undefined) {
+				floorMgrObj.workerTransport.ret2cli.cleanByLocMp = e.data.ret2cli.cleanByLocMp;
+			} 
+			if (e.data.date != undefined) {
+				floorMgrObj.workerTransport.date = e.data.date;
+			} 
+			
+			console.log("captured result ... see canvasMgr.floorMgr.workerTransport. Last day worked -> " + canvasMgr.lastWorkerDay);
+			floorMgrObj.getFloorOcc4DateListElab(canvasMgr.floorMgr.workerTransport);
+			canvasMgr.lastWorkerDay++;
+			floorMgrObj.workerManager();
+		}	
 		
+	}, true);
+	
+	this.workerManager = function() {
+		
+		if (canvasMgr.enableWorker) {
+		
+			if (canvasMgr.daysArr.length > 0) {
+				
+				var workerDay = canvasMgr.currYear+canvasMgr.currMonth+canvasMgr.daysArr.pop();
+				if (canvasMgr.floorArr[canvasMgr.currFloor].bedByDate[workerDay] == undefined) { 	
+					
+					var reqObj = {'buildId': canvasMgr.currFloor, 'dt': workerDay};
+					floorMgrObj.worker.postMessage(reqObj);
+					
+				} else {
+					
+					console.log("Already worked -> " + canvasMgr.lastWorkerDay);
+					canvasMgr.colorDay(canvasMgr.lastWorkerDay);
+					canvasMgr.lastWorkerDay++;
+					floorMgrObj.workerManager();
+				}
+				
+			}
+			/*
+			if (canvasMgr.daysLoaded < canvasMgr.lastDayOfMonth) {
+			
+				var day = (canvasMgr.lastWorkerDay.toString().length == 1) ? canvasMgr.lastWorkerDay="0"+canvasMgr.lastWorkerDay : canvasMgr.lastWorkerDay;
+				//var day = Math.floor(Math.random() * (canvasMgr.lastDayOfMonth - 1 + 1)) + 1;
+				day = (day.toString().length == 1) ? "0"+day : day;
+				console.log("Random day -> " + day);
+				var workerDay = canvasMgr.currYear+canvasMgr.currMonth+day;
+				
+				if (canvasMgr.floorArr[canvasMgr.currFloor].bedByDate[workerDay] == undefined) { 	
+				
+					var reqObj = {'buildId': canvasMgr.currFloor, 'dt': workerDay};
+					floorMgrObj.worker.postMessage(reqObj);
+					
+				} else {
+					
+					console.log("Already worked -> " + canvasMgr.lastWorkerDay);
+					canvasMgr.lastWorkerDay++;
+					floorMgrObj.workerManager();
+				}
+			} else {
+				//floorMgrObj.worker.terminate();
+			}
+			*/
+		}
+	};
+	// WebWorker code (END)
+	
+    this.getVacantBedRange = function(buildId, dt, bed_num) {
+		
+		console.log('SRVR_call -> ' +  "getVacantBedRange called ...");
+		
+		var method = 'getVacantBedRange';
         try {
         	
         	var params = {
-        	    floor: this.id, 
-        	    date: dt,
-        	    action: "occ"};
+                    buildId: buildId,
+                    dt: dt,
+                    bed_num: bed_num,
+                    action: "vacantBedRange"
+                };
             
             $.ajax({
-                url: "DoctorInfoSrvlt",
+                url: "FloorOccupancy",
                 dataType: "json",
                 timeout: 10000,
                 type: 'POST',
@@ -143,7 +235,7 @@ floorMgr = function(){
                 data: params,
                 context: document.body,
                 success: function(transport){
-                	floorMgrObj.getDoctorOcc4DateListElab(transport, stage, layer, _callback);
+                	floorMgrObj.getVacantBedRangeElab(buildId, dt, bed_num, transport);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
@@ -158,17 +250,19 @@ floorMgr = function(){
             return;
         }
 		
-	};
-	
-	this.getDoctorOcc4DateListElab = function(transport, stage, layer, _callback) {
-	
-		var method="getDoctorOcc4DateListElab";
+	};	
+
+
+    this.getVacantBedRangeElab = function(buildId, dt, room, transport) {
+		
+		var method="getVacantBedRangeElab";
 		console.log(method + " called ...");
 		
 		if (transport.error == undefined) {
 			
-			floorMgrObj.occDocMap[transport.date]=transport.ret2cli;
-			_callback(stage, layer, transport.date);
+			//ret = transport.ret2cli;
+			canvasMgr.floorArr[buildId].bedByDate[dt][room].dal = transport.ret2cli.data_dal;
+			canvasMgr.floorArr[buildId].bedByDate[dt][room].al = transport.ret2cli.data_al;
 			
 		} else {
 			var err = transport.error; 
@@ -182,84 +276,19 @@ floorMgr = function(){
 		};
 	};
 	
-	this.getDoctorOccupancyInfo = function(stage, layer, dt, _callback) {
+	this.getFeatureInfo = function(buildId) {
 		
-		// check the occDocMap for occupancy info for the given date ...
-		if (floorMgrObj.occDocMap[dt] == undefined) {
-			floorMgrObj.getDoctorOcc4DateList(stage, layer, dt, _callback);
-		} else {
-			_callback(stage, layer, dt);
-		}
-	};
-	
-	this.paintDoctorOccupancyInfo = function(stage, layer, dt) {
-		
-		console.log("getDoctorInfo called ...");
-		
-		// Doctor info
-		var occDoc=floorMgrObj.occDocMap[dt];
-		var uniqueRoomArray = new Array();
-		floorMgrObj.uniqueDocArr = new Array();
-		for (f in occDoc) {( function() {    
-			
-			var dObj = occDoc[f];
-			 
-			    // Capture distinct room numbers
-				if ($.inArray(dObj.numStanza, uniqueRoomArray) > -1) {
-					// Do next record ... pitty continue does not work
-				} else {
-					
-				    // Capture distinct doctor list
-				    if ($.inArray(dObj.docId, floorMgrObj.uniqueDocArr) < 0) {
-				    	floorMgrObj.uniqueDocArr.push(dObj.docId);
-				    }
-					
-					uniqueRoomArray.push(dObj.numStanza);
-				    var polyPnts = floorMgrObj.roomMap[dObj.numStanza];
-				
-					if (canvasMgr.legendObj.docColors[dObj.docId] != undefined && polyPnts != undefined) {
-		 			
-						var poly2 = new Kinetic.Polygon({
-					        points: polyPnts.split(","),
-					        fill: canvasMgr.legendObj.docColors[dObj.docId].color,
-					        opacity: 0.6,
-					        strokeWidth: 0,
-					        id: "p_" + dObj.docId,
-					        docName: dObj.docName,
-					        rooms: "rooms_dont_know",
-					        draggable: false
-					    });
-					        
-						poly2.on("mouseout", function() {;
-			                $( "#diagRoom" ).html('---');
-			            });
-						poly2.on("mousemove", function(){
-							var toDate=dObj.gmaal=="2030-01-01"?"---":dObj.gmaal;	
-			                $( "#diagRoom" ).html(dObj.numStanza + " (Doc: " + dObj.docName + "[Dal: "+dObj.gmadal +" Al: "+toDate+"])");
-			            });
-					        
-						layer.add(poly2);
-					}
-				}		
-			
-			}());
-		};
-		canvasMgr.legendObj.populateToolTipLyrWithUniqueDocs(floorMgrObj.id);
-		layer.draw();
-		stage.draw();
-	};
-	// doctor occupancy functions(END)
-	
-	this.getFeatureInfo = function(stage, layer) {
+		canvasMgr.featureLyr.removeChildren();
 		
 		var i=1;
-		for (f in floorMgrObj.featMap) {( function() {
+		//for (f in floorMgrObj.featMap) {( function() {
+	    for (f in canvasMgr.floorArr[buildId].featureArr) {( function() {	
 			    //i++;
-				var fObj = floorMgrObj.featMap[f];
+				var fObj = canvasMgr.floorArr[buildId].featureArr[f];
 				var obj;
 				var rom = fObj.room;
-				var romDesc = rom+"["+ fObj.featDesc + "]";
-				var featType = fObj.featType;
+				var romDesc = rom+" ["+ fObj.desc + "]";
+				var featType = fObj.type;
 				console.log("featType -> " + featType);
 				
 				// I;Infermeria,A;Studio Medico,S;Soggiorno Cucinino,T;Vano Tecnico,B;Bagno"
@@ -277,8 +306,8 @@ floorMgr = function(){
 				  default: obj = canvasMgr.featImgB;
 				};
 				
-				xVal = fObj.xVal*i;
-				yVal = fObj.yVal*i;
+				var xVal = fObj.x_val*i;
+				var yVal = fObj.y_val*i;
 
 				var image = new Kinetic.Image({
 					x : xVal,
@@ -299,8 +328,40 @@ floorMgr = function(){
 	            });
 	            image.on("mouseover", function(){
 	            	document.body.style.cursor = "pointer";
+	            	
+	            //});
+	            //image.on("click", function(){
+	            	var tooltip = new Kinetic.Label({
+	                    x: xVal,
+	                    y: yVal,
+	                    opacity: 0.75,
+	                    id: "tt01"
+	                  });
+	            	tooltip.add(new Kinetic.Tag({
+	                    fill: 'black',
+	                    pointerDirection: 'down',
+	                    pointerWidth: 10,
+	                    pointerHeight: 10,
+	                    lineJoin: 'round',
+	                    shadowColor: 'black',
+	                    shadowBlur: 10,
+	                    shadowOffset: {x:10,y:20},
+	                    shadowOpacity: 0.5
+	                  }));
+	                tooltip.add(new Kinetic.Text({
+	                    text: romDesc,
+	                    fontFamily: 'Calibri',
+	                    fontSize: 18,
+	                    padding: 5,
+	                    fill: 'white'
+	                  }));
+	                canvasMgr.featureLyr.add(tooltip);
+	                canvasMgr.featureLyr.draw();
 	            });
 	            image.on("mouseout", function() {
+	            	
+	            	canvasMgr.featureLyr.find('#tt01').destroy();
+	            	canvasMgr.featureLyr.draw();
 	                document.body.style.cursor = "default";
 	                $( "#diagRoom" ).html('---');
 	            });
@@ -308,10 +369,10 @@ floorMgr = function(){
 	                $( "#diagRoom" ).html(romDesc);
 	            });
 				
-				layer.add(image);
+	            canvasMgr.featureLyr.add(image);
 			}());
-				layer.draw();
-				stage.draw();
+		    //canvasMgr.floorLyr.draw();
+		    //canvasMgr.stage.draw();
 		};
 
 	};
@@ -323,7 +384,7 @@ floorMgr = function(){
 		
 		if (!canvasMgr.maintMode) {
 			// Doctor info
-			floorMgrObj.getDoctorOccupancyInfo(stage, layer, day, floorMgrObj.paintDoctorOccupancyInfo);
+			//floorMgrObj.getDoctorOccupancyInfo(stage, layer, day, floorMgrObj.paintDoctorOccupancyInfo);
 			floorMgrObj.createOccLayerMapInfo(stage, layer, day);
 		} else {
 			if (canvasMgr.maintModeType == "letti") {
@@ -386,109 +447,133 @@ floorMgr = function(){
 	  stage.draw();
 	};
 	
-	this.createOccLayerMapInfo = function(stage, layer, day) {
+	this.createOccLayerMapInfo = function() {
 		
-		console.log("createOccLayerMapInfo called ...");
 		
-		var fMap = floorMgrObj.floorMap;
-		var oMap = floorMgrObj.occMap[day];
+		var buildId = canvasMgr.currFloor;
+		var dt = canvasMgr.dt;
 		
-		for (mObj in fMap) {( function() {
-		//for (mObj in fMap) {
-		    
-			var cObj = floorMgrObj.getObj4Bed(oMap, fMap[mObj].bed);
-			  if (cObj != undefined) {
-				var rom = fMap[mObj].room;
-				var bed = cObj.bed; 
+		canvasMgr.occLyr.removeChildren();
+
+	    for (o in canvasMgr.floorArr[buildId].bedByDate[dt]) {( function() {	
+			
+	    	 //OccupationalData: bed, name, status, gender, altro
+	    	 var objA = canvasMgr.floorArr[buildId].bedByDate[dt][o];
+	    	 	    		 
+			 if (objA != undefined) {
+			
+		    	//StaticData: bed_num, room_num, x_val, y_val	 
+		    	var objB = canvasMgr.floorArr[buildId].bedArr[objA.bed_num]; 
+		    	
+				var rom = objB.room_num;
+				var bed = objB.bed_num; 
 				var conf = "No";
-				var obj;
+				//var obj;
 				var zoomFact = 1;
 				
-				if (cObj.status == 0) {
-					obj = canvasMgr.xImgLib;
-					bed = bed + " (libero)";
-				} else {
-					if (cObj.status == 1) {
-						bed = bed + " (prenotato)";
-						if (cObj.gender == "M") {
-							obj = canvasMgr.mImgPre;
+				if (objA.status != 3) { //Letto dissabilitato do nothing
+				
+						if (objA.status == 0) {
+							obj = canvasMgr.xImgLib;
+							bed = bed + " (libero)";
 						} else {
-							obj = canvasMgr.fImgPre;
-						};
-					} else {
-						
-						if (cObj.altro != undefined && cObj.altro.split("_")[0] == "T") {
-							conf="Si (" + cObj.altro.split("_")[2] + ")";
-						}
-						
-						bed = bed + " (occupato)";
-						if (cObj.gender == "M") {
-							if (conf == "No") {
-							obj = canvasMgr.mImgOcc;
-						} else {
-							    obj = canvasMgr.mImgOccConf;
-							}
-						} else {
-							if (conf == "No") {
-							obj = canvasMgr.fImgOcc; 
+							if (objA.status == 1) {
+								bed = bed + " (prenotato)";
+								if (objA.sesso == "M") {
+									obj = canvasMgr.mImgPre;
+								} else {
+									obj = canvasMgr.fImgPre;
+								};
 							} else {
-								obj = canvasMgr.fImgOccConf;
-							}
-							 
-						};					
-						if (cObj.altro != undefined) {
-						    var spl=cObj.altro.split("_");
-						    if (spl[0] == "T") {
-						    	
-						    } 
-						}  
-					} 	
-				};
-			    
-			    var xVal = fMap[mObj].xVal;
-			    var yVal = fMap[mObj].yVal;
-				var image = new Kinetic.Image({
-						x : xVal*zoomFact,
-						y : yVal*zoomFact,
-						image : obj,
-						width : 20,
-						height : 20,
-						draggable: false,
-						bed: cObj.bed,
-						codStanza: fMap[mObj].codStanza,
-						building: fMap[mObj].building,
-						room: fMap[mObj].room
-				});
-				
-	            image.on("dragstart", function() {
-	            	document.body.style.cursor = "pointer";
-	            });
-	            image.on("dragmove", function() {
-	                document.body.style.cursor = "pointer";
-	            });
-	            image.on("mouseover", function(){
-	            	document.body.style.cursor = "pointer";
-	            });
-	            image.on("mouseout", function() {
-	                document.body.style.cursor = "default";              
-	                $( "#diagRoom" ).html('---');
-	                $( "#diagBed" ).html('---');
-	                $( "#dimConf" ).html('---');
-	            });
-				
-	            image.on("mousemove", function(){
-	                $( "#diagRoom" ).html(rom);
-	                //$( "#diagBed" ).html(bed);
-	                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(cObj.name));
-	                $( "#dimConf" ).html(conf);
-	            });
-	
-	            layer.add(image);
-			  } else {console.log(" WARN: cObj is undefined for mObj -> " + mObj ) ;}  
-		}());
-	  }
-	  layer.draw();
-	  stage.draw();
+								
+								if (objA.altro != undefined && objA.altro.split("_")[0] == "T") {
+									conf="Si (" + objA.altro.split("_")[2] + ")";
+								}
+								
+								bed = bed + " (occupato)";
+								if (objA.sesso == "M") {
+									if (conf == "No") {
+									obj = canvasMgr.mImgOcc;
+								} else {
+									    obj = canvasMgr.mImgOccConf;
+									}
+								} else {
+									if (conf == "No") {
+									obj = canvasMgr.fImgOcc; 
+									} else {
+										obj = canvasMgr.fImgOccConf;
+									}
+									 
+								};					
+								if (objA.altro != undefined) {
+								    var spl=objA.altro.split("_");
+								    if (spl[0] == "T") {
+								    	
+								    } 
+								}  
+							} 	
+						};
+					    
+					    var xVal = objB.x_val;
+					    var yVal = objB.y_val;
+						var image = new Kinetic.Image({
+								x : xVal*zoomFact,
+								y : yVal*zoomFact,
+								image : obj,
+								width : 20,
+								height : 20,
+								draggable: false,
+								bed: objA.bed,
+								codStanza: objB.room_num,
+								building: buildId,
+								room: objB.room_num
+						});
+						
+			            image.on("dragstart", function() {
+			            	document.body.style.cursor = "pointer";
+			            });
+			            image.on("dragmove", function() {
+			                document.body.style.cursor = "pointer";
+			            });
+			            image.on("mouseover", function(){
+			            	document.body.style.cursor = "pointer";
+			            });
+			            image.on("mouseout", function() {
+			                document.body.style.cursor = "default";              
+			                $( "#diagRoom" ).html('---');
+			                $( "#diagBed" ).html('---');
+			                $( "#dimConf" ).html('---');
+			            });
+						
+			            image.on("mousemove", function(){
+			            	
+			            	var vals="";
+			            	var bed_num = objB.bed_num;
+			            	if (objA.status == 0) {
+			            		if (canvasMgr.floorArr[buildId].bedByDate[dt][bed_num].dal == undefined) {
+			            			floorMgrObj.getVacantBedRange(buildId, dt, bed_num);
+			            		}
+			            		vals = " dal: " + canvasMgr.floorArr[buildId].bedByDate[dt][bed_num].dal + " al: " + canvasMgr.floorArr[buildId].bedByDate[dt][bed_num].al;
+			            	}
+			            	
+			                $( "#diagRoom" ).html(rom);
+			                //$( "#diagBed" ).html(bed);
+			                $( "#diagBed" ).html(bed + floorMgrObj.getInitials(objA.nome) + vals);
+			                $( "#dimConf" ).html(conf);
+			            });
+			
+			            canvasMgr.occLyr.add(image);
+					  } else {
+						  //Letto dissabilitato do nothing
+						  //console.log(" WARN: objB is undefined for -> " + objA.status ) ;
+					  }  
+			 } // do nothing 
+			
+		    }());
+		}
+		//canvasMgr.occLyr.draw();
+		//canvasMgr.stage.draw();
+		
 	};
 	
 	// helper function to get 3 intials from Name and Lastname ...

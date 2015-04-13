@@ -1,4 +1,7 @@
-package it.sbsoft.beans;
+package it.sbsoft.beans.todeprecate;
+
+import it.sbsoft.beans.FeatureMap;
+import it.sbsoft.beans.FloorMap;
 
 import java.util.ArrayList;
 import java.util.List;

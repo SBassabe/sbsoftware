@@ -4,18 +4,23 @@ import com.google.gson.Gson;
 
 import it.sbsoft.beans.Bean2cli;
 import it.sbsoft.beans.Errore;
+import it.sbsoft.db.FBDBHelper;
+import it.sbsoft.db.H2DBHelper;
 import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.utility.LoggerUtils;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,11 +34,16 @@ public class MaintSrvlt extends HttpServlet {
     static Gson gson = new Gson();
 	static PropertiesCommon prop;
 	static String cHome;
-	static Logger log = LoggerUtils.getLogger("sbsoftware"); 
+	static Logger log = LoggerUtils.getLogger("sbsoftware");
+	public H2DBHelper h2Help = new H2DBHelper();
     
 	public void init() {
 		prop = PropertiesCommon.getPropertiesFile();
 		cHome = prop.cHome;
+		
+		//H2DB
+		Connection conn = (Connection)getServletContext().getAttribute("connection");
+		h2Help.initConn(conn);
 	}
 	
     public MaintSrvlt() {

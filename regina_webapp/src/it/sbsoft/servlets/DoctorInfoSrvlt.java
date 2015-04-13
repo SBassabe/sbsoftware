@@ -1,6 +1,7 @@
 package it.sbsoft.servlets;
 
 import it.sbsoft.beans.*;
+import it.sbsoft.beans.todeprecate.DoctorInfoBean;
 import it.sbsoft.doctors.DocOccupancy;
 import it.sbsoft.propfiles.PropertiesRooms;
 import it.sbsoft.utility.DateHelper;
@@ -11,8 +12,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,6 +66,11 @@ public class DoctorInfoSrvlt extends HttpServlet {
 			String action = request.getParameter("action");
 			String rqst = request.getParameter("request");
 			
+			log.info("DoctorInfoSrvlt param action --> " + floor);
+			log.info("DoctorInfoSrvlt param doc2del --> " + date);
+			log.info("DoctorInfoSrvlt param currFloor --> " + action);
+			log.info("DoctorInfoSrvlt param featureMap --> " + rqst);
+			
 			Bean2serv b2s = new Bean2serv();
 			b2s = gson.fromJson(rqst, Bean2serv.class);
 			if (b2s != null) {
@@ -101,10 +109,37 @@ public class DoctorInfoSrvlt extends HttpServlet {
 				
 				String prKey="";
 				PropertiesRooms pr = PropertiesRooms.getPropertiesFile();
+				
+				/*
 				for (DoctorInfoBean dib : b2s.getDoctorMap()) {
 					prKey=floor+"_"+dib.getNumStanza();
 					pr.setProperty(prKey, dib.getPolyPointsAsString());	
 				}
+				*/
+				
+				Statement h2Stmt = dOcc.h2Help.getConn().createStatement();
+				StringBuffer sql = new StringBuffer();
+				int r = 0;
+				
+			    Map<String, LocObj> locArr = b2s.getLocArr();
+			    for (String s : locArr.keySet()) {
+			    	
+			    	locArr.get(s);
+			    	prKey=s;
+			    	pr.setProperty(prKey, locArr.get(s).getPoly_points());
+					
+			    	sql.append("MERGE INTO LOCATION_POLY (LOC_ID, POLY_PTNS) VALUES ('"+ prKey +"', '"+ locArr.get(s).getPoly_points() +"')");
+					log.info("sql.toString -> " + sql.toString());
+					r = h2Stmt.executeUpdate(sql.toString());
+					dOcc.h2Help.getConn().commit();
+					System.out.println("executeUpdaate result " + r );
+					sql.delete(0, sql.length());
+			
+			    }
+				
+			    h2Stmt = null;
+			    sql = null;
+			    
 			    pr.store(new FileOutputStream(pr.cHome), "#justcomment");
 			    pr.sortFile();
 			
@@ -114,10 +149,10 @@ public class DoctorInfoSrvlt extends HttpServlet {
 				//SELECT * FROM DOCDTMAP where flOORID = 'A0' and (GMADAL <= cast('2012-06-24' as date) and  GMAAL >= cast('2012-06-24' as date))
 				// TODO: create new method to get MIN_MAX info
 				
-				dibList = dOcc.getDoctorOccupancy(floor, DateHelper.getDate4Query(date));
+				//dibList = dOcc.getDoctorOccupancy(floor, DateHelper.getDate4Query(date));
 				ret.setFloor(floor);
 				ret.setDate(date);
-				ret.setRet2cli(dibList);
+				ret.setRet2cli(dOcc.getDoctorOccupancyMap(floor, DateHelper.getDate4Query(date)));
 			
 			} else if (action.compareToIgnoreCase("refresh") == 0) {
 				

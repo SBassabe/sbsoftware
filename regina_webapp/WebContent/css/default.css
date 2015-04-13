@@ -17,6 +17,9 @@ body {
 	border: 2px solid #222222;
 	border-radius: 10px;
 	position: relative;
+	margin-top: 5px;
+	padding-top: 5px;
+	padding-bottom: 10px;
 }
 
 #cont_border {
@@ -85,7 +88,7 @@ div.left {
 	text-align: right;
 	position: absolute;
 	display: inline;
-	width: 180px;
+	width: 200px;
 }
 
 div.right {
@@ -93,7 +96,7 @@ div.right {
 	position: absolute;
 	display: inline;
 	width: 75%;
-	left: 200px;
+	left: 220px;
 }
 
 #jbutton {
@@ -118,4 +121,34 @@ div.right {
     text-align: center;
     font-size: 10px;
 	color: gray;
-}	
+}
+
+/* Days Table */
+.ou {
+    display: -webkit-inline-box;
+	border: 1px solid;
+	border-color: black;
+	background-color: black;
+	color: white;
+	margin-left: -5px;
+	/*width: 2.8%;*/
+	border-radius: 26px;
+}
+.in {
+	/*width: 50%;*/
+	display: block;
+	text-align: center;
+	margin: 0px auto;
+	font-family: monospace;
+	font-weight: bold;
+	font-size: xx-small;
+	height: 12px;
+}
+.in:hover {
+	color: white;
+	background-color: black;
+}
+
+/* Cleaning form */
+.rtd { text-align: right; width: 50%; padding: 0px 5px 0px 5px; }
+.ltd { text-align: left; }

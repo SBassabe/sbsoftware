@@ -1,4 +1,4 @@
-package it.sbsoft.beans;
+package it.sbsoft.beans.todeprecate;
 
 public class DoctorMap {
 	

@@ -3,25 +3,49 @@ canvasMgr = function(){
 	console.log("canvasMgr obj created ...");
 	var currObj = this;
 	this.currFloor = "";
-	this.currMonth = "";
+	
+	//Date attributes
+	this.currMonth = ""; //01|02|03...
 	this.currYear = "";
+	this.currDay = "";
+	this.dt = "";
+	this.dayOfWeek = ""; //DOM|LUN|MAR...
+	this.currMonthString = ""; //GEN|FEB|MAR...
+	
+	//Worker attributes
 	this.lastDayOfMonth=0;
+	this.daysLoaded=40;
+	this.lastWorkerDay=1;
+	this.enableWorker = true;
+	this.daysArr = new Array();
+	
 	this.maintMode = false; // false, letti, stanze
-	this.maintModeType = "";
+	this.maintModeType = ""; // letti stanze
+	this.modFlag = false;
+	this.daysInMonthArray = new Array();
+	this.yearList = new Array();
+	this.currVis = "docs"; //docs,clean
+	
+	//Complete objects
 	this.maintMgrBeds = new maintMgrBeds();
 	this.maintMgrRooms = new maintMgrRooms();
-	this.daysInMonthArray = new Array();
-	this.legendObj = new legendMgr();
+    this.legendObj = new legendMgr();
+	this.floorMgr = new floorMgr();
+	this.doctorMgr = new doctorsMgr();
+	this.cleaningMgr = new cleaningMgr();
 
 	// Add 1 stage and 3 layers
 	this.stage = new Kinetic.Stage({
 		container : "container",
 		width : 1164,
 		height : 500,
-		x : 10
+		x : 10,
+		draggable: false
 	});
 	//this.stage.setScale(0.9);
 	this.floorLyr = new Kinetic.Layer({id: "floorLyr"});
+	this.featureLyr = new Kinetic.Layer({id: "featureLyr"});
+	this.doctorLyr = new Kinetic.Layer({id: "doctorLyr"});
 	this.toolTipLyr = new Kinetic.Layer({id: "toolTipLyr"});
 	this.occLyr = new Kinetic.Layer({id: "occLyr"});
 	
@@ -75,29 +99,36 @@ canvasMgr = function(){
 		
 		// add all layers to stage
 		currObj.stage.add(currObj.floorLyr);
+		currObj.stage.add(currObj.doctorLyr);
 		currObj.toolTipLyr.add(currObj.tooltip);
 		currObj.stage.add(currObj.toolTipLyr);
 		currObj.stage.add(currObj.occLyr);
+		currObj.stage.add(currObj.featureLyr);
 		
 		// get all floor info from server
-		currObj.getFloorList(currObj.createBuildingPulldown);
+		currObj.getStaticInfo();
+		currObj.createBuildingPulldown();
+		currObj.createYearsPulldown();
 		
 		// initialize Selectors here if necessary.
+		currObj.createDaysTable();
 		currObj.selectorsChanged();
 		//currObj.legendObj.populateStage(); // Old code with complete DoctorsList deprecated
+		
+		setTimeout(function() { canvasMgr.floorMgr.workerManager(); }, 1000);
+		
 	};
 
 	// get floor list from server and load array...
-	this.getFloorList = function(_callback) {
+	this.getStaticInfo = function() {
 		
-		var method = 'getFloorList';
-		var params = {
-			maint: currObj.maintMode	
-		};
+		var method = 'getStaticInfo';
+		console.log('SRVR_call -> ' + method + " called ...");
+		var params = {};
         try {
             
             $.ajax({
-                url: "FloorList",
+                url: "StaticInfoSrvlt",
                 dataType: "json",
                 timeout: 10000,
                 type: 'POST',
@@ -105,7 +136,7 @@ canvasMgr = function(){
                 data: params,
                 context: document.body,
                 success: function(transport){
-                	currObj.getFloorListElab(transport, _callback);
+                	currObj.getStaticInfoElab(transport);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
@@ -120,35 +151,13 @@ canvasMgr = function(){
         }
 	};
 	
-	this.getFloorListElab = function(transport, _callback) {
+	this.getStaticInfoElab = function(transport) {
 		
-		// This function loads the floorArray[] with floor objects ....
 		if (transport.error == undefined) {
-			
-			var firstFloor="";
-			
-			for(var i=0; i<transport.ret2cli.length; i++) {	
-				
-				var flr = transport.ret2cli[i];
-				
-				var floor = new floorMgr();
-				floor.id = flr.id;
-				floor.desc = flr.description;
-				floor.imgSrc = flr.imgSrc;
-				floor.floorMap = flr.floorMap;
-				floor.featMap = flr.featureMap;
-				floor.doctorMap = flr.doctorMap;
-				
-				$.each(flr.roomMap, function(index, value) {
-					floor.roomMap[value.numStanza]=value.polyPoints.toString();
-				});
-				
-				currObj.floorArr[flr.id] = floor;  // <-- Important piece of code!
-				
-				if (i==0) firstFloor=flr.id;
-			}
-			
-			_callback(firstFloor); //currObj.createBuildingPulldown
+						
+			currObj.floorArr = transport.ret2cli;
+			currObj.yearList = transport.yearList;
+			//currObj.currFloor="A0";
 			
 		} else {
 			var err = transport.error;
@@ -162,25 +171,53 @@ canvasMgr = function(){
 	};
 	
 	// create pulldown with list of floors ...
-	this.createBuildingPulldown = function(buildId) {
+	this.createBuildingPulldown = function() {
 
 		if ($('#building').val() == null) {
 		
-			for (obj in currObj.floorArr) {
+			// Just sort this bitch !!!
+		    var sortedObj = new Array();
+		    for (o in currObj.floorArr) {
+		    	sortedObj.push(currObj.floorArr[o].floor_id);
+		    }
+		    sortedObj.sort();
+		    
+			for (obj in sortedObj) {
 				
 				$('#building').append($("<option/>", {
-					 value: currObj.floorArr[obj].id,
-					 text: currObj.floorArr[obj].desc
+					 value: currObj.floorArr[sortedObj[obj]].floor_id,
+					 text: currObj.floorArr[sortedObj[obj]].description
 				}));
 				
 			}
-			$('#building').val(buildId);
+			$('#building').val(currObj.currFloor);
+			currObj.currFloor=""; //trick the system !!
 		};
+	};
+	
+	// create year pulldown ...
+	this.createYearsPulldown = function() {
+		
+		// Just sort this bitch !!!
+	    var sortedObj = new Array();
+	    for (o in currObj.yearList) {
+	    	sortedObj.push(currObj.yearList[o]);
+	    }
+	    sortedObj.sort();
+	    
+		for (obj in sortedObj) {
+			
+			$('#year').append($("<option/>", {
+				 value: sortedObj[obj],
+				 text: sortedObj[obj]
+			}));
+			
+		}
 	};
 	
 	this.selectorsChanged = function() {
 
-		// capture current values
+		// capture current selector values
 		var buildId="";
 		var year="";
 		var month="";
@@ -204,6 +241,7 @@ canvasMgr = function(){
 		// Get the max days in month and set the slider accordingly
 		var d = new Date(year,month,0);
 		currObj.lastDayOfMonth = d.getDate();
+		currObj.prepareWorkerDtArray();
 		$('#day').slider("option","max",currObj.lastDayOfMonth);
 		$('#day').slider("option","min",1);
 		
@@ -216,15 +254,17 @@ canvasMgr = function(){
 		// collect values
 		day=day+"";
 		$('#dayvalue').text(day);
+		//$('#header_display').val(day).change();
 		if (day.toString().length == 1) day="0"+day;
 		if (month.toString().length == 1) month="0"+month;
 		var dt = year+month+day;
 		
+		currObj.checkToResetWorker(month, year, buildId);
+		
 		// flag used to empty occupancy array
 		if (this.currMonth != month || this.currYear != year) {
-			currObj.floorArr[buildId].occMap=[];
-			this.currMonth = month;
-			this.currYear = year;
+			
+			currObj.floorArr[buildId].bedByDate=[];
 			console.log(" occMapArray empty for floor -> " + buildId);
 			this.daysInMonthArray = new Array();
 			for (var i=1; i<=currObj.lastDayOfMonth; i++) {
@@ -234,31 +274,119 @@ canvasMgr = function(){
 			};
 		}
 		
+		currObj.dt = dt;
+		currObj.currMonth = month;
+		currObj.decodeMonth();
+		currObj.currYear = year;
+		currObj.currDay = day;
+		
+		d = new Date(currObj.currYear, Number(currObj.currMonth)-1, currObj.currDay);
+		
+		currObj.decodeDay(d.getDay());
+		//$('#dayOfWeek').html(currObj.dayOfWeek);
+		$('#dayVerbose').html(d.toDateString());
+		var s = currObj.dayOfWeek + '-';
+		if (currObj.currDay.length == 1) s=s+'0';
+		s=s+currObj.currDay+"-"+currObj.currMonthString+"</br>"+currObj.currYear;
+		$('#header_display').val(s).change();
+		$('#dayOfWeek').html(s);
+		
 		// If floor selector changes (or on first run)
 		if (this.currFloor != buildId) {
 			
 			// Note: The occupation array gets emptied on every floor change. 
 			// This is done to spare some memory on the client and to keep info from getting stale.
 			if (this.currFloor != "") {
-				currObj.floorArr[this.currFloor].occMap=[];
+				currObj.floorArr[this.currFloor].bedByDate=[];
+				currObj.floorArr[this.currFloor].cleanByDate=[];
 				console.log(" occMapArray empty for floor -> " + this.currFloor);
 			}
 			
 			this.currFloor=buildId;
-			currObj.floorArr[buildId].populateFloorLayer(currObj.stage, currObj.floorLyr, currObj.occLyr, dt);
-		
-		// If floor selector does NOT change, just get occupancy info	
-		} else {
+			currObj.floorMgr.populateFloorLayer(currObj.currFloor);
+			currObj.floorMgr.getFeatureInfo(currObj.currFloor);
 			
-			// populateOccLayer
-			if (currObj.floorArr[buildId].occMap[dt] == undefined ) {
-				currObj.floorArr[buildId].getFloorOcc4DateList(currObj.stage, currObj.occLyr, dt, currObj.floorArr[buildId].createOccLayer);
-			} else {
-				currObj.floorArr[buildId].createOccLayer(currObj.stage, currObj.occLyr, dt);
-			}			
 		}
 		
-		currObj.toolTipLyr.moveToTop();
+		currObj.floorMgr.getAndPaintFloorOccupancyInfo();
+		currObj.chooseRoomInfoOverlay();
+		//canvasMgr.occLyr.batchDraw();
+		//currObj.toolTipLyr.moveToTop();
+		//canvasMgr.featureLyr.moveToTop;
+	    canvasMgr.stage.batchDraw();
+	};
+	
+	this.decodeDay = function(dayNum) {
+		
+		switch(dayNum) {
+			case 0: currObj.dayOfWeek = "Domenica"; break;
+			case 1: currObj.dayOfWeek = "Lunedi"; break;
+			case 2: currObj.dayOfWeek = "Martedi"; break;
+			case 3: currObj.dayOfWeek = "Mercoledi"; break;
+			case 4: currObj.dayOfWeek = "Giovedi"; break;
+			case 5: currObj.dayOfWeek = "Venerdi"; break;
+			case 6: currObj.dayOfWeek = "Sabato"; break;
+			default: currObj.dayOfWeek = "---";
+		}
+		
+	};
+	
+	this.decodeMonth = function() {
+		
+		switch(currObj.currMonth) {
+			case '01': currObj.currMonthString = "Gennaio"; break;
+			case '02': currObj.currMonthString = "Febbraio"; break;
+			case '03': currObj.currMonthString = "Marzo"; break;
+			case '04': currObj.currMonthString = "Aprile"; break;
+			case '05': currObj.currMonthString = "Maggio"; break;
+			case '06': currObj.currMonthString = "Giugno"; break;
+			case '07': currObj.currMonthString = "Luglio"; break;
+			case '08': currObj.currMonthString = "Agosto"; break;
+			case '09': currObj.currMonthString = "Settembre"; break;
+			case '10': currObj.currMonthString = "Ottobre"; break;
+			case '11': currObj.currMonthString = "Novembre"; break;
+			case '12': currObj.currMonthString = "Dicembre"; break;
+			default: currObj.dayOfWeek = "---";
+		}
+		
+	};
+	
+	this.checkToResetWorker = function(newMonth, newYear, newBuildId) {
+		
+		if (currObj.currMonth != newMonth ||
+			currObj.currYear  != newYear  ||
+			currObj.currFloor != newBuildId) {
+			
+			this.resetWorker();
+		}
+	};
+	
+	this.resetWorker = function() {
+		
+		console.log('resetWorker ... called');
+		currObj.daysLoaded=0;
+		currObj.lastWorkerDay=1;
+		currObj.prepareWorkerDtArray();
+		setTimeout(function() { canvasMgr.floorMgr.workerManager(); }, 1000);
+		currObj.createDaysTable();
+		console.log("checkToResetWorker -> yes: currObj.lastDayOfMonth -> " + currObj.lastDayOfMonth);
+		
+	};
+	
+	this.chooseRoomInfoOverlay = function() {
+		
+		switch (canvasMgr.currVis) {
+		case "docs":
+			currObj.doctorMgr.getAndPaintDoctorOccupancyInfo();
+
+			break;
+		case "clean":
+			currObj.cleaningMgr.getAndPaintCleaningInfo();
+			break;
+		default:
+			console.log("did nothing, what happened ??");
+		}
+		
 	};
 	
 	// Maintenance mode ...
@@ -348,7 +476,7 @@ canvasMgr = function(){
 			currObj.maintModeType=val;
 
 			// get all floor info from server
-			currObj.getFloorList(currObj.createBuildingPulldown);
+			//currObj.getFloorList(currObj.createBuildingPulldown);
 			
 			// initialize Selectors here if necessary.
 			$("#radio3").button( "disable" );
@@ -356,40 +484,57 @@ canvasMgr = function(){
 			$("#radio4").button( "enable" );
 			$("#radio2").button( "enable" );
 			
-			currObj.occLyr.removeChildren();
+			currObj.occLyr.destroyChildren();
+			currObj.doctorLyr.destroyChildren();
 			
+			// Room objects
 			if (currObj.maintModeType == "stanze") {
-				currObj.maintMgrRooms.initTst(currObj.currFloor);
-				currObj.occLyr.draw();
+				currObj.maintMgrRooms.createRoomMaintInfo();
+				//currObj.occLyr.draw();
+			
+			// Bed objects
 			} else {
-				currObj.maintMgrBeds.createOccLayerMaintInfo(currObj.stage, currObj.occLyr, currObj.currFloor);
+				currObj.maintMgrBeds.createBedMaintInfo();
 			}
+			
+			currObj.stage.batchDraw();
 						
 		} else if (val == "off" || val == "salva") {
+			
+			if (currObj.modFlag) {
+				var r = confirm("Qualcosa è cambiato vuoi salvare ?");
+				if (r == true) {
+				    val = "salva";
+				}
+			}
 			
 			if (val == "salva") {
 				if (currObj.maintModeType == "stanze") {
 					currObj.maintMgrRooms.saveFloorMap4FloorPrepare();
-					return;
 				} else {
 					currObj.maintMgrBeds.collectLayerData();
-					return;
 				}				
 			}
 			
+			
 			currObj.maintMode=false;
+			currObj.maintModeType="";
 			currObj.currFloor = "";
 			currObj.floorLyr.removeChildren();
 			currObj.occLyr.removeChildren();
 			// get all floor info from server
-			currObj.getFloorList(currObj.createBuildingPulldown);
+			//currObj.getFloorList(currObj.createBuildingPulldown);
 			
 			// initialize Selectors here if necessary.
-			currObj.selectorsChanged();
 			$("#radio3").button( "enable" );
 			$("#radio1").button( "enable" );
 			$("#radio4").button( "disable" );
 			$("#radio2").button( "disable" );
+			
+			// Redraw everything
+			currObj.getStaticInfo();
+			currObj.selectorsChanged();
+			$("#maintDiag").dialog('close');
 			
 		};
 	};
@@ -404,6 +549,104 @@ canvasMgr = function(){
 		
 		$("#msgMsg").html(msgDesc);
 		$("#msgDiag").dialog('open');
+	};
+	
+	this.toggleVis = function() {
+		
+		// Just clean everything
+		//currObj.floorArr[this.currFloor].bedByDate=[];
+		//currObj.floorArr[this.currFloor].cleanByDate=[];
+		
+		if (canvasMgr.currVis == "docs") {
+			canvasMgr.currVis = "clean";
+			$("#visualizza").html('Assegnazione Medici');
+		} else {
+			canvasMgr.currVis = "docs";
+			$("#visualizza").html('Pulizia Giornaliera');
+		}
+		console.log("currVis -> " + canvasMgr.currVis);
+		currObj.chooseRoomInfoOverlay();
+		canvasMgr.stage.batchDraw();
+		this.resetWorker();
+	};
+	
+	
+	// Days table manager (start)
+	this.createDaysTable = function() {
+	
+		// 31 gg -> 1.32em	
+		// 30 gg -> 1.36em
+		// 29 gg -> 1.38em
+	    // 28 gg -> 1.45em
+		var newWidth = "1.45em";
+		
+		switch(currObj.lastDayOfMonth) {
+		case 28:
+			newWidth = "3.4%";//"1.45em";
+			break;
+		case 29:
+			newWidth = "3.25%";//"1.38em";
+			break;
+		case 30:
+			newWidth = "3.15%";//"1.36em";
+			break;
+		case 31:
+			newWidth = "3.04%";//"1.32em";
+			break;
+		}  
+		
+		var html = null;
+		try {
+			var myejs = new EJS({
+				url : './view/days.ejs'
+			});
+			obj = {days : currObj.lastDayOfMonth,
+				   width: newWidth};
+			html = myejs.render(obj);
+		} catch (e) {
+			if (e.description)
+				e = e.description;
+			alert('ex -> ' + e);
+		}
+
+		$('#daysTable').html(html);
+		
+	};
+	
+	this.colorDay = function(day) {
+		
+		var dayNum = Number(day);
+		console.log('colorDay for -> ' + dayNum);
+		
+		$('#day'+dayNum).css('color', 'black');
+		$('#day'+dayNum).css('background-color', 'white');
+		$('#day'+dayNum).parent().css('background-color', 'white');
+	};
+	
+	// Days table manager (end)
+	
+	// Date management (start)
+	this.prepareWorkerDtArray = function() {
+		
+		var b="";
+		currObj.daysArr = new Array();
+		for (var i=1; i<=currObj.lastDayOfMonth; i++) {
+			if (i.toString().length == 1) {
+				b="0"+i.toString();
+			} else {
+				b=i.toString();
+			}
+			currObj.daysArr.push(b);
+		}
+		
+		// Just shuffle everything !!
+		currObj.shuffle(currObj.daysArr);
+		
+	};
+	
+	this.shuffle = function(o){ 
+	    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	    return o;
 	};
 	
 };

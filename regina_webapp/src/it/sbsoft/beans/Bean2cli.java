@@ -1,11 +1,15 @@
 package it.sbsoft.beans;
 
+import java.util.List;
+
 public class Bean2cli {
 	
 	private Object ret2cli;
     private Errore error;
     private String floor;
 	private String date;
+	private String message;
+	private List<String> yearList; 
 	
 	public Object getRet2cli() {
 		return ret2cli;
@@ -31,6 +35,17 @@ public class Bean2cli {
 	public void setDate(String date) {
 		this.date = date;
 	}
-	
+	public List<String> getYearList() {
+		return yearList;
+	}
+	public void setYearList(List<String> yearList) {
+		this.yearList = yearList;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
     
 }

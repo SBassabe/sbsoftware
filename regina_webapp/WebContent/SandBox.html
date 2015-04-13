@@ -1,0 +1,74 @@
+<html>
+<style>
+.ou {
+    display: -webkit-inline-box;
+	border: 1px solid;
+	border-color: black;
+	background-color: white;
+	margin-left: -5px;
+}
+.in {
+	width: 17px;
+	display: block;
+	text-align: center;
+	margin: 0px auto;
+	font-family: monospace;
+	font-weight: bold;
+	font-size: medium;
+}
+.in:hover {
+	color: white;
+	background-color: black;
+}
+</style>
+<script src="./libraries/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="./libraries/ejs_production.js"></script>
+<script>
+function createDayList() {
+
+	var html = null;
+	try {
+		var myejs = new EJS({
+			url : './view/days.ejs'
+		});
+		html = myejs.render();
+	} catch (e) {
+		if (e.description)
+			e = e.description;
+		alert('ex -> ' + e);
+	}
+
+	$('#container').html(html);
+	
+}
+</script>
+<body>
+<H3>HELLO WORLD</H3>
+<div class="ou"><div class="in">1</div></div>
+<div class="ou"><div class="in">10</div></div>
+<div class="ou"><div class="in">20</div></div>
+</br>
+<text id="container">
+<div id="floatMe" style="border: 1px solid; position: absolute; top: 99px; left: 84px; padding: 5px; background-color: grey; display: flex">
+    <style>
+    .cDiag {
+	   display: inline;
+	   margin-right: 9px;
+	}
+    </style>
+    <table>
+    	<tr><td><div class="cDiag">Valore: Automatico</div></td></tr>
+    	<tr><td><div class="cDiag">CValue:<input type="text"></input></div></td></tr>
+    </table>
+    			<option value="02">0,25</option>
+			<option value="03">0,50</option>
+			<option value="04">0,75</option>
+			<option value="05">1,00</option>
+			<option value="06">1,25</option>
+			<option value="07">1,50</option>
+			<option value="08">1,75</option>
+			<option value="09">2,00</option>
+</div>
+<div><textarea rows="4" cols="50" style="border: 0px solid;"></textarea></div>
+</body>
+</html>

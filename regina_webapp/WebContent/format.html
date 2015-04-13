@@ -1,0 +1,473 @@
+<html dir="ltr" lang="it" style="visibility: visible;"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="Content-Language" content="it"><title>Oracle BI Answers</title><noscript>Per usare Oracle BIEE, abilitare javascript nel browser in uso.</noscript><script type="text/javascript" src="res/b_mozilla/browserdom.js"></script><script type="text/javascript">try{saw.doFrameBust(1);function sawC2U(s){return "saw.dll?__xyz__".replace("__xyz__",s);}function sawP2U(s){return "saw.dll/__xyz__".replace("__xyz__",s);}var sawEmptyHtm="res/empty.htm";var obips_fmapId="R8rVHA";var obips_scid="bZWA3ASIK40jPbLJoHyZ";var obips_maxStylesheets=100;var g_LocaleInfo={sDateSeparator:"/",sTimeSeparator:".",sDecimalPoint:",",sThousandsSeparator:".",sAM:"am",sPM:"pm",b24:true,sDateOrder:"dmy",nFDOW:0,nYearPadding:4,nMonthPadding:2,nDayPadding:2,nHourPadding:2,sListSeparator:";",sNegativeNumberTemplate:"-#"};var obips_seeded_res = [{p:"styleproperties.res",v:{exprs:{"dialogHelpPosition":"header","shuttleButtonSpace":"true","shuttleButtonLabel":"false","shuttleTableCellSpace":"6","shuttleDropdownWidth":"7px","shuttleDropdownHeight":"4px","menubarSeparator":"false","pageShadowBackground":"true","headerRightBorder":"true","pageBorderBottomRequired":"true","tabBarStartCellWidth":"5px","tabBarStartImgRequired":"true","bihRoundCorner":"false","adminBannerBackground":"false","breadCrumbHeight":"15"}}}];}catch(e){if (window.console && console.error) console.error('Header script error:' + e.message);}</script><link href="res/sk_blafp/b_mozilla_4/htmlglobals.css" type="text/css" rel="stylesheet"><noscript>&lt;link href="res/sk_blafp/b_mozilla_4/noscript.css" type="text/css" rel="stylesheet"&gt;</noscript><link href="res/s_FusionFX/b_mozilla_4/common.css" type="text/css" rel="stylesheet">
+
+<link href="Missing_views/clipboard_xml.swf" type="application/x-shockwave-flash">
+<script>saw_clipboard_SWF_file_ = 'Missing_views/clipboard_xml.swf';</script><link href="res/s_FusionFX/b_mozilla_4/views.css" type="text/css" rel="stylesheet"><link href="res/s_blafp/b_mozilla_4/custom.css" type="text/css" rel="stylesheet"><script type="text/javascript" src="res/b_mozilla/common.js"></script><script type="text/javascript" src="res/b_mozilla/viewhelper.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.ImportMeFirst.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.JavaScriptExtensions.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.Global.js"></script><script type="text/javascript" src="res/b_mozilla/common/ajax.js"></script><script type="text/javascript" src="res/b_mozilla/views/viewcontroller.js"></script><script type="text/javascript" src="res/b_mozilla/menu.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.Observable.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.XMLDOM.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.ClientState.js"></script>
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/common/storage.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/obips.history.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.AnalysisHistory.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.Analysis.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.Criteria.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.ViewBase.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.AnalysisEventManager.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.AnalysisEventListener.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.AnalysisEvent.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.CommonAnalysisEvents.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.SelectionsEvent.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.CustomMemberEvent.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.ColumnInfo.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.ReportMetadata.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/analysis/obips.MetadataUtil.js"></script>
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/xmluiframework.js"></script>
+
+
+
+<script type="text/javascript" src="res/b_mozilla/common/obips.BrowserEventFramework.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/obips.TabStop.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/obips.ResourceManager.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/dragdropframework.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/obips.BrowserQuirks.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/obips.XMLHTTP.js"></script>
+
+
+<script type="text/javascript" src="res/b_mozilla/common/sessioninfos.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/drillinfo.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/ondemandload.js"></script>
+
+<script type="text/javascript" src="res/b_mozilla/views/obips.jsdatalayout.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/obips.qdr.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/obips.viewmodelbase.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/obips.viewmodel.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Tree/obips.Tree.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.FloatingWindow/obips.FloatingWindow.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/simplecriteriaeditor.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/actionlink.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Dialog/obips.Dialog.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/formattedlabelpreviewer.js"></script>
+
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.Dialog/obips.Dialog.css">
+<link rel="stylesheet" type="text/css" href="res/sk_blafp/b_mozilla_4/selections.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.FormFields/obips.FormFields.css">
+<script type="text/javascript" src="res/b_mozilla/answers/selectionsmodel.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/selectionrightclkview.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/selectionstemplates.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.ContextMenu/obips.ContextMenu.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/viewrightclickmenu.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/obips.ViewContextMenuModel.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/chartview.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.TooltipPopup/obips.TooltipPopup.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.TooltipPopup/obips.SimpleTooltipPopup.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/chartpnginteractivity.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/microchartview.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/eventing/obips.view.touchTapAndLongPressHandler.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/viewXMLmodel/baseviewXMLmodel.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/viewXMLmodel/chartviewXMLmodel.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/dvtchart/viewXMLmodel/gaugeviewXMLmodel.js"></script>
+
+<script type="text/javascript" src="res/b_mozilla/views/pivot/events/gridevents.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/pivot/pivotview.js"></script>
+<script type="text/javascript">var kmsgDVTChartViewDrillDownText="Espandi";
+var ksChartNoStyle = "Nessuno stile";</script>
+<link rel="stylesheet" type="text/css" href="res/s_blafp/uicomponents/obips.TooltipPopup/obips.TooltipPopup.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.ContextMenu/obips.ContextMenu.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/pageelements.js"></script>
+
+
+
+
+
+
+
+        
+
+
+
+<link rel="stylesheet" href="res/sk_FusionFX/b_mozilla_4/dvtchartsui.css" type="text/css">
+
+
+<script type="text/javascript" src="res/b_mozilla/uicomponents/common/obips.TextDialog.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/common/obips.MessageDialog.js"></script>
+<script type="text/javascript" src="res/b_mozilla/answers/answerscommon.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/catalogdialogviewer.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/customgroupseditor.js"></script>        
+
+
+<script type="text/javascript" src="res/b_mozilla/views/calcitemeditor.js"></script>
+
+
+<link rel="stylesheet" href="res/s_FusionFX/uicomponents/obips.Shuttle/obips.Shuttle.css" type="text/css">
+<link rel="stylesheet" href="res/s_FusionFX/uicomponents/obips.Shuttle/obips.HtmlShuttle.css" type="text/css">
+<link rel="stylesheet" href="res/sk_FusionFX/b_mozilla_4/menus.css" type="text/css">
+<link rel="stylesheet" type="text/css" href="res/s_blafp/uicomponents/blafplus.css">
+<link rel="stylesheet" type="text/css" href="res/s_blafp/uicomponents/obips.FloatingWindow/obips.FloatingWindow.css">
+
+
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.Tree/obips.Tree.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.Table/obips.Table.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.Toolbar/obips.Toolbar.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.TabBar/obips.TabBar.css">
+
+<link rel="stylesheet" type="text/css" href="res/s_blafp/uicomponents/obips.ObjectPicker/obips.ObjectPicker.css">
+<link rel="stylesheet" type="text/css" href="res/s_FusionFX/uicomponents/obips.DateTimePicker/obips.DateTimePicker.css">
+<link rel="stylesheet" type="text/css" href="res/s_blafp/uicomponents/obips.DropDown/obips.searchdropdown.css">
+
+
+<link rel="stylesheet" type="text/css" href="res/s_blafp/deliversShared/obids.Delivers.css">
+
+
+<script type="text/javascript">var kmsgWriteBackTableColumn = "Colonne";
+kmsgFCTScrollWithoutSave = 'Sono state apportate delle modifiche. Continuare senza salvare?';
+kmsgWBInvalidInput = 'Valore di input non valido: ';
+kmsgGridViewRemoveColumnFromAllViews = 'La colonna selezionata verr\u00e0 rimossa da tutte le viste.';
+if(typeof obians == "undefined")
+obians = function(){};
+if(typeof(obips) == 'undefined')
+{
+obips = function(){}
+}
+if(typeof(obips.PivotTable) == 'undefined')
+{
+obips.PivotTable = function(){}
+}
+if(typeof(obips.PivotTable.SORT_IMAGE_PLACEHOLDER) == 'undefined')
+{
+obips.PivotTable.SORT_IMAGE_PLACEHOLDER = 'viewui/pivot/sort_plc.png';
+obips.PivotTable.SORT_IMAGE_ASC_ON = 'viewui/pivot/sort_asc_s.png';
+obips.PivotTable.SORT_IMAGE_ASC_OFF = 'viewui/pivot/sort_asc_n.png';
+obips.PivotTable.SORT_IMAGE_ASC_MO = 'viewui/pivot/sort_asc_mo.png';
+obips.PivotTable.SORT_IMAGE_DES_ON = 'viewui/pivot/sort_des_s.png';
+obips.PivotTable.SORT_IMAGE_DES_OFF = 'viewui/pivot/sort_des_n.png';
+obips.PivotTable.SORT_IMAGE_DES_MO = 'viewui/pivot/sort_des_mo.png';
+obips.PivotTable.SORT_IMAGE_RT_ON = 'viewui/pivot/sort_right_s.png';
+obips.PivotTable.SORT_IMAGE_RT_OFF = 'viewui/pivot/sort_right_n.png';
+obips.PivotTable.SORT_IMAGE_RT_MO = 'viewui/pivot/sort_right_mo.png';
+obips.PivotTable.SORT_IMAGE_LT_ON = 'viewui/pivot/sort_left_s.png';
+obips.PivotTable.SORT_IMAGE_LT_OFF = 'viewui/pivot/sort_left_n.png';
+obips.PivotTable.SORT_IMAGE_LT_MO = 'viewui/pivot/sort_left_mo.png';
+WebScriptMapAdd(obips.PivotTable.SORT_IMAGE_ASC_ON,'res/s_FusionFX/viewui/pivot/sort_asc_s.png',
+obips.PivotTable.SORT_IMAGE_ASC_OFF,'res/s_FusionFX/viewui/pivot/sort_asc_n.png',
+obips.PivotTable.SORT_IMAGE_ASC_MO,'res/s_FusionFX/viewui/pivot/sort_asc_mo.png',
+obips.PivotTable.SORT_IMAGE_DES_ON,'res/s_FusionFX/viewui/pivot/sort_des_s.png',
+obips.PivotTable.SORT_IMAGE_DES_OFF,'res/s_FusionFX/viewui/pivot/sort_des_n.png',
+obips.PivotTable.SORT_IMAGE_DES_MO,'res/s_FusionFX/viewui/pivot/sort_des_mo.png',
+obips.PivotTable.SORT_IMAGE_RT_ON,'res/s_FusionFX/viewui/pivot/sort_right_s.png',
+obips.PivotTable.SORT_IMAGE_RT_OFF,'res/s_FusionFX/viewui/pivot/sort_right_n.png',
+obips.PivotTable.SORT_IMAGE_RT_MO,'res/s_FusionFX/viewui/pivot/sort_right_mo.png',
+obips.PivotTable.SORT_IMAGE_LT_ON,'res/s_FusionFX/viewui/pivot/sort_left_s.png',
+obips.PivotTable.SORT_IMAGE_LT_OFF,'res/s_FusionFX/viewui/pivot/sort_left_n.png',
+obips.PivotTable.SORT_IMAGE_LT_MO,'res/s_FusionFX/viewui/pivot/sort_left_mo.png',
+obips.PivotTable.SORT_IMAGE_PLACEHOLDER,'res/s_FusionFX/viewui/pivot/sort_plc.png'
+);
+PreloadImages(WebScriptMapGet(obips.PivotTable.SORT_IMAGE_ASC_ON),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_ASC_OFF),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_ASC_MO),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_DES_ON),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_DES_OFF),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_DES_MO),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_RT_ON),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_RT_OFF),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_RT_MO),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_LT_ON),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_LT_OFF),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_LT_MO),
+WebScriptMapGet(obips.PivotTable.SORT_IMAGE_PLACEHOLDER));
+}</script>
+<script type="text/javascript" src="res/b_mozilla/valuetable.js"></script>
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Toolbar/obips.Toolbar.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.CommonIconSets/obips.CommonIconSets.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.FormFields/obips.FormFields.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Table/obips.Table.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.ValueTypeTextField/obips.ValueTypeTextField.js"></script>
+
+
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.CommentField/obips.CommentField.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Shuttle/obips.ShuttleBase.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Shuttle/obips.SelectComponent.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Shuttle/obips.Shuttle.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.DropDown/obips.dropvalue.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.DropDown/obips.datasource.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.DropDown/obips.searchdropdown.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.DropDown/obips.dropdownsearchdialog.js"></script>
+
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.Shuttle/obips.HtmlShuttle.js"></script>
+<script type="text/javascript" src="res/b_mozilla/prompts/obiprp.promptcomponentsutil.js"></script>
+<script type="text/javascript" src="res/b_mozilla/prompts/obiprp.prompteditbox.js"></script>
+<script type="text/javascript" src="res/b_mozilla/prompts/obiprp.promptcalendar.js"></script>
+<script type="text/javascript" src="res/b_mozilla/prompts/obiprp.promptlist.js"></script>
+<script type="text/javascript" src="res/b_mozilla/prompts/obiprp.promptchooseop.js"></script>
+
+<script type="text/javascript" src="res/b_mozilla/common/obips.DateTime.js"></script>
+<script type="text/javascript" src="res/b_mozilla/common/datetime.js"></script>
+<script type="text/javascript" src="res/b_mozilla/writeback/wbcommon.js"></script>
+<script type="text/javascript" src="res/b_mozilla/writeback/writeback.js"></script>
+<script type="text/javascript" src="res/b_mozilla/writeback/obipswb.multivaluefield.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/pivot/wbpivotview.js"></script>
+<script type="text/javascript" src="res/b_mozilla/views/pivot/scrollingpivotview.js"></script><script type="text/javascript" src="res/b_mozilla/common/AC_OETags.js"></script><script type="text/javascript" src="res/b_mozilla/common/flashcommon.js"></script><script type="text/javascript" src="res/b_mozilla/common/clipboard.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.Clipboard.js"></script><script type="text/javascript" src="res/b_mozilla/dashboards/banner.js"></script><script type="text/javascript" src="res/b_mozilla/common/obips.HTMLDOM.js"></script><script type="text/javascript" src="res/b_mozilla/common/launcher.js"></script><script type="text/javascript" src="res/b_mozilla/views/gohtml.js"></script><script type="text/javascript" src="res/b_mozilla/downloadguard.js"></script>
+
+<link href="res/s_FusionFX/uicomponents/obips.UberBar/obips.UberBar.css" type="text/css" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/common/obips.CSS.js"></script>
+
+
+
+
+<script type="text/javascript" src="res/b_mozilla/catalog/catalogbase.js"></script>
+
+
+<script type="text/javascript" src="res/b_mozilla/header.js"></script>
+<script type="text/javascript" src="res/b_mozilla/home/customlinks.js"></script><script type="text/javascript" src="saw.dll/common/saw.header.xml?fmapId=R8rVHA" id="common/saw.header.xml"></script>
+
+
+<script type="text/javascript" src="res/b_mozilla/catalog/catalogaction.js"></script>
+<script type="text/javascript" src="res/b_mozilla/catalog/actionhandlerimpl.js"></script>
+<script type="text/javascript" src="res/b_mozilla/webserviceproxies/catalogmanager.js"></script>
+<script type="text/javascript" src="res/b_mozilla/uicomponents/obips.BreadCrumbs/obips.BreadCrumbs.js"></script><script type="text/javascript" src="saw.dll/uicomponents/obips.BreadCrumbs/breadcrumb.xml?fmapId=R8rVHA" id="uicomponents/obips.BreadCrumbs/breadcrumb.xml"></script>
+<script>obips.ResourceManager.seedResource({p:"common/saw.sessioninfos.xml",v:{exprs:{"noLogoffUI":false,"syndicate":"","canAccessDashboards":true,"hdrLinkCatalog":true,"hdrLinkOpen":true,"hdrLinkAdvanced":true,"hdrLinkHelp":true,"hdrLinkHome":true,"hdrLinkGSearch":true,"hdrLinkNew":true,"hdrLinkDashboards":true,"hdrLinkSettings":true,"bipKeepAlive":false,"bipWebUrl":"/xmlpserver","bipExternalRepository":false,"biComposerContext":"/bicomposer","matchCase":"on","isMultiTenantMode":false}}});</script>
+<script type="text/javascript">var tSessionInfos = saw.getSessionInfos();
+tSessionInfos.hasCreatableItem = true;
+tSessionInfos.setUserInfo("378229C0684B11E39F61A7D35DEBD9ED", "prodney", "Paulo Rodney", "/users/prodney",
+"prodney", "prodney", false);
+tSessionInfos.privileges.isAdmin = true;
+tSessionInfos.privileges.canActAs = true;
+tSessionInfos.privileges.personalStorage = true;
+tSessionInfos.privileges.canUseMyAccount = true;
+saw.catalog.buildTypeCategoryInfos([{"id":"system","name":"File di sistema", "notSearchType":true},{"id":"queryitem1","name":"Analisi"},{"id":"customgroup1","name":"Gruppo"},{"id":"calcitem1","name":"Elemento calcolato"},{"id":"bipReport","name":"Report"},{"id":"coibot1","name":"Agente"},{"id":"frobject","name":"Financial Reporting"},{"id":"dashboard","name":"Dashboard"},{"id":"bsc","name":"Scorecard"},{"id":"cobriefingbook1","name":"Briefing book"},{"id":"action","name":"Azione"},{"id":"globalfilteritem1","name":"Prompt del dashboard"},{"id":"filteritem1","name":"Filtro"},{"id":"kpi1","name":"Indicatore KPI"},{"id":"scorecardkpiwatchlist1","name":"Lista di controllo KPI"},{"id":"condition1","name":"Condizione"},{"id":".xdm","name":"Modello dati"},{"id":".xss","name":"Modello stile"},{"id":".xsb","name":"Modello secondario"},{"id":"comktgsegment1","name":"Segmento"},{"id":"comktgsegmenttree1","name":"Struttura segmento"},{"id":"exportFormat","name":"Formato lista"},{"id":"couserpreferences1","name":"Preferenze utente"},{"id":"bipMobileApp","name":"Mobile App"}]);
+tSessionInfos.user.prefs.userPrefsMap['enableSection508'] = false;
+tSessionInfos.user.prefs.userPrefsMap['defaultAnalysisMode'] = "answers";
+saw.customlink.setCustomLinks([{"id":"l1","name":"SampleApp OTN Page","description":"SampleApp Page on OTN","icon0":"res/sk_blafp/common/info_ena.png","src":"http://www.oracle.com/technetwork/middleware/bi-foundation/obiee-samples-167534.html","target":"blank","locations":[{"name":"header","insertBefore":"logout"}]},{"id":"l2","name":"Custom Link","description":"Instructions on how to insert a custom URL on OBI EE headers","icon0":"res/sk_blafp/common/info_ena.png","src":"http://docs.oracle.com/cd/E23943_01/bi.1111/e10541/answersconfigset.htm#BIESG3738","target":"blank","locations":[{"name":"header","insertBefore":"home"}]}]);</script><script type="text/javascript">function obips_owlsaw_78_1(){obips.history.initialize(null, null);}</script><script type="text/javascript">function NQOnLoadEvent(){obips_owlsaw_78_1();};window.onload=NQOnLoadEvent;</script></head><body class="GoBody"><script type="text/javascript">obips.history.create();</script><form style="position: absolute; top: -1000px; display:none;"><textarea id="saw_historystorage_textArea_id" tabindex="-1" style="position: absolute; top: -1000px; display:none;"></textarea></form><table class="previewbartable" width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="HeaderLogo"><img alt="" src="res/sk_blafp/b_mozilla_4/oracle_logo.png"></td><td class="HeaderBrandingCell"><span class="HeaderBrandName" style="position:static; width: 556px;">Business Intelligence</span></td><td class="previewbartext">&nbsp;</td><td bgcolor="#cccccc" color="#000000" class="previewbarbutton"><a onclick="window.close();"><img alt="" src="res/sk_FusionFX/common/closedialog.gif" border="0"></a></td></tr></tbody></table><table class="ViewTable" cellspacing="0">
+<tbody><tr>
+<td class="ViewCell" vid="o:preview~r:report" sid="n5mog8901t1qk292q11cnnj9l6" pid=""><script type="text/javascript" id="almapscript">if(!document.almap)
+  document.almap = []; 
+document.almap['saw_78_2'] = {};</script><div class="ViewContent" id="o:preview~r:reportResult" result="finished" options="bsfrdgc" viewtype="compoundView" viewname="compoundView!1"><div class="ViewContainer" id="o:preview~r:report~v:compoundView!1ViewContainer" vid="o:preview~r:report~v:compoundView!1" viewtype="compoundView">
+<table class="CVTable" cellspacing="0">
+<tbody><tr>
+<td class="CVView" align="center" valign="top" style="vertical-align:top;" vid="o:preview~r:report~v:compoundView!1~v:titleView!1" sid="n5mog8901t1qk292q11cnnj9l6" pid=""><table class="CVFormatTable" style="width:100%;" cellspacing="0">
+<tbody><tr>
+<td class="CVFormatCell" id="o:preview~r:report~v:compoundView!1~v:titleView!1ViewContainer" align="center" valign="top" style="vertical-align:top;" viewtype="titleView">
+<table class="TitleTable" cellspacing="0" style="" width="100%">
+<tbody><tr><td tabindex="0" class="TitleNameCell" style="" title=""><label></label></td></tr></tbody></table></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+<tr>
+<td class="CVView" align="center" valign="top" style="vertical-align:top;" vid="o:preview~r:report~v:compoundView!1~v:tableView!1" sid="n5mog8901t1qk292q11cnnj9l6" pid=""><table class="CVFormatTable" style="width:100%;" cellspacing="0">
+<tbody><tr>
+<td class="CVFormatCell" id="o:preview~r:report~v:compoundView!1~v:tableView!1ViewContainer" align="center" valign="top" style="vertical-align:top;" viewtype="tableView"><div class="PTRoll">
+<table cellspacing="0">
+<tbody><tr>
+</tr>
+</tbody></table>
+</div>
+<div class="PivotContainer" id="saw_78_5" oncontextmenu="obips.PivotTable.onContextMenu(event);return false;">
+<table cellspacing="0">
+<tbody><tr>
+<td><div>
+<table style="width:100%" cellspacing="0">
+<tbody><tr id="saw_78_6_2_0_Grp" e="2" l="0" s="-1" cid="saw_78_6" style="display:none">
+<td class="PTCLDC" e="2" l="0" s="0" cid="saw_78_6" align="center" style="width:100%">Prompt tabella</td>
+</tr>
+<tr style="width:100%">
+<td class="PTBPDC" e="2" l="0" s="0" cid="saw_78_6" style="width:100%">&nbsp;</td>
+</tr>
+</tbody></table>
+</div>
+</td>
+</tr>
+<tr>
+<td><table style="width:100%" cellspacing="0">
+<tbody><tr id="saw_78_7_3_0_Grp" e="3" l="0" s="-1" cid="saw_78_7" style="display:none">
+<td class="PTCLDC" e="3" l="0" s="0" cid="saw_78_7" align="center" style="width:100%">Sezioni</td>
+</tr>
+<tr style="width:100%">
+<td class="PTBSDC" e="3" l="0" s="0" cid="saw_78_7" style="width:100%">&nbsp;</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+<tr>
+<td class="PTChildPivotTable"><table tabindex="0" id="saw_78_7" cellspacing="0">
+<colgroup><col></colgroup><colgroup><col></colgroup><tbody><tr>
+<td class="PTTCC" e="1" l="0" s="-1" cid="saw_78_7" dc=" t">&nbsp;</td>
+<td class="PTTCC PTNLB"><table border="0" cellpadding="0px" style="width:100%" cellspacing="0px">
+<tbody><tr style="width:100%">
+<td e="1" l="1" s="-1" cid="saw_78_7" style="width:100%;vertical-align:bottom;">&nbsp;</td>
+<td e="0" l="0" s="-1" cid="saw_78_7" style="width:100%"></td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+<tr>
+<td class="PTCHC0" id="hl_saw_78_7_1_0" e="1" l="0" s="-1" cid="saw_78_7"><table cellpadding="0" cellspacing="0"><tbody><tr><td><a class="PTL" onclick="return PTPLDrl(this, event)">P1  Product</a><div class="PTSDV" style="display:none"><img class="PT_SI" border="0" alt="" src="res/s_FusionFX/viewui/pivot/sort_asc_n.png" title="Ordinamento crescente" si="t" f="t" onclick="PTSrtLyr(this, event)"><img class="PT_SI" border="0" alt="" src="res/s_FusionFX/viewui/pivot/sort_des_n.png" title="Ordinamento decrescente" si="t" f="f" onclick="PTSrtLyr(this, event)"></div></td></tr></tbody></table></td>
+<td class="PTCHC1 PTLC" id="hl_saw_78_7_1_1" e="1" l="1" s="-1" cid="saw_78_7"><table cellpadding="0" cellspacing="0"><tbody><tr><td> COUNT(P1  Product)<div class="PTSDV" style="top: 34px; left: 214px; width: 28px; position: absolute; z-index: 3; display: none;"><img class="PT_SI" border="0" alt="" src="res/s_FusionFX/viewui/pivot/sort_plc.png" title="Ordinamento crescente" si="t" f="t" onclick="PTSrtLyr(this, event)"><img class="PT_SI" border="0" alt="" src="res/s_FusionFX/viewui/pivot/sort_plc.png" title="Ordinamento decrescente" si="t" f="f" onclick="PTSrtLyr(this, event)"></div></td></tr></tbody></table></td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_0"><a class="PTL" onclick="return PTPCDrl(this, event)">7 Megapixel Digital Camera</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_0">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_1"><a class="PTL" onclick="return PTPCDrl(this, event)">Bluetooth Adaptor</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_1">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_2"><a class="PTL" onclick="return PTPCDrl(this, event)">CompCell RX3</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_2">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_3"><a class="PTL" onclick="return PTPCDrl(this, event)">Game Station</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_3">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_4"><a class="PTL" onclick="return PTPCDrl(this, event)">HomeCoach 2000</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_4">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_5"><a class="PTL" onclick="return PTPCDrl(this, event)">Install</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_5">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_6"><a class="PTL" onclick="return PTPCDrl(this, event)">KeyMax S-Phone</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_6">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_7"><a class="PTL" onclick="return PTPCDrl(this, event)">LCD 36X Standard</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_7">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_8"><a class="PTL" onclick="return PTPCDrl(this, event)">LCD HD Television</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_8">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_9"><a class="PTL" onclick="return PTPCDrl(this, event)">MP3 Speakers System</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_9">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_10"><a class="PTL" onclick="return PTPCDrl(this, event)">MPEG4 Camcorder</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_10">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_11"><a class="PTL" onclick="return PTPCDrl(this, event)">Maintenance</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_11">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_12"><a class="PTL" onclick="return PTPCDrl(this, event)">MaxiFun 2000</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_12">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_13"><a class="PTL" onclick="return PTPCDrl(this, event)">MicroPod 60Gb</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_13">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_14"><a class="PTL" onclick="return PTPCDrl(this, event)">Plasma HD Television</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_14">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_15"><a class="PTL" onclick="return PTPCDrl(this, event)">PocketFun ES</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_15">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_16"><a class="PTL" onclick="return PTPCDrl(this, event)">SoundX Nano 4Gb</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_16">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_17"><a class="PTL" onclick="return PTPCDrl(this, event)">Touch-Screen T5</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_17">1</td>
+</tr>
+<tr>
+<td class="TTHC OOLT" id="e_saw_78_7_1_0_18"><a class="PTL" onclick="return PTPCDrl(this, event)">Tungsten E Plasma TV</a></td>
+<td class="TTHC PTLC OORT" id="e_saw_78_7_1_1_18">1</td>
+</tr>
+<tr>
+<td class="TTHC PTLR OOLT" id="e_saw_78_7_1_0_19"><a class="PTL" onclick="return PTPCDrl(this, event)">V5x Flip Phone</a></td>
+<td class="TTHC PTLR PTLC OORT" id="e_saw_78_7_1_1_19">1</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+<div id="ptFloatingGrabHandlesaw_78_7_1_1" style="top: 18px; left: 138px; position: absolute; overflow: hidden; z-index: 3; width: 105px;"><table cellspacing="0px" cellpadding="0px" border="0" onmousedown="PTPSS(event, this); return false" class="PT_HGHT" id="saw_78_7_1_1" cid="saw_78_7" e="1" l="1" s="-1"><tbody><tr border="0" class="PT_HGHR"><td class="PT_RHPHL">&nbsp;</td><td class="PT_RHPHC">&nbsp;</td><td class="PT_RHPHR">&nbsp;</td></tr><tr style="display:none" class="PT_HGHRL"><td colspan="3" id="saw_78_7_1_1_floatingLabel"></td></tr></tbody></table></div></div>
+</td>
+</tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</div>
+<table id="o:preview~r:reportLinks" cellspacing="0"><tbody><tr>
+<td class="ResultLinksCell"><a href="javascript:void(0)" onclick="javascript:HereLink('o:preview~r:report','Refresh'); return false;" title="Aggiorna i risultati dell'analisi corrente" name="SectionElements">Aggiorna</a></td><td>&nbsp;- </td><td class="ResultLinksCell"><a title="Stampa in un formato diverso" name="ReportLinkMenu" href="javascript:void(null)" onclick="return NQWPopupMenu(event,'idPrintLinksMenuo:preview~r:report')">Stampa</a><div id="idPrintLinksMenuo:preview~r:report" class="NQWMenu" onmouseover="NQWMenuMouseOver(event)"><table cellspacing="0" class="menuShadowWrapper">
+<tbody><tr><td rowspan="2" colspan="2" class="shadowMenuCell"><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null)" onclick="NQWClearActiveMenu();saw.printAnalysis('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;viewName=compoundView%211', 'pdf', event);return false;"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/printtopdf_ena.png"></td><td class="MenuItemTextCell">PDF stampabile</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" onclick="NQWClearActiveMenu();saw.printAnalysis('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;viewName=compoundView%211', null, event);return false;" href="javascript:void(null)" target="obipsAnsPrnWnd"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/printtohtml_ena.png"></td><td class="MenuItemTextCell">HTML stampabile</td></tr></tbody></table></a></td>
+<td class="shadowOffsetCellRight"></td>      </tr>
+<tr><td class="shadowRight">&nbsp;</td></tr><tr><td class="shadowOffsetCellBottom"></td><td class="shadowBottom">&nbsp;</td><td class="shadowCorner"></td></tr>      </tbody></table></div></td><td>&nbsp;- </td><td class="ResultLinksCell">
+
+<a name="ReportLinkMenu" title="Esporta in un formato diverso" href="javascript:void(null)" onclick="return NQWPopupMenu(event,'idDownloadLinksMenuo:preview~r:report')">Esporta</a><div id="idDownloadLinksMenuo:preview~r:report" class="NQWMenu" onmouseover="NQWMenuMouseOver(event)"><table cellspacing="0" class="menuShadowWrapper">
+<tbody><tr><td rowspan="2" colspan="2" class="shadowMenuCell"><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=pdf&amp;Attach=1'); return false"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttopdf_ena.png"></td><td class="MenuItemTextCell">PDF</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" href="javascript:void(null);" onclick="return false;" onmouseover="saw.menuItemMouseOver(event,'idDownloadExcelMenuo:preview~r:report');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoexcel_ena.png"></td><td class="MenuItemTextCell">Excel</td><td class="MenuItemRightArrowCell"><img src="res/sk_FusionFX/common/menurtarrow.gif" title="Scarica dati in colonne" alt="Scarica dati in colonne"></td></tr></tbody></table></a><div id="idDownloadExcelMenuo:preview~r:report" class="NQWMenu" onmouseover="NQWMenuMouseOver(event)"><table cellspacing="0" class="menuShadowWrapper">
+<tbody><tr><td rowspan="2" colspan="2" class="shadowMenuCell"><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=mht&amp;Extension=.xls');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoexcel_ena.png"></td><td class="MenuItemTextCell">Excel 2003</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=excel2007&amp;Extension=.xlsx');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoexcel_ena.png"></td><td class="MenuItemTextCell">Excel 2007+</td></tr></tbody></table></a></td>
+<td class="shadowOffsetCellRight"></td>      </tr>
+<tr><td class="shadowRight">&nbsp;</td></tr><tr><td class="shadowOffsetCellBottom"></td><td class="shadowBottom">&nbsp;</td><td class="shadowCorner"></td></tr>      </tbody></table></div><a class="NQWMenuItem NQWMenuItemWIconMixin" href="javascript:void(null)" onclick="return false;" onmouseover="saw.menuItemMouseOver(event,'idDownloadPptMenuo:preview~r:report');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoppt_ena.png"></td><td class="MenuItemTextCell">PowerPoint</td><td class="MenuItemRightArrowCell"><img src="res/sk_FusionFX/common/menurtarrow.gif" title="Scarica dati in colonne" alt="Scarica dati in colonne"></td></tr></tbody></table></a><div id="idDownloadPptMenuo:preview~r:report" class="NQWMenu" onmouseover="NQWMenuMouseOver(event)"><table cellspacing="0" class="menuShadowWrapper">
+<tbody><tr><td rowspan="2" colspan="2" class="shadowMenuCell"><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();return Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=powerpoint&amp;Extension=.ppt');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoppt_ena.png"></td><td class="MenuItemTextCell">Powerpoint 2003</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();return Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=powerpoint2007&amp;Extension=.pptx');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoppt_ena.png"></td><td class="MenuItemTextCell">Powerpoint 2007+</td></tr></tbody></table></a></td>
+<td class="shadowOffsetCellRight"></td>      </tr>
+<tr><td class="shadowRight">&nbsp;</td></tr><tr><td class="shadowOffsetCellBottom"></td><td class="shadowBottom">&nbsp;</td><td class="shadowCorner"></td></tr>      </tbody></table></div><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=mht'); return false"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttomhtml_ena.png"></td><td class="MenuItemTextCell">Archivio Web (.mht)</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" href="javascript:void(null)" onclick="return false;" onmouseover="saw.menuItemMouseOver(event,'idDownloadDataMenuo:preview~r:report');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttocsv_ena.png"></td><td class="MenuItemTextCell">Dati</td><td class="MenuItemRightArrowCell"><img src="res/sk_FusionFX/common/menurtarrow.gif" title="Scarica dati in colonne" alt="Scarica dati in colonne"></td></tr></tbody></table></a></td>
+<td class="shadowOffsetCellRight"></td>      </tr>
+<tr><td class="shadowRight">&nbsp;</td></tr><tr><td class="shadowOffsetCellBottom"></td><td class="shadowBottom">&nbsp;</td><td class="shadowCorner"></td></tr>      </tbody></table></div><div id="idDownloadDataMenuo:preview~r:report" class="NQWMenu" onmouseover="NQWMenuMouseOver(event)"><table cellspacing="0" class="menuShadowWrapper">
+<tbody><tr><td rowspan="2" colspan="2" class="shadowMenuCell"><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();return Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=csv&amp;Extension=.csv');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttocsv_ena.png"></td><td class="MenuItemTextCell">Formato CSV</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();return Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=txt&amp;Extension=.csv');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttocsv_ena.png"></td><td class="MenuItemTextCell">Formato delimitato da tabulazioni</td></tr></tbody></table></a><a class="NQWMenuItem NQWMenuItemWIconMixin" name="SectionElements" href="javascript:void(null);" onclick="NQWClearActiveMenu();return Download('saw.dll?Go&amp;ViewID=o%3apreview%7er%3areport&amp;Action=Download&amp;SearchID=n5mog8901t1qk292q11cnnj9l6&amp;Style=FusionFx&amp;Options=bfrdcg&amp;ViewState=31bpmccvtt5ec9mh1585vsel6i&amp;path=&amp;Format=xml&amp;Extension=.txt');"><table class="MenuItemTable" cellspacing="0" cellpadding="0"><tbody><tr><td class="MenuItemIconCell"><img alt="" src="res/sk_blafp/catalog/exporttoxml_ena.png"></td><td class="MenuItemTextCell">Formato XML</td></tr></tbody></table></a>                    
+</td>
+<td class="shadowOffsetCellRight"></td>      </tr>
+<tr><td class="shadowRight">&nbsp;</td></tr><tr><td class="shadowOffsetCellBottom"></td><td class="shadowBottom">&nbsp;</td><td class="shadowCorner"></td></tr>      </tbody></table></div></td><td><div id="idAddToBBDiv" style="display: none;">
+&nbsp;- <a id="idAddToBBLink" href="javascript:void(null)" name="Aggiungi a briefing book" title="Salva il contenuto per la visualizzazione non in linea">
+Aggiungi a briefing book</a>
+</div></td><td>&nbsp;- </td><td class="ResultLinksCell"><a class="copyflash" id="o:preview~r:report" title="Copia richiesta XML sugli Appunti"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="copy2cliptesto:preview~r:report" border="0" align="bottom" width="35" height="21" codebase="https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,1,53,64"><param name="movie" value="res/s_blafp/views/clipboard_xml_v2.swf"><param name="wmode" value="transparent"><param name="flashvars" value="sSearchId=&amp;sViewName=compoundView!1&amp;sCopyXml=Copia&amp;sId=o:preview~r:report&amp;sReportName="><param name="quality" value="high"><param name="bgcolor" value="#FFFFFF"><param name="allowScriptAccess" value="sameDomain"><embed onfocus="renderFlashFocus('o:preview~r:report');" onblur="removeFlashFocus('o:preview~r:report');" tabindex="0" id="embedcopy2cliptest" src="res/s_blafp/views/clipboard_xml_v2.swf" quality="high" bgcolor="#FFFFFF" width="35" height="21" name="copy2cliptest" align="bottom" border="0px" play="true" loop="false" allowscriptaccess="sameDomain" flashvars="sSearchId=&amp;sViewName=compoundView!1&amp;sCopyXml=Copia&amp;sId=o:preview~r:report&amp;sReportName=" type="application/x-shockwave-flash" wmode="transparent" pluginspage="https://www.macromedia.com/go/getflashplayer"></object></a><a id="o:preview~r:report_foobar"></a><script type="text/javascript">
+AddTabIndex('copy2cliptesto:preview~r:report');isFlashReadyForUse();</script>
+</td></tr></tbody></table><script>window.sawXmlIslandidClientStateXml="<nqw xmlns:saw=\x22com.siebel.analytics.web/report/v1.1\x22 xmlns:xsi=\x22http://www.w3.org/2001/XMLSchema-instance\x22 xmlns:sawst=\x22com.siebel.analytics.web/state/v1\x22>\u003csawst:clientState>\u003csawst:stateRef>\u003csawst:envState xmlns:sawst=\"com.siebel.analytics.web/state/v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlVersion=\"200811100\">\u003csawst:container cid=\"o:preview\" xsi:type=\"sawst:unknown\">\u003csawst:container cid=\"r:report\" xsi:type=\"sawst:report\" links=\"bsfrdgc\" defaultView=\"compoundView!1\" searchId=\"n5mog8901t1qk292q11cnnj9l6\"/>\u003c/sawst:container>\u003c/sawst:envState>\u003c/sawst:stateRef>\u003csawst:reportXmlRefferedTo>\u003cref statePath=\"o:preview~r:report\" searchID=\"n5mog8901t1qk292q11cnnj9l6\">\u003c/ref>\u003c/sawst:reportXmlRefferedTo>\u003c/sawst:clientState></nqw>";</script>
+<script type="text/javascript">obips.views.ViewController.getController('o:preview~r:report~v:compoundView!1').getClientStateManager()._loadClientStateXml()</script><script type="text/javascript">
+if(typeof(obips) == 'undefined') obips = {};
+if( obips.Analysis ) obips.Analysis.resetReport('o:preview~r:report');
+</script>
+<script id="saw_78_4_JSDataLayout" type="text/javascript">
+obips.ViewModelBase.getViewInstanceCache('saw_78_4').JSDataLayout = new obips.JSDataLayout('saw_78_4',0,0,[0,1],[],[],[]);
+</script>
+<script type="text/javascript">document.body.saw_78_4=new obips.PivotTable('saw_78_4','saw_78_5','saw_78_7','saw_78_6','tableView!1','o:preview~r:report','o:preview~r:report~v:compoundView!1~v:tableView!1','n5mog8901t1qk292q11cnnj9l6','',{'c2042c6ae86d053c4':{f:'\"Products\".\"P1  Product\"',dc:false,'ch':'P1  Product'},'c49ed2cd528abf0c4':{f:'COUNT(\"Products\".\"P1  Product\")',dc:false,'ch':' COUNT(P1  Product)'}},0,4,[1,1,1,1,1,1,1,1,1,1,1,1,1],false,'saw_78_2','',false,[[],[0,1],[],[]],0);
+</script><div id="idStatePathDiv" statepath="o:preview~r:report"></div></div></td>
+</tr>
+</tbody></table>

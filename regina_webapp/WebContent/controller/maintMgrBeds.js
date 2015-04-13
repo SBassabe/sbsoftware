@@ -4,24 +4,25 @@ maintMgrBeds = function() {
 	this.polyArray = new Array();
 	this.doctorMap = new Array();
 
-	this.createOccLayerMaintInfo = function(stage, layer, floorId) {
+	this.createBedMaintInfo = function() {
 		
-		console.log("createOccLayerMaintInfo called ...");
+		console.log("createBedMaintInfo called ...");
+		floorId = canvasMgr.currFloor;
 		
-		var fMap = canvasMgr.floorArr[floorId].floorMap;
+		var fMap = canvasMgr.floorArr[floorId].bedArr;
 		
 		// populates with bed dots ...
 		for (mObj in fMap) {( function() {
 		    
-			var rom = fMap[mObj].room;
-			var bed = fMap[mObj].bed; 
+			var rom = fMap[mObj].room_num;
+			var bed = fMap[mObj].bed_num; 
 			var obj;
 			var zoomFact = 1;
 		
 			obj = canvasMgr.zImgLib;
 		    
-		    var xVal = fMap[mObj].xVal;
-		    var yVal = fMap[mObj].yVal;
+		    var xVal = fMap[mObj].x_val;
+		    var yVal = fMap[mObj].y_val;
 			var image = new Kinetic.Image({
 					x : xVal*zoomFact,
 					y : yVal*zoomFact,
@@ -29,9 +30,9 @@ maintMgrBeds = function() {
 					width : 20,
 					height : 20,
 					bed: bed,
-					codStanza: fMap[mObj].codStanza,
-					building: fMap[mObj].building,
-					room: fMap[mObj].room,
+					codStanza: fMap[mObj].room_num,
+					building: floorId,
+					room: fMap[mObj].room_num,
 					draggable: true
 			});
 			
@@ -47,11 +48,12 @@ maintMgrBeds = function() {
                 $( "#diagBed" ).html(bed);
             });
 
-            layer.add(image);
+            canvasMgr.occLyr.add(image);
 		}());
 	  }
-	  layer.draw();
-	  stage.draw();
+	  //layer.draw();
+	  //stage.draw();
+	  canvasMgr.stage.batchDraw();
 	};
 	
 	// Maintenance mode ...
@@ -70,40 +72,44 @@ maintMgrBeds = function() {
 		var y;
 		var posObj;
 		
-		for (obj in canvasMgr.floorLyr.getChildren()) {
+		// Feature info
+		for (obj in canvasMgr.featureLyr.getChildren()) {
 			
-			var child = canvasMgr.floorLyr.children[obj];
+			try {
+				var child = canvasMgr.featureLyr.children[obj];
+				type = child.attrs.featType;
 			
-			// Feature info
-			type = child.getAttrs().featType;
-			if (type != undefined) {
-				
-				room = canvasMgr.floorLyr.children[obj].getAttrs().room;
-				posObj=canvasMgr.floorLyr.children[obj].getPosition();
-				x = posObj.x;
-				y = posObj.y;
-				
-				txt = type + ";" + room + ";" + x + ";" + y;
-				retObj.featureMap.push(txt);
-			}
+				if (type != undefined) {
+					
+					room = canvasMgr.featureLyr.children[obj].attrs.room;
+					posObj=canvasMgr.featureLyr.children[obj].attrs;
+					x = Math.round(posObj.x);
+					y = Math.round(posObj.y);
+					
+					txt = type + ";" + room + ";" + x + ";" + y;
+					retObj.featureMap.push(txt);
+				}
+			} catch(e) {console.log("error ->" + e.message);}
 		}
 		
 		// BedMap info
 		for (obj in canvasMgr.occLyr.getChildren()) {
 			
-			posObj=canvasMgr.occLyr.children[obj].getPosition();
-			//txt= txt+"id:"+currObj.occLyr.children[obj]._id+" X="+posObj.x+" Y="+posObj.y+"\n";
-			// java sctructure -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
-			
-			var X = posObj.x;
-			var Y = posObj.y;
-			var CODSTAN = canvasMgr.occLyr.children[obj].getAttrs().codStanza;
-			var NUMSTANZA = canvasMgr.occLyr.children[obj].getAttrs().room;
-			var CODLETTO = canvasMgr.occLyr.children[obj].getAttrs().bed;
-			var IDSEDE = canvasMgr.occLyr.children[obj].getAttrs().building;
-			//txt = CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y;
-			txt = IDSEDE +';'+ CODLETTO +';'+ CODSTAN +';'+ NUMSTANZA +';'+ X +';'+ Y;
-			retObj.floorMap.push(txt);
+			try {
+				posObj=canvasMgr.occLyr.children[obj].attrs;
+				//txt= txt+"id:"+currObj.occLyr.children[obj]._id+" X="+posObj.x+" Y="+posObj.y+"\n";
+				// java sctructure -> buildId;codBed;codRoom;guiRoom;xVal;yVal;DB
+				
+				var X = Math.round(posObj.x);
+				var Y = Math.round(posObj.y);
+				var CODSTAN = canvasMgr.occLyr.children[obj].attrs.codStanza;
+				var NUMSTANZA = canvasMgr.occLyr.children[obj].attrs.room;
+				var CODLETTO = canvasMgr.occLyr.children[obj].attrs.bed;
+				var IDSEDE = canvasMgr.occLyr.children[obj].attrs.building;
+				//txt = CODSTAN +';'+ NUMSTANZA +';'+ CODLETTO +';'+ IDSEDE +';'+ X +';'+ Y;
+				txt = IDSEDE +';'+ CODLETTO +';'+ CODSTAN +';'+ NUMSTANZA +';'+ X +';'+ Y;
+				retObj.floorMap.push(txt);
+			} catch(e) {console.log("error ->" + e.message);}
 		};
 		
 		maintObj.callMgmtSrvlt(retObj);
@@ -111,7 +117,7 @@ maintMgrBeds = function() {
 	
 	this.callMgmtSrvlt = function(reqObj) {
 		
-		console.log("callMgmtSrvlt called ...");
+		console.log('SRVR_call -> ' + "callMgmtSrvlt called ...");
         
 		var param = {
 		    currFloor: canvasMgr.currFloor,
@@ -148,7 +154,7 @@ maintMgrBeds = function() {
 	
 	this.callMgmtSrvltDoc = function(reqObj, doc2del, act) {
 		
-		console.log("callMgmtSrvltNewDoc called ...");
+		console.log('SRVR_call -> ' + "callMgmtSrvltNewDoc called ...");
  
 		var param = {
 			action: act,	
