@@ -1,0 +1,199 @@
+-----------------------------------------------------------------------
+-- Call Stack
+-----------------------------------------------------------------------
+
+AsIs
+canvasMgr.selectorsChanged()
+	floorMgr.populateFloorLayer()
+			floorMgr.getFloorOcc4DateList() <- just if no info exists for date!
+ 				floorMgr.createOccLayer()
+					floorMgr.getDoctorOccupancyInfo()
+						floorMgr.paintDoctorOccupancyInfo()
+					floorMgr.createOccLayerMapInfo() <- put dots on canvas !!	
+				floorMgr.getFeatureInfo()	
+
+ToBe
+canvasMgr.selectorsChanged()
+	floorMgr.populateFloorLayer()
+			floorMgr.getFloorOcc4DateList() <- just if no info exists for date!
+ 				floorMgr.createOccLayer()
+					floorMgr.createOccLayerMapInfo() <- put dots on canvas !!	
+	floorMgr.getDoctorOccupancyInfo()
+		floorMgr.paintDoctorOccupancyInfo()
+	floorMgr.getFeatureInfo()
+	
+-----------------------------------------------------------------------
+-- Dev Tasks
+-----------------------------------------------------------------------	
+	
+1) Brainstorm: Data-Structures + Algorithms
+
+                                 |-- toolTipLyr
+	jsStructures:      stage ----|-- occLyr
+					     |       |-- floorLyr
+					     |
+					 canvasMgr                  |-- locArr[loc_id]
+					   |     |                  |      |-- bedArr[bed_num] (deprecated)
+					   |     |                  |
+					   | floorArr[floor_id] ----|-- bedArr[bed_num]
+					   |   | | |                |-- featureArr[n]
+					   |   | | |                       
+					   |   | | |             
+	dataStructures:    |   | | | 
+					   |   | | |--- docByDate[dt]
+					   |   | |          |-- docByLoc[loc_id]
+					   |   | |
+					   |   | |----- cleanByDate[dt]
+					   |   |            |-- cleanByLoc[loc_id]
+					   |   |					   
+                       |   |------- bedByDate[dt]
+					   |                |-- occByBed[bed_num]
+					   |    
+					   |
+					   |
+					   |--- docArr[doc_id]
+					   
+					   
+	floorArr[floor_id]
+		- img_src
+		- desc
+		
+	locArr[loc_id]
+		- loc_id
+		- room_num
+		- poly_points
+		- cvalue (extracted from h2.LOCATION table)
+		
+	bedArr[bed_num]
+		- bed_num
+		- bed_cod
+		- room_num
+		- x_val
+		- y_val
+		
+	bedByDate[dt]
+		- date
+	
+	occByBed[bed_num]
+		- bed_num
+		- status (P,C,L)
+		- nome
+		- sesso
+		- data_dal
+		- data_al
+		
+	docByDate[dt]
+		- date
+	
+	docByLoc[loc_id]
+		- loc_id
+		- doc_id
+		- data_dal
+		- data_al
+		
+	cleanByDate[dt]
+		-date
+		
+	cleanByLoc[loc_id]
+		- loc_id
+		- cvalue
+		
+	featureArr[n]
+		- desc
+		- type
+		- x_val
+		- y_val
+		
+	docArr[doc_id]
+		- doc_id
+		- doc_name
+		- color
+
+	Algorithms:
+	a) canvasMgr.dateChange()
+		- clear occLyr
+		- check if occupancy info exist for Floor $ Date
+			floorArr[id].bedByDate[dt]
+			if NOT exist then call floorMgr.getFloorOcc4DateList(dt) method
+		- paint occLyr with bed occupancy info (beds)
+			N.B. the bedByDate[dt].occByBed[bed_num] array will contain all occupancy (Prenotata, Confermata, Libera)
+				 the idea is:
+				 for (obj in bedByDate[dt]) {
+					x = floorArr[id].bedArr[obj.id].x_val;
+					y = floorArr[id].bedArr[obj.id].y_val;
+					...
+				 }
+				 in other words only what is found in the array gets painted !!
+		
+		- (IF Doctor mode) check if doctor info exist for Floor & Date
+			floorArr[id].docByDate[dt]
+			if NOT exist then call floorMgr.getDoctorOcc4DateList(dt) method
+		- paint occLyr with doctor occupancy info (locations)
+				 the idea is:
+				 for (obj in docByDate[dt]) {
+					polyPnts = floorArr[id].locArr[obj.loc_id].polyPoints;
+					...
+				 }
+				 in other words only what is found in the array gets painted !!
+				 
+		- (IF Cleaning mode) check if cleanSchedule info exist for Floor & Date
+			floorArr[id].cleanByDate[dt]
+			if NOT exist then call floorMgr.getCleanSchedule4DateList(dt) method
+		- paint occLyr with cleaning occupancy info (locations)
+				 the idea is:
+				 for (obj in cleanByDate[dt]) {
+					polyPnts = floorArr[id].locArr[obj.loc_id].polyPoints;
+					...
+				 }
+				 in other words only what is found in the array gets painted !!		 
+		
+    b) canvasMgr.floorChange()
+		- clear floorLyr
+		- repaint floorLyr
+			- main img_src
+			- paint Features
+				for (obj in floorArr[id].featureArr) {
+					x = obj.x_val;
+					y = obj.y_val;
+					type = obj.type;
+					...
+				}
+		
+		- call canvasMgr.dateChange()
+		
+	c) canvasMgr.init()
+		- create jsStructures: stage, toolTipLyr, floorLyr, occLyr
+		- call servlet and load staticObj: floorArr, locArr, bedArr, docColors, featureArr
+			N.B. this can be done by one servlet call that would load all the objects.
+			     remember than in maintMode() there will be the need to load one floor at a time ....
+				 
+	d) maintMgr.createDragableObjects()
+		- clear occLyr
+		- paint occLyr with static bed info
+			for (obj in floorArr[id].bedArr) {
+				// just paint the object
+			}
+		- paint occLyr with static location info
+			for (obj in floorArr[id].locArr) {
+				// just paint the object
+			}
+			
+	e) maintMgr.collectDraggedObjects()
+		// code recycle !!!
+					   
+2) Create Dynamic Web-app project
+	- done created project: 'regina_webapp_new'
+	
+3) Beans: staticObj + occBed + occDoc
+	- done created all 11 bean objects
+	- refractored depracable objects to package 'it.sbsoft.beans.todeprecate'
+
+4) StaticInfoSrvlt
+	- done created new servlet copying from existing 'FloorList.java'
+	
+5) CanvasMgr.init() method
+	- done redesign of layers populate: occLyr & floorLyr
+	- created list with calcolated year ranges
+	
+6) MaintMgr methods + usage
+7) CleaningMgr methods + usage
