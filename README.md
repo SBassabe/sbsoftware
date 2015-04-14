@@ -107,7 +107,7 @@ Released
 - RolledBack 'jaybird-full-2.2.2.jar' to version 'jaybird-full-2.1.6.jar'
 
 ------------------------------------------------------------------------
-Ver 1.0.0_Final - 13/04/2015 [Final GA]
+Ver 2.0.0_Final - 13/04/2015 [Final GA]
 ------------------------------------------------------------------------
 Released [Too many changes to list!!]
 - Revamped object model
