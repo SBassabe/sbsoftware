@@ -17,7 +17,7 @@ public class StaticObj {
 	private static StaticObj ref;
 	static Logger log = LoggerUtils.getLogger("sbsoftware");
 	static Logger logDB = LoggerUtils.getLogger("db");
-	static FBDBHelper fbdbH = new FBDBHelper();
+	//static FBDBHelper fbdbH = new FBDBHelper();
 	static Gson gson = new Gson();
     Map<String, String> bedMap = new TreeMap<String, String>();
     Map<String, String> roomMap = new TreeMap<String, String>();
@@ -36,7 +36,8 @@ public class StaticObj {
 		try {
 			
 			// bedMaps
-			c = fbdbH.getCBADATIIBConn();
+			//c = fbdbH.getCBADATIIBConn();
+			c = FBDBHelperAsync.getCBADATIIBConn();
 			sbQuery = new StringBuffer();
 			sbQuery.append("SELECT distinct a.CODSTAN, b.NUMSTANZA, a.CODLETTO ");
 			sbQuery.append("FROM GELETTI a, GESTANZE b ");
@@ -63,7 +64,12 @@ public class StaticObj {
 			e.printStackTrace();
 		} finally {
 			
-			c=null;
+			//c=null;
+			if (c !=null) {
+				try {
+				  c.close();
+				} catch (Exception e) {e.printStackTrace();} 
+			}
 		}
 	}
 	

@@ -3,6 +3,7 @@ package it.sbsoft.doctors;
 import it.sbsoft.beans.DocByLoc;
 import it.sbsoft.beans.todeprecate.DoctorInfoBean;
 import it.sbsoft.db.FBDBHelper;
+import it.sbsoft.db.FBDBHelperAsync;
 import it.sbsoft.db.H2DBHelper;
 import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.utility.DateHelper;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 public class DocOccupancy {
@@ -24,7 +26,7 @@ public class DocOccupancy {
     static Logger log = LoggerUtils.getLogger("sbsoftware");
     static Logger logDB = LoggerUtils.getLogger("db");
 	public H2DBHelper h2Help = new H2DBHelper();
-	private FBDBHelper fbHelp = new FBDBHelper();
+	//private FBDBHelper fbHelp = new FBDBHelper();
 	private PropertiesCommon propCommon = PropertiesCommon.getPropertiesFile();
 	public Map<String, String> mpTables = new HashMap<String, String>();
 	
@@ -100,7 +102,7 @@ public class DocOccupancy {
 	
 		log.info("into method ...");
 		boolean ret=false;
-		Connection fbOspitiCon, fbDaticon;
+		Connection fbOspitiCon=null, fbDaticon=null;
 		Date dtStart, dtEnd;
 		StringBuffer sql;
 		int i;
@@ -109,7 +111,8 @@ public class DocOccupancy {
 			
 			// Select and insert from CBAOSPITIIB to DOCDTMAP
 			log.info("Select from CBAOSPITIIB and INSERT INTO DOCDTMAP ...");
-			fbOspitiCon = fbHelp.getCBAOSPITIBConn();
+			//fbOspitiCon = fbHelp.getCBAOSPITIBConn();
+			fbOspitiCon = FBDBHelperAsync.getCBAOSPITIBConn();
 			Statement fbStmt = fbOspitiCon.createStatement();
 			
 			sql = new StringBuffer();
@@ -161,7 +164,10 @@ public class DocOccupancy {
 				
 				// Get room number CODSTAN NUMSTANZA conversion from CBADATI schema
 				log.info("Get room number CODSTAN NUMSTANZA conversion from CBADATI schema and UPDATE DOCDTMAP");
-				fbDaticon = fbHelp.getCBADATIIBConn();
+				
+				//fbDaticon = fbHelp.getCBADATIIBConn();
+				fbDaticon = FBDBHelperAsync.getCBADATIIBConn();
+				
 				fbStmt = fbDaticon.createStatement();
 				
 				sql = new StringBuffer();
@@ -180,7 +186,7 @@ public class DocOccupancy {
 				}
 				log.info("update DOCDTMAP : Records processed -> " + i);
 				
-				fbDaticon.close();
+				//fbDaticon.close();
 				
 				// Get floor list and room ranges from 'regina.properties'
 				log.info(" Get floor list and room ranges from 'regina.properties' and UPDATE DOCDTMAP ...");
@@ -203,14 +209,25 @@ public class DocOccupancy {
 				log.info("rs is NULL");
 			}
 			
-			fbOspitiCon.close();
+			//fbOspitiCon.close();
 			ret=true;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			fbOspitiCon=null;
-			fbDaticon=null;
+			
+			try {
+				
+				if (fbOspitiCon != null) {fbOspitiCon.close();}
+				if (fbDaticon != null) {fbDaticon.close();}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			
+			//fbOspitiCon=null;
+			//fbDaticon=null;
 		}
 		return ret;
 	}
@@ -347,8 +364,9 @@ public class DocOccupancy {
 			    
 				bedRange = bedRange.replace("[", "").replace("]", "");
 			
-				c = fbHelp.getCBADATIIBConn();
-				  
+				//c = fbHelp.getCBADATIIBConn();
+				c = FBDBHelperAsync.getCBADATIIBConn();
+				
 			    sbQuery = new StringBuffer();
 			    sbQuery.append("SELECT a.CODSTAN, b.NUMSTANZA, a.CODLETTO, a.NUMERO_LETTO, b.NUMLETTI, b.ANNULLATO GSTANZE_ANULL, a.ANNULLATO GELETTI_ANULL ");
 			    sbQuery.append("FROM GELETTI a, GESTANZE b ");
@@ -367,7 +385,8 @@ public class DocOccupancy {
 					mpRooms.put(rs.getString("CODSTAN"), rs.getString("NUMSTANZA"));
 				}
 			    
-				c = null;
+				//c = null;
+				c.close();
 			
 			}
 			
@@ -376,7 +395,9 @@ public class DocOccupancy {
 			if (mpRooms != null || !mpRooms.isEmpty()) {
 				
 				if (mpRooms.size() > 0) {
-					c = fbHelp.getCBAOSPITIBConn();
+					//c = fbHelp.getCBAOSPITIBConn();
+					c = FBDBHelperAsync.getCBAOSPITIBConn();
+					
 				    sbQuery = new StringBuffer();
 				    sbQuery.append("SELECT a.GMADAL, a.GMAAL, b.PROGR as DOCID, b.DESCR as DOCNAME, a.CODSTAN  FROM CLIN_MEDICO_STANZA a, TEANAPERS b "); 
 				    sbQuery.append("WHERE a.PROGMEDICO = b.PROGR AND (GMADAL <= CAST('" + date + "' AS DATE) AND (GMAAL is null OR GMAAL >= CAST('" + date + "' AS DATE))) ");
@@ -401,7 +422,8 @@ public class DocOccupancy {
 						
 					}
 					
-					c = null;
+					//c = null;
+					c.close();
 				}
 			}
 			

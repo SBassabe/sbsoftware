@@ -26,7 +26,8 @@ public class DBTools {
     static Logger logDB = LoggerUtils.getLogger("db");
     static CodeEncodeString decode = CodeEncodeString.getInstance();
     //static DateHelper dh = new DateHelper();
-    static FBDBHelper fbdbH = new FBDBHelper();
+    //static FBDBHelper fbdbH = new FBDBHelper();
+    //static FBDBHelperAsync fbdbH;
 	private PropertiesCommon propFile = PropertiesCommon.getPropertiesFile();
 	static Gson gson = new Gson();
 	
@@ -53,7 +54,8 @@ public class DBTools {
 				  
 				  // Get bed availability from the 'other DB' CBADATIIB (what a shity way of doing this !!!)
 	              // START
-				  c = fbdbH.getCBADATIIBConn();
+				  //c = fbdbH.getCBADATIIBConn();
+				  c = FBDBHelperAsync.getCBADATIIBConn();
 				  
 			      sbQuery = new StringBuffer();
 			      sbQuery.append("SELECT a.CODSTAN, b.NUMSTANZA, a.CODLETTO, a.NUMERO_LETTO, b.NUMLETTI, b.ANNULLATO GSTANZE_ANULL, a.ANNULLATO GELETTI_ANULL ");
@@ -79,7 +81,8 @@ public class DBTools {
 					  nonAtt++;
 		          }
 				
-				  c = null;
+				  //c = null;
+				  if (c !=null) {c.close();}
 			  }
 
 			  //log.info("occByBed (avail) -> " + gson.toJson(occByBed));
@@ -95,7 +98,8 @@ public class DBTools {
 				  bedRange = bedRange.replace("[", "");
 				  bedRange = bedRange.replace("]", "");
 				  
-				  c = fbdbH.getCBAOSPITIBConn();
+				  //c = fbdbH.getCBAOSPITIBConn();
+				  c = FBDBHelperAsync.getCBAOSPITIBConn();
 			      
 			      sbQuery = new StringBuffer();
 			      sbQuery.append("SELECT a.sesso,d.stanza,d.codice_letto,a.gmadim,d.gmainizioutili,d.gmafineutili,a.codospite,a.nomeospite,d.sede,d.reparto,coalesce(d.FINECONFERMATA,'F') as fineconfermata ");
@@ -212,7 +216,8 @@ public class DBTools {
 		} finally {
 			rs=null;
 			pstmt=null;
-			c=null;
+			//c=null;
+			if (c !=null) {c.close();}
 		}
 		log.info("Total records occ/pre/nonAtt/lib -> " +  occNum+"/"+preNum+"/"+nonAtt+"/"+libNum);
 		logDB.info("Total records occ/pre/nonAtt/lib -> " +occNum+"/"+preNum+"/"+nonAtt+"/"+libNum);
@@ -225,11 +230,12 @@ public class DBTools {
 		StringBuffer sbQuery = new StringBuffer();
 		PreparedStatement pstmt;
 		ResultSet rs;
-		Connection c;
+		Connection c = null;
 		
 		try {
 
-			c = fbdbH.getCBAOSPITIBConn();
+			//c = fbdbH.getCBAOSPITIBConn();
+			c = FBDBHelperAsync.getCBAOSPITIBConn();
 			occByBed.setBed_num(bed);
 			occByBed.setData_dal("---");
 			occByBed.setData_al("---");
@@ -279,7 +285,8 @@ public class DBTools {
 		} finally {
 			rs=null;
 			pstmt=null;
-			c=null;
+			//c=null;
+			if (c !=null) {c.close();}
 		}
 		
 		return occByBed;
