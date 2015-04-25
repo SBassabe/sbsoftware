@@ -115,3 +115,13 @@ Released [Too many changes to list!!]
 - Reworked all java servlet objects
 - introduction of Cleaning Layer
 - indroduction of Excel file creation (Cleaning Schedule)
+
+------------------------------------------------------------------------
+Ver 2.0.1_GA - 25/04/2015 [Final GA]
+------------------------------------------------------------------------
+Excel file creation mod.
+- New dialog for excel file selection.
+- Logic to modulate DatePicker calendar with dates on excel file name.
+- Modification of Excel file for many dates not only one.
+Introduction of Connection Pool
+- CP usage for FireBird connection.
