@@ -102,9 +102,15 @@ public class CleaningSrvlt extends HttpServlet {
 				    //cSched.populateTempTable(
 				    //cSched.calculateRoomOccupancy(
 				    //cSched.getAllRoomOcc4GivenDT(date)), date);
+				    System.out.println("getExcelChosenFile -> " + b2s.getExcelChosenFile());
 				    
-				    ret.setMessage(cSched.addDay2Excel(date));
+				    ret.setMessage(cSched.addDay2Excel(b2s.getDtSet(), b2s.getExcelChosenFile()));
 				    
+			} else if (action.compareToIgnoreCase("getExcelFileList") == 0) {
+				
+				FileHelper fh = new FileHelper();
+				retObj = fh.get3MonthFileList();
+					
 			} else if (action.compareToIgnoreCase("test") == 0) {
 				
 				    cSched.populateTempTable(cSched.calculateRoomOccupancy(cSched.getAllRoomOcc4GivenDT(date)), date);  ;

@@ -1,6 +1,9 @@
 cleaningMgr = function(){
 	
 	var cleaningMgrObj = this;
+	this.dateArr = new Array();
+	this.excelFiles = "";
+	this.excelChosenFile = "";
 
 	// Get info from server (START)
     this.getCleaningSchedule4DateList = function() {
@@ -246,40 +249,6 @@ cleaningMgr = function(){
  	};
  	// doctor occupancy functions(END)
  	
- 	/* This method finds calculates the RoomOccupancy based on the BedOccupancy. If at least one bed is occupied (status="2") the room is rendered occupied. */
- 	/*
- 	this.createVacantRoomList = function() {
- 		
- 		var cleanRoomArr = new Array();
- 		var bedObj;
- 		
- 		for (o in canvasMgr.floorArr[canvasMgr.currFloor].bedArr) {
- 			
- 			bedObj = canvasMgr.floorArr[canvasMgr.currFloor].bedArr[o];
- 			occObj = canvasMgr.floorArr[canvasMgr.currFloor].bedByDate[canvasMgr.dt][o];
- 			
- 			if (cleanRoomArr[bedObj.room_num] == undefined) {
- 				
- 				if (occObj == undefined) {
- 					cleanRoomArr[bedObj.room_num] = 0;
- 				} else {
- 					cleanRoomArr[bedObj.room_num] = occObj.status == "2" ? canvasMgr.floorArr[canvasMgr.currFloor].locArr[canvasMgr.currFloor+'_'+bedObj.room_num].cvalue : "0";
- 				}
- 				 
- 			} else {
- 				if (occObj == undefined) {
- 				} else {
- 					if (Number(occObj.status) > Number(cleanRoomArr[bedObj.room_num])) {
- 						
- 						cleanRoomArr[bedObj.room_num] = occObj.status == "2" ? "1" : cleanRoomArr[bedObj.room_num];
- 					}
- 				}	
- 			}
- 		}
- 		canvasMgr.floorArr[canvasMgr.currFloor].cleanRoomArr = cleanRoomArr;
- 		
- 	};
- 	*/
  	/* Cleaning Form Dialog */
 	this.showCleanDiag = function(loc_id, cval, autMan) {
 	
@@ -352,6 +321,138 @@ cleaningMgr = function(){
     };
     
     
+    // Excel Diag (START)
+    this.getExcelFiles = function() {
+ 		
+ 	    var method = 'getExcelFiles';
+ 		console.log('SRVR_call -> ' + method + " called ...");
+ 		
+         try {
+         	
+         	var params = {
+         	    action: "getExcelFileList"
+         	};
+         	params = { request: JSON.stringify(params) };
+             
+             $.ajax({
+                 url: "CleaningSrvlt",
+                 dataType: "json",
+                 timeout: 10000,
+                 type: 'POST',
+                 async: false,
+                 data: params,
+                 context: document.body,
+                 success: function(transport){
+                 	cleaningMgrObj.getExcelFilesElab(transport);
+                 },
+                 error: function(jqXHR, textStatus, errorThrown){
+                     var errDesc = "error on method:"+method+", textStatus:"+textStatus+", errorThrown:"+errorThrown;
+                     canvasMgr.showError(errDesc);
+                 }
+             });
+             
+         } catch (e) {
+         	canvasMgr.showError(" on method:" + method);
+            console.log(e);
+            return;
+         }
+ 		
+ 	};
+ 	
+ 	this.getExcelFilesElab = function(transport) {
+ 	
+ 		var method="getExcelFilesElab";
+ 		console.log(method + " called ...");
+ 		
+ 		if (transport.error == undefined) {
+ 			
+ 			cleaningMgrObj.excelFiles = transport.ret2cli.fileMap;
+ 			cleaningMgrObj.openExcelDiag();
+ 			
+ 		} else {
+ 			var err = transport.error; 
+ 			if (err.errorCode == 1) {
+ 				canvasMgr.showError(transport.error.errorDesc);
+ 			    
+ 			} else {
+ 				canvasMgr.showError(" in method -> " + method);
+ 			};
+ 			
+ 		};
+ 	};
+    
+    this.openExcelDiag = function() {
+    	
+    	var method  = 'openExcelDiag';
+    	console.log(method + "called");
+    	
+    	var myejs = new EJS({
+			url : './view/excelDialog.ejs'
+		});
+    	
+    	var aFname = new Array();
+    	var aId = new Array();
+    	for (f in cleaningMgrObj.excelFiles) {
+    		aFname.push(cleaningMgrObj.excelFiles[f].fileName);
+    		aId.push(cleaningMgrObj.excelFiles[f].id);
+    	}
+    	
+    	obj = {files : aFname,
+    	       ids : aId};
+	    html = myejs.render(obj);
+    	
+		$('#excelDiag').html(html);
+    	
+	    $( "#datepicker" ).datepicker({
+		      numberOfMonths: 1,
+		      showButtonPanel: false,
+			  weekHeader: "W",
+			  stepMonths: 0,
+			  maxDate: "-2",
+			  minDate: "+2",
+			  dateFormat: "yymmdd",
+			  onSelect: function(dateText, inst) {
+				
+				if (jQuery.inArray(dateText, cleaningMgrObj.dateArr) == -1) {
+					cleaningMgrObj.dateArr.push(dateText);
+				} else {
+					cleaningMgrObj.dateArr = jQuery.grep(cleaningMgrObj.dateArr, function(value) { return value != dateText; });
+				}
+				
+				$("#modExcel").prop('disabled',cleaningMgrObj.dateArr.length==0);
+				
+			  },
+			  beforeShowDay: function (date){
+
+				     var e = $.datepicker.formatDate("yymmdd", date);
+					 
+					 if (jQuery.inArray(e, cleaningMgrObj.dateArr) != -1) {	 
+					   return [true,"ui-state-highlight", "Giorno Selezionato"];
+					 } else {
+					   return [true, ""];//enable all other days
+					 }
+			  } 
+	    });
+	    
+    	$('#excelDiag').dialog('open');
+    };
+    
+    // Excel Diag (End)
+    
+    this.changeFileName = function(obj) {
+    	
+    	cleaningMgrObj.excelChosenFile = cleaningMgrObj.excelFiles[obj.value].fileUri;
+    	
+    	cleaningMgrObj.dateArr = new Array();
+    	console.log('change -> ' + obj.value);
+    	console.log('id -> ' + cleaningMgrObj.excelFiles[obj.value].id);
+    	$( "#datepicker" ).datepicker("option","maxDate", cleaningMgrObj.excelFiles[obj.value].dtLast );
+    	$( "#datepicker" ).datepicker("option","minDate", cleaningMgrObj.excelFiles[obj.value].dtFirst );
+    	$( "#datepicker" ).datepicker("refresh");
+    	$( "#modExcel" ).prop('disabled',true);
+    	
+    };
+    
     // Excel Elab (START)
     this.generateExcel = function() {
     	
@@ -364,7 +465,9 @@ cleaningMgr = function(){
           	    floor: canvasMgr.currFloor,	
           	    date: canvasMgr.dt,
           	    action: "excel",
-          	    cleanByLocMap: canvasMgr.floorArr[canvasMgr.currFloor].cleanByDate[canvasMgr.dt]
+          	    cleanByLocMap: canvasMgr.floorArr[canvasMgr.currFloor].cleanByDate[canvasMgr.dt],
+          	    dtSet: cleaningMgrObj.dateArr,
+          	    excelChosenFile: cleaningMgrObj.excelChosenFile
           	};
           	params = { request: JSON.stringify(params) };
               
@@ -373,7 +476,7 @@ cleaningMgr = function(){
                   dataType: "json",
                   timeout: 10000,
                   type: 'POST',
-                  async: false,
+                  async: true,
                   data: params,
                   context: document.body,
                   success: function(transport){
@@ -390,6 +493,8 @@ cleaningMgr = function(){
              console.log(e);
              return;
           }
+          
+          $('#excelDiag').dialog('close');
     	
     };
 
@@ -401,7 +506,9 @@ cleaningMgr = function(){
  		if (transport.error == undefined) {
  			
  			if (transport.message != undefined) {
- 				canvasMgr.showMsg(transport.message);
+ 				var msg = "File: '"+transport.message+"' modificato con successo.";
+ 				canvasMgr.showMsg(msg);
+ 				
  			} else {
  				canvasMgr.showMsg("File prodotto correttamente !");
  			}

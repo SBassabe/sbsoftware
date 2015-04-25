@@ -126,12 +126,25 @@ window.onload = function() {
 		    //open: function() {$("#cleaningForm").hide();}
 	});
 	
+	$( "#excelDiag" ).dialog({
+			width: 600,
+			resizable: false,
+			minHeight: 575,
+			position: [600,125],
+			//$('#cleaningForm').parent().css("top","80px");
+		    title: "Modifica Foglio Excel",
+		    modal: true,
+		    autoOpen: false,
+		    //close: function() {$("#cleaningForm").show();},
+		    //open: function() {$("#cleaningForm").hide();}
+	});
+	
 	$('#header_display').flapper({
 		width:6,
 		chars_preset:'alpha'
 		//chars: [0,1,2,3,4,5,6,7,8,9]
 	});
-
+	
 	canvasMgr = new canvasMgr();
 	setTimeout(function(){canvasMgr.init()},100);
 
@@ -157,7 +170,7 @@ window.onload = function() {
 					<li><a href="#" class="parent"><span>Pulizie</span></a>
 					  <div>
 					    <ul>
-						  <li><a href="#"><span onclick="canvasMgr.cleaningMgr.generateExcel()">Genera Excel Odierno</span></a></li>
+						  <li><a href="#"><span onclick="canvasMgr.cleaningMgr.getExcelFiles()">Modifica File Excel</span></a></li>
 						</ul>
 					  </div>
 					</li>
@@ -245,6 +258,7 @@ window.onload = function() {
 	</div>
 	<div id="lgndDiag" title="legenda"></div>
 	<div id="cleaningForm" title="Pulizia Stanza"></div>
+	<div id="excelDiag" title="Pulizia Stanza"></div>
 	<a href="http://apycom.com/" style="visibility: hidden">Apycom jQuery Menus</a>
 </body>
 </html>

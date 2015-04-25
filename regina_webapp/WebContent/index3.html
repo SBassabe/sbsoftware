@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Datepicker - Display multiple months</title>
+  <link rel="stylesheet" href="./css/jquery-ui.css">
+  <!--  script src="./jquery-1.7.2.min.js"></script-->
+  <!--  script src="./jquery-ui-1.8.20.custom.min.js"></script-->
+  <script src="./libraries/jquery-1.7.2.min.js"></script>
+  <script src="./libraries/jquery-ui-1.8.20.custom.min.js"></script>
+  <script src="./libraries/datepicker-it.js"></script>
+  <script>
+  $(function() {
+    $( "#datepicker" ).datepicker({
+      numberOfMonths: 3,
+      showButtonPanel: false,
+	  weekHeader: "W",
+	  stepMonths: 0,
+	  onSelect: function(dateText, inst) {
+	    var date = $(this).datepicker('getDate');
+		console.log('date -> ' + date);
+		console.log('date + 1 -> ' + date.setDate(date.getDate  + 1));
+		$( "#datepicker" ).datepicker("option", "maxDate", -1 );
+		$( "#datepicker" ).datepicker("option", "minDate", +1 );
+		$( "#datepicker" ).datepicker("refresh");
+		
+	  }
+    });
+  });
+  </script>
+</head>
+<body>
+ 
+<p display="none"><div id="datepicker"/></p>
+ 
+ 
+</body>
+</html>

@@ -4,6 +4,7 @@ import it.sbsoft.beans.todeprecate.DoctorInfoBean;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Bean2serv {
 
@@ -14,6 +15,8 @@ public class Bean2serv {
     private List<DoctorInfoBean> doctorMap;
     private Map<String, LocObj> locArr;
     private Map<String, CleanByLoc> cleanByLocMap;
+    private Set<String> dtSet;
+    private String excelChosenFile;
     
 	public String getFloor() {
 		return floor;
@@ -57,6 +60,23 @@ public class Bean2serv {
 	public void setCbl(CleanByLoc cbl) {
 		this.cleanByLoc = cbl;
 	}
-	
+	public CleanByLoc getCleanByLoc() {
+		return cleanByLoc;
+	}
+	public void setCleanByLoc(CleanByLoc cleanByLoc) {
+		this.cleanByLoc = cleanByLoc;
+	}
+	public Set<String> getDtSet() {
+		return dtSet;
+	}
+	public void setDtSet(Set<String> dtSet) {
+		this.dtSet = dtSet;
+	}
+	public String getExcelChosenFile() {
+		return excelChosenFile;
+	}
+	public void setExcelChosenFile(String excelChosenFile) {
+		this.excelChosenFile = excelChosenFile;
+	}
 	
 }

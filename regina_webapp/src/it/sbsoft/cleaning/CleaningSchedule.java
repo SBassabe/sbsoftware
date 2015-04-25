@@ -11,8 +11,10 @@ import it.sbsoft.propfiles.PropertiesCommon;
 import it.sbsoft.utility.DateHelper;
 import it.sbsoft.utility.LoggerUtils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -286,32 +288,37 @@ public class CleaningSchedule {
 		return mp;
 	}
 	
-	public String addDay2Excel(String dt) throws Exception {
+	public String addDay2Excel(Set<String> dtSet, String fileUri) throws Exception {
 		
 		log.info("Start method");
+			
 		String ret = "";
 		PropertiesCommon pc = PropertiesCommon.getPropertiesFile();
-		String path = pc.getPropertySB("Excel.path");
+		//String path = pc.getPropertySB("Excel.path");
 		//String path = "C:\\PCMigration_private\\SBSoftware\\sbsoftware\\Archive\\ExcelWorkDir\\";
-		String fileNamePrefix = "prog_pulizie_mese_";
+		//String fileNamePrefix = "prog_pulizie_mese_";
 		int dayOneColumn = 2;
-		int wCol = (new Integer(dt.substring(6, 8)) + dayOneColumn), rowNum=0;
+		int wCol = 0, rowNum=0;
 		double dblValue = 0.00;
 		CleanByLoc cbl;
 		
-		int dtN = new Integer(dt);
-		dtN--;
+		//int dtN = new Integer(dt);
+		//dtN--;
 		/*
 		if (dt.endsWith("01")) {
 			// If 1st of month do not look for previews day
 			// For demo just make sure file exists
 		} else { dtN--; }
 		*/
-		String inFile = path + fileNamePrefix + dtN + ".xls";
-		String outFile = path + fileNamePrefix + dt + ".xls";
+		//String inFile = path + fileNamePrefix + dtN + ".xls";
+		//String outFile = path + fileNamePrefix + dt + ".xls";
 		
-		//log.info("fileName -> " + inFile);
-		//log.info("outFile -> " + outFile);
+		File f = new File(new URI(fileUri));
+		String inFile = f.getAbsolutePath();
+		String outFile = inFile;
+		
+		log.info("fileName -> " + inFile);
+		log.info("outFile -> " + outFile);
 		
 		try {
 			
@@ -323,7 +330,7 @@ public class CleaningSchedule {
 				 
 				 log.info("Into Exception from FileInputStream method: getMessage -> " + e.getMessage());
 				 e.printStackTrace();
-				 throw new SBException("\bFile: '"+ fileNamePrefix + dtN + ".xls'  non trovato ...");
+				 throw new SBException("\bFile: '"+ inFile + "'  non trovato ...");
 			}
 			
 			FileOutputStream stream;
@@ -334,36 +341,46 @@ public class CleaningSchedule {
 				
 				log.info("Into Exception from FileOutputStream method: getMessage -> " + e.getMessage());
 				e.printStackTrace();
-				wb.close(); throw new SBException("\bFile: '"+ fileNamePrefix + dt + ".xls' non gestibile probabilmente aperto.");}
+				wb.close(); throw new SBException("\bFile: '"+ outFile + "' non gestibile probabilmente aperto.");}
 				
 			HSSFSheet sheet = wb.getSheetAt(0);
 			
 			log.info("getting getDays4Excel ...");
-			Map<String, CleanByLoc> mp = getDays4Excel(dt);
-			if (mp != null) {
+			
+			for (String dt : dtSet) {
 				
-				Iterator<String> it = mp.keySet().iterator();
+				wCol = (new Integer(dt.substring(6, 8)) + dayOneColumn);
+				Map<String, CleanByLoc> mp = getDays4Excel(dt);
 				
-				while (it.hasNext()) {
-					cbl = mp.get(it.next());
+				System.out.println("working dt -> " + dt + ", and wCol -> " + wCol);
+				
+				if (mp != null) {
 					
-					System.out.println(cbl.getExcelRow() + " < - cbl.getExcelRow(), cbl.getLoc_id() -> "  + cbl.getLoc_id() + ", cbl.getCvalue() -> " + new Double(cbl.getCvalue()) ); 
+					System.out.println("mp != null & mp.size() -> " + mp.size());
+					Iterator<String> it = mp.keySet().iterator();
 					
-					rowNum = new Integer(cbl.getExcelRow());
-					dblValue =  new Double(cbl.getCvalue());
-					
-					HSSFRow row = sheet.getRow(rowNum - 1);
-					HSSFCell cell = row.getCell(wCol);
-					//cell.setCellValue(new Double(cbl.getCvalue()));
-					cell.setCellValue(dblValue);
+					while (it.hasNext()) {
+						cbl = mp.get(it.next());
+						
+						//System.out.println(cbl.getExcelRow() + " < - cbl.getExcelRow(), cbl.getLoc_id() -> "  + cbl.getLoc_id() + ", cbl.getCvalue() -> " + new Double(cbl.getCvalue()) ); 
+						
+						rowNum = new Integer(cbl.getExcelRow());
+						dblValue =  new Double(cbl.getCvalue());
+						
+						HSSFRow row = sheet.getRow(rowNum - 1);
+						HSSFCell cell = row.getCell(wCol);
+						//cell.setCellValue(new Double(cbl.getCvalue()));
+						cell.setCellValue(dblValue);
+					}
 				}
-				
-				HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
-				wb.write(stream);
-				stream.close();
 			}
+			HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+			wb.write(stream);
+			stream.close();
+			
 			wb.close();
-			ret = "file: '"+ outFile +"' prodotto correttamente.";
+			//ret = "file: '"+ outFile +"' prodotto correttamente.";
+			ret = f.getName() ;
 			log.info("End method success");
 			
 		} catch (Exception e) {

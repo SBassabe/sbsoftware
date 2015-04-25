@@ -12,6 +12,7 @@ public class DateHelper {
 	protected static SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd");
 	protected static SimpleDateFormat sdfY = new SimpleDateFormat("yyyy");
 	protected static SimpleDateFormat sdfWd = new SimpleDateFormat("u");
+	protected static SimpleDateFormat sdf2M = new SimpleDateFormat("MM");
 	
 	public static String getDtAsStr(Date dt) {
 		
@@ -48,6 +49,46 @@ public class DateHelper {
 				default: ret= "---"; break;
 			}
 			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public static String get2DigitMonth(String dt) {
+		
+		String ret="";
+		try {
+							
+			switch (dt) {
+				case "gennaio": ret = "01"; break;
+				case "febbraio": ret = "02"; break;
+				case "marzo": ret = "03"; break;
+				case "aprile": ret = "04"; break;
+				case "maggio": ret = "05"; break;
+				case "giugnio": ret = "06"; break;
+				case "luglio": ret = "07"; break;
+				case "agosto": ret = "08"; break;
+				case "settembre": ret = "09"; break;
+				case "ottobre": ret = "10"; break;
+				case "novembre": ret = "11"; break;
+				case "dicembre": ret = "12"; break;
+				default: ret= "--"; break;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public static String get2DigitMonth(Date dt) {
+
+		String ret="";
+		try {
+				
+			ret = sdf2M.format(dt);
 
 		} catch (Exception e) {
 			e.printStackTrace();

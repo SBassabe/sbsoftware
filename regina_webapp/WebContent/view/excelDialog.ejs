@@ -1,0 +1,23 @@
+	<table>
+		<tr>
+			<td><img src="./css/images/070174-blue-white-pearl-icon-alphanumeric-number-1.png" height="75"></img></td>
+			<td><div>Scegli il foglio Excel esistente da modificare.</div></td>
+		</tr><tr>
+		    <td><img src="./css/images/blank.png" height="75"></img></td>
+			<td>
+				<select name="files" size="5" style="width: 90%;">
+				  <% for(var i=1; i <= files.length; i++) {%>
+				  	<option value="<%=files[i] %>" onClick="canvasMgr.cleaningMgr.changeFileName(this)"><%=files[i] %></option>
+				  <% } %>
+				</select>
+			</td>	
+		</tr><tr>
+		    <td><img src="./css/images/070175-blue-white-pearl-icon-alphanumeric-number-2.png" height="75"></img>
+			<td><div>Scegli le date che vorresti aggiornare nel foglio scelto prima. Soltanto le date nel arco di giorni gestiti dal file verrano proposte.</div></td>
+		</tr><tr>
+		    <td><img src="./css/images/blank.png" height="75"></img></td>
+			<td style="height: 240px; vertical-align: top;"><p display="none"><div id="datepicker" style="padding-left: 70px;"/></p></td>	
+		</tr><tr>
+		    <td style="text-align: center; padding: 20px;" colspan=2><button type="button" id="modExcel" disabled=true onClick="canvasMgr.cleaningMgr.generateExcel()">Modifica Excel</button></td>
+		</tr>
+	</table>
