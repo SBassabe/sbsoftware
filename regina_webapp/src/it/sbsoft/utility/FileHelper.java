@@ -82,7 +82,7 @@ public class FileHelper {
 			// Populate object SetCollection inside FVO object
 			//for (String d : month_year.keySet()) {
 			for (DtObj d : dtObjSet) {
-				p = Paths.get(rootPath+FileSystems.getDefault().getSeparator()+d.monthUpper);
+				p = Paths.get(rootPath+FileSystems.getDefault().getSeparator()+d.monthUpper+" "+d.year);
 				fvo.setMatcher(pattern.replace("@month_year@", d.mm_year));
 				System.out.println("walking tree using path -> " + p.getFileName());
 				Files.walkFileTree(p, fvo);

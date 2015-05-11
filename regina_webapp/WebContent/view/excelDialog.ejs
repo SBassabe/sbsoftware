@@ -6,7 +6,7 @@
 		    <td><img src="./css/images/blank.png" height="75"></img></td>
 			<td>
 				<select name="files" size="5" style="width: 90%;">
-				  <% for(var i=1; i <= files.length; i++) {%>
+				  <% for(var i=0; i <= files.length; i++) {%>
 				  	<option value="<%=files[i] %>" onClick="canvasMgr.cleaningMgr.changeFileName(this)"><%=files[i] %></option>
 				  <% } %>
 				</select>

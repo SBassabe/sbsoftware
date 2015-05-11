@@ -316,6 +316,13 @@ canvasMgr = function(){
 	    canvasMgr.stage.batchDraw();
 	};
 	
+	this.changeSliderDay = function(obj) {
+		
+		console.log('obj -> ' + obj );
+		$('#day').slider( "option", "value", obj.innerHTML);
+		currObj.selectorsChanged();
+	};
+	
 	this.decodeDay = function(dayNum) {
 		
 		switch(dayNum) {

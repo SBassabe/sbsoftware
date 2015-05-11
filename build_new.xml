@@ -4,7 +4,7 @@
 
   <!-- set global properties for this build -->
   <tstamp><format property="TODAY2" pattern="yyyyMMdd_kkmm"/></tstamp>
-  <property name="b_ver" value="2.0.1"/>
+  <property name="b_ver" value="2.0.2"/>
   <property name="build_ver" value="${b_ver} GA ${TODAY2}"/>
   <property name="src_dir" location=".\regina_webapp\src"/>
   <property name="webapp_dir"  location=".\regina_webapp\WebContent"/>
@@ -82,8 +82,8 @@
            classpathref="compile_classpath"
 	       debug="on"
 	       encoding="ISO-8859-1"
-		   source="1.6"
-		   target="1.6">
+		   source="1.7"
+		   target="1.7">
 	  <src path="${src_dir}"/>
     </javac>
   </target>

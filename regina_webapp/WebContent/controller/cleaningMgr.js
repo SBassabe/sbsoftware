@@ -216,7 +216,7 @@ cleaningMgr = function(){
 	 			var poly2 = new Kinetic.Line({
 			        points: polyPnts.split(","),
 			        fill: canvasMgr.legendObj.cleanColor[cvalue].rgba,
-			        opacity: 0.6,
+			        opacity: canvasMgr.legendObj.cleanColor[cvalue].opacity,
 			        strokeWidth: 0,
 			        id: "loc_"+f,
 			        rooms: locObj.room_num,
@@ -229,9 +229,12 @@ cleaningMgr = function(){
 	                $( "#diagRoom" ).html('---');
 	            });
 				poly2.on("mousemove", function(){
-	                $( "#diagRoom" ).html(locObj.room_num + " (CValue: " + cvalue +")");
+	                $( "#diagRoom" ).html(locObj.loc_desc + " (CValue: " + cvalue +")");
 	            });
-	            poly2.on("mouseover", function(){
+	            poly2.on("mouseover", function(evt){
+	            	console.log(evt.target);
+	            	console.log(evt.target.getAttr('opacity'));
+	            	evt.target.setAttr('opacity',1);
 	            	document.body.style.cursor = "pointer";
 	            });
 				poly2.on("dblclick", function(){
@@ -254,7 +257,7 @@ cleaningMgr = function(){
 	
 		var desc = canvasMgr.floorArr[canvasMgr.currFloor].locArr[loc_id].room_num;
 		var defVal = canvasMgr.floorArr[canvasMgr.currFloor].locArr[loc_id].cvalue;
-		var vals = [0, 0.25, 0.5, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00];
+		var vals = [0, 0.5, 1.00, 2.00, 3.00];
 		var autMan = 'Automatica';
 		
 		if (cval != defVal) { 

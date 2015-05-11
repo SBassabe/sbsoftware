@@ -57,7 +57,8 @@ maintMgrRooms = function() {
         });
 		
 		poly.on("mousemove", function(){
-			$( "#diagRoom" ).html(roomId);
+			//$( "#diagRoom" ).html(roomId);
+			$( "#diagRoom" ).html(obj.loc_desc);
         });
 		
 		poly.on("dragstart", function(pl) {

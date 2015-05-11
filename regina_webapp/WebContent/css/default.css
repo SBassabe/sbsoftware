@@ -134,6 +134,12 @@ div.right {
 	/*width: 2.8%;*/
 	border-radius: 26px;
 }
+
+.ou:hoover {  
+	border-color: white;
+	background-color: white;
+}
+
 .in {
 	/*width: 50%;*/
 	display: block;
@@ -145,8 +151,10 @@ div.right {
 	height: 12px;
 }
 .in:hover {
-	color: white;
-	background-color: black;
+	/*color: white;
+	background-color: black;*/
+	transform: scale(2.5);
+	cursor:pointer;
 }
 
 /* Cleaning form */

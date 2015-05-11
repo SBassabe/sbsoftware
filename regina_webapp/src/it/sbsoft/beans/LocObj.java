@@ -7,6 +7,7 @@ public class LocObj {
 	
 	private String loc_id;
     private String room_num;
+    private String loc_desc;
     private String poly_points;
     private double cvalue; // range from 0 to 2 
     //private Map<String, BedObj> bedArr = new HashMap<String, BedObj>();
@@ -22,6 +23,12 @@ public class LocObj {
 	}
 	public void setRoom_num(String room_num) {
 		this.room_num = room_num;
+	}
+	public String getLoc_desc() {
+		return loc_desc;
+	}
+	public void setLoc_desc(String loc_desc) {
+		this.loc_desc = loc_desc;
 	}
 	public String getPoly_points() {
 		return poly_points;

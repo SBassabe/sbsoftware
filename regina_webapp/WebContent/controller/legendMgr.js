@@ -11,6 +11,21 @@ legendMgr = function(){
 	this.docColors[16172]={color:"red",name:"DR.SSA Tonet Silvana"};
 	this.docColors[16174]={color:"blue",name:"DR.SSA Guella Veronica"};
 	this.docColors[17243]={color:"firebrick",name:"DR.Perazzolli Gabriele"};
+	this.docColors[17542]={color:"aqua",name:"DR. Cucino Alberto"};	
+	this.docColors[16867]={color:"crimson",name:"DR.SSA Galletti Annacristina"};
+	this.docColors[16205]={color:"deeppink",name:"Stanze Stand-By"};
+
+	/*  16168	 DR.SSA PATTON LAURA 
+		16169	 DR. MININNO RAFFAELE
+		16170	 DR.SSA DALBOSCO BARBARA 
+		16172	 DR.SSA TONET SILVANA
+		16173	 DR.SSA DORIGONI SABINA 
+		16174	 DR.SSA GUELLA VERONICA
+		16205	 STANZE STAND BY
+		16867	GALLETTI ANNACRISTINA
+		17243	 DR. PERAZZOLLI GABRIELE
+		17542	 DR. CUCINO ALBERTO
+     */
 	
 	//support functions
 	this.populateStage = function() {
@@ -87,20 +102,18 @@ legendMgr = function(){
 	//Cleaning Ovrlays
 	// http://www.rapidtables.com/web/color/RGB_Color.htm
 	this.cleanColor = new Array();
-	this.cleanColor[0]={color:"red", rgba:'rgba(255,0,0,0.5)', desc: "Pulizia non richiesta"};
-	this.cleanColor[0.25]={color:"yellow", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia parziale"};
-	this.cleanColor[0.50]={color:"yellow", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia parziale"};
-	this.cleanColor[0.75]={color:"yellow", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia parziale"};
-	this.cleanColor[1]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da pulire"};
-	this.cleanColor[1.25]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da pulire"};
-	this.cleanColor[1.50]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da pulire"};
-	this.cleanColor[1.75]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da pulire"};
-	this.cleanColor[2]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da pulire"};
+	this.cleanColor[0]={opacity:0.4, color:"red", rgba:'rgba(255,0,0,0.5)', desc: "Pulizia non richiesta"};
+	this.cleanColor[0.50]={opacity:0.4, color:"yellow", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia parziale"};
+	this.cleanColor[1]={opacity:0.5, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia completa"};
+	this.cleanColor[2]={opacity:0.6, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia 2 volte al di"};
+	this.cleanColor[3]={opacity:0.8, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia 3 volte al di"};
 	
 	this.cleanColorLegend = new Array();
-	this.cleanColorLegend[0]={color:"red", rgba:'rgba(255,0,0,0.5)', desc: "Pulizia Non Richiesta"};
-	this.cleanColorLegend[1]={color:"yellow", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia Parziale"};
-	this.cleanColorLegend[2]={color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Da Pulire"};
+	this.cleanColorLegend[0]={num:0, opacity:0.4, color:"red", rgba:'rgba(255,0,0,0.5)', desc: "Pulizia non richiesta"};
+	this.cleanColorLegend[1]={num:0.5, opacity:0.4, color:"red", rgba:'rgba(255,255,0,0.5)', desc: "Pulizia parziale"};
+	this.cleanColorLegend[2]={num:1, opacity:0.5, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia completa"};
+	this.cleanColorLegend[3]={num:2, opacity:0.6, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia 2 volte al di"};
+	this.cleanColorLegend[4]={num:3, opacity:0.8, color:"green", rgba:'rgba(0,255,0,0.5)', desc: "Pulizia 3 volte al di"};
 	
 	this.populateToolTipWithCleaningLegend = function() {
 		
@@ -110,13 +123,14 @@ legendMgr = function(){
 		 
 		 for (var o in this.cleanColorLegend) {
 			 
+			 console.log('o' + o);
 			 var cColor=this.cleanColorLegend[o];
 			 if (cColor != undefined) {
 			 
 				 var simpleText = new Kinetic.Text({
 				        x: 940+22,
 				        y: (i*14)+3,
-				        text: o + ' - ' + cColor.desc,
+				        text: cColor.num + ' - ' + cColor.desc,
 				        fontSize: 18,
 				        fontFamily: 'Calibri',
 				        fill: 'black'
@@ -125,12 +139,12 @@ legendMgr = function(){
 				 var rect = new Kinetic.Rect({
 				        x: 940+0,
 				        y: (i*14)+7,
-				        width: 20,
+				        width: 20,	
 				        height: 12,
 				        fill: cColor.rgba,
 				        stroke: 'black',
 				        strokeWidth: 0.1,
-				        opacity: 0.6
+				        opacity: cColor.opacity
 				 });
 			 
 				 canvasMgr.toolTipLyr.add(rect);

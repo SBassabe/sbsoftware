@@ -223,7 +223,7 @@ public class StaticInfoSrvlt extends HttpServlet {
 			
 			h2Stmt = dOcc.h2Help.getConn().createStatement();
 			sql = new StringBuffer();
-			sql.append("SELECT A.FLOOR_ID, A.NUM_STAN, B.LOC_ID, B.POLY_PTNS FROM LOCATION A JOIN LOCATION_POLY B ON A.LOC_ID = B.LOC_ID AND FLOOR_ID = '" + floorObj.getFloor_id() + "'");
+			sql.append("SELECT A.FLOOR_ID, A.NUM_STAN, A.LOC_DESC, B.LOC_ID, B.POLY_PTNS FROM LOCATION A JOIN LOCATION_POLY B ON A.LOC_ID = B.LOC_ID AND FLOOR_ID = '" + floorObj.getFloor_id() + "'");
 			sql.append(" WHERE B.POLY_PTNS IS NOT NULL ");
 			log.debug("sql.toString -> " + sql.toString());
 			rs = h2Stmt.executeQuery(sql.toString());
@@ -232,6 +232,7 @@ public class StaticInfoSrvlt extends HttpServlet {
 				
 				locObj = new LocObj();
 				locObj.setRoom_num(rs.getString("NUM_STAN"));
+				locObj.setLoc_desc(rs.getString("LOC_DESC"));
 				locObj.setPoly_points(rs.getString("POLY_PTNS"));
 				locObj.setLoc_id(rs.getString("LOC_ID"));
 				locArr.put(locObj.getLoc_id(), locObj);
