@@ -125,3 +125,16 @@ Excel file creation mod.
 - Modification of Excel file for many dates not only one.
 Introduction of Connection Pool
 - CP usage for FireBird connection.
+
+------------------------------------------------------------------------
+Ver 2.0.2_GA - 05/05/2015 [Final GA]
+------------------------------------------------------------------------
+Production install
+
+------------------------------------------------------------------------
+Ver 2.0.3_GA - 11/05/2015 [Final GA]
+------------------------------------------------------------------------
+Minor changes:
+- Fixed legend for cleaning
+- Highlight of numbers on hover
+- Shortend list of choices for cleaning numbers.
